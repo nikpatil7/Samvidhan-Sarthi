@@ -14,6 +14,8 @@ import NotFound from './pages/NotFound';
 import ConstitutionalTopics from './pages/ConstitutionalTopics';
 import ConstitutionalGamePage from './pages/ConstitutionalGamePage';
 import ConstitutionMapPage from './pages/ConstitutionMapPage';
+import UserStories from './pages/UserStories';
+import UserStoryDetail from './pages/UserStoryDetail';
 
 // Layout
 import Layout from './components/Layout';
@@ -57,7 +59,9 @@ function App() {
         <Route path="profile" element={<Profile />} />
         <Route path="constitution" element={<ConstitutionalTopics />} />
         <Route path="constitution/games" element={<ConstitutionalGamePage />} />
+        <Route path="user-stories" element={<UserStories />} />
         <Route path="constitution/map" element={<ConstitutionMapPage />} />
+        <Route path="user-stories/:id" element={<UserStoryDetail />} />
       </Route>
       
       {/* 404 route */}

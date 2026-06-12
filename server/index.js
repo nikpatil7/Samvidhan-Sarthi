@@ -9,7 +9,7 @@ const contentRoutes = require('./routes/content');
 const progressRoutes = require('./routes/progress');
 const topicDetailsRoutes = require('./routes/topics');
 const userStoriesRoutes = require('./routes/userStories');
-
+const constitutionalAssistantRoutes =require('./routes/constitutionalAssistant');
 
 
 const path = require('path');
@@ -44,6 +44,8 @@ app.use('/api/content', contentRoutes);
 app.use('/api/progress', progressRoutes);
 app.use('/api/topics', topicDetailsRoutes);
 app.use('/api/user-stories', userStoriesRoutes);
+app.use('/api/constitutional-assistant',constitutionalAssistantRoutes);
+ 
 
 // Health check route
 app.get('/health', (req, res) => {
