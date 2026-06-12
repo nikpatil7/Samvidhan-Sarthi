@@ -152,7 +152,7 @@ const TopicDetail = () => {
         
         <div className="relative z-10">
           <motion.h1 
-            className="text-3xl font-bold text-white mb-2"
+            className="text-3xl font-bold text-gray-900 mb-2"
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
@@ -161,7 +161,7 @@ const TopicDetail = () => {
           </motion.h1>
           
           <motion.p 
-            className="text-white/90 text-lg max-w-3xl"
+            className="text-gray-700 text-lg max-w-3xl"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.2 }}
@@ -170,7 +170,7 @@ const TopicDetail = () => {
           </motion.p>
           
           <div className="flex flex-wrap gap-3 mt-4">
-            <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-black/20 text-white">
+            <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-white/70 text-gray-700 border border-gray-200">
               {topic.category}
             </span>
             <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-black/20 text-white">
@@ -187,10 +187,10 @@ const TopicDetail = () => {
       {progress && (
         <div className="card">
           <div className="flex items-center justify-between mb-2">
-            <h3 className="text-lg font-medium text-white">Your Progress</h3>
+            <h3 className="text-lg font-medium text-gray-900">Your Progress</h3>
             <span className="text-lg font-semibold text-primary-500">{progress.completionPercentage}%</span>
           </div>
-          <div className="w-full bg-dark-200 rounded-full h-4">
+          <div className="w-full bg-surface-200 rounded-full h-4 border border-gray-200">
             <motion.div 
               className="h-4 rounded-full bg-primary-600"
               initial={{ width: 0 }}
@@ -203,10 +203,10 @@ const TopicDetail = () => {
       
       {/* Content list */}
       <div className="card">
-        <h2 className="text-xl font-bold text-white mb-4">Learning Content</h2>
+        <h2 className="text-xl font-bold text-gray-900 mb-4">Learning Content</h2>
         
         {content.length === 0 ? (
-          <div className="text-center py-6 text-gray-400">
+          <div className="text-center py-6 text-gray-600">
             <p>No content available for this topic yet.</p>
           </div>
         ) : (
@@ -234,7 +234,7 @@ const TopicDetail = () => {
               >
                 <Link 
                   to={`/content/${item._id}`}
-                  className="flex items-center p-4 rounded-lg bg-dark-200 hover:bg-dark-100 transition-colors"
+                  className="flex items-center p-4 rounded-lg bg-white hover:bg-gray-50 transition-colors border border-gray-200 shadow-sm"
                 >
                   <div className="flex-shrink-0 h-10 w-10 rounded-lg bg-primary-600/20 flex items-center justify-center mr-4">
                     <span className="text-primary-500">
@@ -243,8 +243,8 @@ const TopicDetail = () => {
                   </div>
                   
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-lg font-medium text-white truncate">{item.title}</h3>
-                    <p className="text-sm text-gray-400">
+                    <h3 className="text-lg font-medium text-gray-900 truncate">{item.title}</h3>
+                    <p className="text-sm text-gray-600">
                       {getContentTypeLabel(item.type)} • {item.estimatedTime} min
                     </p>
                   </div>
@@ -258,7 +258,7 @@ const TopicDetail = () => {
                         Completed
                       </span>
                     ) : (
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                       </svg>
                     )}

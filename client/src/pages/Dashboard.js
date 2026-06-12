@@ -36,7 +36,7 @@ const ProgressCard = ({ title, value, maxValue, color = 'primary' }) => {
   return (
     <div className="card">
       <h3 className="text-lg font-medium text-gray-200 mb-2">{title}</h3>
-      <div className="w-full bg-dark-200 rounded-full h-4 mb-2">
+      <div className="w-full bg-surface-200 rounded-full h-4 mb-2">
         <motion.div 
           className={`h-4 rounded-full ${classes.bar}`}
           initial={{ width: 0 }}
@@ -44,7 +44,7 @@ const ProgressCard = ({ title, value, maxValue, color = 'primary' }) => {
           transition={{ duration: 1, ease: "easeOut" }}
         />
       </div>
-      <div className="text-sm text-gray-400">
+      <div className="text-sm text-gray-600">
         {value} of {maxValue} ({percentage}%)
       </div>
     </div>
@@ -64,8 +64,8 @@ const StatCard = ({ title, value, icon, color = 'primary' }) => {
         <span className={classes.iconText}>{icon}</span>
       </div>
       <div>
-        <p className="text-sm font-medium text-gray-400">{title}</p>
-        <h3 className="text-xl font-semibold text-white">{value}</h3>
+        <p className="text-sm font-medium text-gray-600">{title}</p>
+        <h3 className="text-xl font-semibold text-gray-900">{value}</h3>
       </div>
     </motion.div>
   );
@@ -110,7 +110,7 @@ const Dashboard = () => {
   
   if (error) {
     return (
-      <div className="bg-red-900/30 border border-red-800 text-red-300 px-4 py-3 rounded relative" role="alert">
+      <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded relative" role="alert">
         <span className="block sm:inline">{error}</span>
       </div>
     );
@@ -140,13 +140,13 @@ const Dashboard = () => {
     <div className="space-y-8">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-white">Dashboard</h1>
-          <p className="text-sm text-gray-400 mt-1">Track your learning progress and recent activity.</p>
+          <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+          <p className="text-sm text-gray-600 mt-1">Track your learning progress and recent activity.</p>
         </div>
         <div className="flex items-center space-x-2">
           <button
             onClick={handleRefresh}
-            className="p-2 rounded-lg bg-dark-200 hover:bg-dark-100 text-gray-400 hover:text-white transition-colors"
+            className="p-2 rounded-lg bg-white border border-gray-200 hover:bg-gray-50 text-gray-600 hover:text-primary-600 transition-colors shadow-sm"
             title="Refresh dashboard"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -154,7 +154,7 @@ const Dashboard = () => {
             </svg>
           </button>
           <select 
-            className="input bg-dark-200 text-sm"
+            className="input text-sm"
             value={selectedCountry}
             onChange={handleCountryChange}
             disabled={isUpdatingCountry}
@@ -219,8 +219,8 @@ const Dashboard = () => {
             {/* Topic progress */}
             <div className="lg:col-span-2 card space-y-4">
               <div className="flex items-center justify-between mb-2">
-                <h2 className="text-xl font-bold text-white">Topic Progress</h2>
-                <Link to="/topics" className="text-sm text-primary-500 hover:text-primary-400">
+                <h2 className="text-xl font-bold text-gray-900">Topic Progress</h2>
+                <Link to="/topics" className="text-sm text-primary-600 hover:text-primary-700">
                   View all topics
                 </Link>
               </div>
@@ -243,7 +243,7 @@ const Dashboard = () => {
                 ))}
                 
                 {dashboardData.progress.length === 0 && (
-                  <div className="text-center py-8 text-gray-400">
+                  <div className="text-center py-8 text-gray-600">
                     <p>No topics started yet. Explore topics to begin learning!</p>
                     <div className="mt-4">
                       <Link to="/topics" className="btn btn-primary">
@@ -257,23 +257,23 @@ const Dashboard = () => {
             
             {/* Recent activities */}
             <div className="card">
-              <h2 className="text-xl font-bold text-white mb-4">Recent Activity</h2>
+              <h2 className="text-xl font-bold text-gray-900 mb-4">Recent Activity</h2>
               
               <div className="space-y-4">
                 {dashboardData.recentActivities.map((activity, index) => (
-                  <div key={index} className="flex items-start space-x-3 pb-3 border-b border-dark-200">
-                    <div className="flex-shrink-0 h-8 w-8 rounded-full bg-primary-600/20 flex items-center justify-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <div key={index} className="flex items-start space-x-3 pb-3 border-b border-gray-200">
+                    <div className="flex-shrink-0 h-8 w-8 rounded-full bg-primary-50 border border-primary-100 flex items-center justify-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
                       </svg>
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-white">
+                      <p className="text-sm font-medium text-gray-900">
                         {activity.completed 
                           ? `Completed an activity in ${activity.topicTitle}` 
                           : `Started an activity in ${activity.topicTitle}`}
                       </p>
-                      <p className="text-xs text-gray-400">
+                      <p className="text-xs text-gray-600">
                         {new Date(activity.date).toLocaleDateString()}
                         {activity.score > 0 && ` • Score: ${activity.score}%`}
                       </p>
@@ -282,7 +282,7 @@ const Dashboard = () => {
                 ))}
                 
                 {dashboardData.recentActivities.length === 0 && (
-                  <div className="text-center py-4 text-gray-400">
+                  <div className="text-center py-4 text-gray-600">
                     <p>No recent activities</p>
                   </div>
                 )}
@@ -293,8 +293,8 @@ const Dashboard = () => {
           {/* Continue learning section */}
           <div className="card">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold text-white">Continue Learning</h2>
-              <Link to="/topics" className="text-sm text-primary-500 hover:text-primary-400">
+              <h2 className="text-xl font-bold text-gray-900">Continue Learning</h2>
+              <Link to="/topics" className="text-sm text-primary-600 hover:text-primary-700">
                 View all topics
               </Link>
             </div>
@@ -309,17 +309,17 @@ const Dashboard = () => {
                       key={item.topicId}
                       whileHover={{ y: -5 }}
                       transition={{ duration: 0.2 }}
-                      className="bg-dark-200 p-4 rounded-lg"
+                      className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm"
                     >
                       <Link to={`/topics/${item.topicId}`}>
-                        <h3 className="font-medium text-gray-100 mb-2">{item.topicTitle}</h3>
-                        <div className="w-full bg-dark-300 rounded-full h-2 mb-2">
+                        <h3 className="font-medium text-gray-900 mb-2">{item.topicTitle}</h3>
+                        <div className="w-full bg-surface-200 rounded-full h-2 mb-2">
                           <div 
-                            className="h-2 rounded-full bg-primary-600"
+                            className="h-2 rounded-full bg-primary-500"
                             style={{ width: `${item.completionPercentage}%` }}
                           />
                         </div>
-                        <div className="flex justify-between text-xs text-gray-400">
+                        <div className="flex justify-between text-xs text-gray-600">
                           <span>{item.completionPercentage}% complete</span>
                           <span>Continue</span>
                         </div>
@@ -328,7 +328,7 @@ const Dashboard = () => {
                   ))}
               </div>
             ) : (
-              <div className="text-center py-8 text-gray-400">
+              <div className="text-center py-8 text-gray-600">
                 <p>Start exploring topics to begin your learning journey!</p>
                 <div className="mt-4">
                   <Link to="/topics" className="btn btn-primary">

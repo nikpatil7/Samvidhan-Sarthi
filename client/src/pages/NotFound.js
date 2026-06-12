@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 
 const NotFound = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-dark-400 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-surface-300 px-4 sm:px-6 lg:px-8">
       <motion.div 
         className="max-w-md w-full text-center"
         initial={{ opacity: 0, y: 20 }}
@@ -12,8 +12,8 @@ const NotFound = () => {
         transition={{ duration: 0.5 }}
       >
         <h1 className="text-9xl font-extrabold text-primary-500">404</h1>
-        <h2 className="text-3xl font-bold text-white mt-4">Page Not Found</h2>
-        <p className="mt-4 text-gray-400">
+        <h2 className="text-3xl font-bold text-gray-900 mt-4">Page Not Found</h2>
+        <p className="mt-4 text-gray-600">
           The page you're looking for doesn't exist or has been moved.
         </p>
         <div className="mt-8">

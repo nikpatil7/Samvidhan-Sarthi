@@ -208,7 +208,7 @@ const Profile = () => {
 
   return (
     <div className="space-y-8">
-      <h1 className="text-2xl font-bold text-white">Profile Settings</h1>
+      <h1 className="text-2xl font-bold text-gray-900">Profile Settings</h1>
       
       {error && (
         <motion.div 
@@ -259,7 +259,7 @@ const Profile = () => {
                   className="h-24 w-24 rounded-full object-cover border-2 border-primary-600"
                 />
               ) : (
-                <div className="h-24 w-24 rounded-full bg-primary-600 flex items-center justify-center text-white text-4xl font-medium">
+                <div className="h-24 w-24 rounded-full bg-primary-500 flex items-center justify-center text-white text-4xl font-medium shadow-sm">
                   {getUserInitials()}
                 </div>
               )}
@@ -270,12 +270,12 @@ const Profile = () => {
                 title="Change profile picture"
               >
                 {uploadingAvatar ? (
-                  <svg className="animate-spin h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <svg className="animate-spin h-6 w-6 text-primary-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
                   </svg>
                 ) : (
-                  <svg className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="h-6 w-6 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
@@ -313,7 +313,7 @@ const Profile = () => {
           {/* Profile form */}
           <div className="card">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-bold text-white">Account Information</h2>
+              <h2 className="text-xl font-bold text-gray-900">Account Information</h2>
               
               {!isEditing && (
                 <button
@@ -328,7 +328,7 @@ const Profile = () => {
             <form onSubmit={handleProfileSubmit}>
               <div className="space-y-4">
                 <div>
-                  <label htmlFor="username" className="block text-sm font-medium text-gray-300 mb-1">
+                  <label htmlFor="username" className="block text-sm font-medium text-gray-600 mb-1">
                     Username
                   </label>
                   <input
@@ -347,7 +347,7 @@ const Profile = () => {
                 </div>
                 
                 <div>
-                  <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-1">
+                  <label htmlFor="name" className="block text-sm font-medium text-gray-600 mb-1">
                     Name
                   </label>
                   <input
@@ -363,7 +363,7 @@ const Profile = () => {
                 </div>
                 
                 <div>
-                  <label htmlFor="preferredCountry" className="block text-sm font-medium text-gray-300 mb-1">
+                  <label htmlFor="preferredCountry" className="block text-sm font-medium text-gray-600 mb-1">
                     Preferred Country
                   </label>
                   <select
@@ -395,7 +395,7 @@ const Profile = () => {
                       });
                       setFormErrors({});
                     }}
-                    className="btn border border-gray-600 text-gray-300 hover:bg-gray-700"
+                    className="btn border border-gray-300 text-gray-700 hover:bg-gray-50"
                   >
                     Cancel
                   </button>
@@ -413,7 +413,7 @@ const Profile = () => {
           {/* Password form */}
           <div className="card">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-bold text-white">Change Password</h2>
+              <h2 className="text-xl font-bold text-gray-900">Change Password</h2>
               
               {!isChangingPassword && (
                 <button
@@ -429,7 +429,7 @@ const Profile = () => {
               <form onSubmit={handlePasswordSubmit}>
                 <div className="space-y-4">
                   <div>
-                    <label htmlFor="currentPassword" className="block text-sm font-medium text-gray-300 mb-1">
+                    <label htmlFor="currentPassword" className="block text-sm font-medium text-gray-600 mb-1">
                       Current Password
                     </label>
                     <input
@@ -447,7 +447,7 @@ const Profile = () => {
                   </div>
                   
                   <div>
-                    <label htmlFor="newPassword" className="block text-sm font-medium text-gray-300 mb-1">
+                    <label htmlFor="newPassword" className="block text-sm font-medium text-gray-600 mb-1">
                       New Password
                     </label>
                     <input
@@ -465,7 +465,7 @@ const Profile = () => {
                   </div>
                   
                   <div>
-                    <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-300 mb-1">
+                    <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-600 mb-1">
                       Confirm New Password
                     </label>
                     <input
@@ -495,7 +495,7 @@ const Profile = () => {
                       });
                       setPasswordErrors({});
                     }}
-                    className="btn border border-gray-600 text-gray-300 hover:bg-gray-700"
+                    className="btn border border-gray-300 text-gray-700 hover:bg-gray-50"
                   >
                     Cancel
                   </button>
@@ -508,7 +508,7 @@ const Profile = () => {
                 </div>
               </form>
             ) : (
-              <p className="text-gray-400">
+              <p className="text-gray-600">
                 We recommend using a strong password that you don't use elsewhere.
               </p>
             )}

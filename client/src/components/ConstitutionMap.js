@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../contexts/AuthContext';
 
-const defaultColors = ['#3498db', '#2ecc71', '#9b59b6', '#e74c3c', '#f39c12', '#1abc9c', '#e67e22'];
+const defaultColors = ['#054187', '#FF9933', '#138808', '#04356F', '#E67F00', '#0F6D06', '#7DAEFF'];
 
 const ConstitutionMap = ({ country = 'India' }) => {
   const [hoveredSection, setHoveredSection] = useState(null);
@@ -94,7 +94,7 @@ const ConstitutionMap = ({ country = 'India' }) => {
     },
     hover: { 
       scale: 1.05,
-      boxShadow: "0px 10px 30px rgba(0, 0, 0, 0.2)",
+      boxShadow: "0px 10px 24px rgba(5, 65, 135, 0.10)",
       transition: { type: "spring", stiffness: 400, damping: 10 }
     }
   };
@@ -128,7 +128,7 @@ const ConstitutionMap = ({ country = 'India' }) => {
       <div className="absolute top-0 right-0 m-4">
         <button 
           onClick={toggleExpandedView}
-          className="px-4 py-2 bg-primary-600 text-white rounded-lg flex items-center gap-2 hover:bg-primary-700 transition-colors"
+          className="px-4 py-2 bg-primary-500 text-white rounded-lg flex items-center gap-2 hover:bg-primary-600 transition-colors shadow-sm"
         >
           {expandedView ? (
             <>
@@ -150,7 +150,7 @@ const ConstitutionMap = ({ country = 'India' }) => {
       </div>
 
       <div className="container mx-auto px-4">
-        <h1 className="text-3xl font-bold text-white mb-6 text-center">
+        <h1 className="text-3xl font-bold text-gray-900 mb-6 text-center">
           {country} Constitution Map
         </h1>
         
@@ -168,8 +168,8 @@ const ConstitutionMap = ({ country = 'India' }) => {
               onClick={() => setSelectedLevel(level.id)}
               className={`px-4 py-3 rounded-lg transition-all duration-300 flex items-center gap-2 ${
                 selectedLevel === level.id
-                  ? 'bg-primary-600 text-white shadow-lg' 
-                  : 'bg-dark-200 text-gray-300 hover:bg-dark-100'
+                  ? 'bg-primary-50 text-primary-700 shadow-sm border border-primary-200' 
+                  : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
               }`}
             >
               <span className="text-xl">{level.icon}</span>
@@ -180,7 +180,7 @@ const ConstitutionMap = ({ country = 'India' }) => {
 
         {loadingTopics && (
           <div className="flex justify-center py-10">
-            <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-primary-500"></div>
+              <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-primary-500"></div>
           </div>
         )}
 
@@ -190,7 +190,7 @@ const ConstitutionMap = ({ country = 'India' }) => {
           <div className="relative flex justify-center items-center" style={{ height: '600px' }}>
             {/* Center Element */}
             <motion.div 
-              className="absolute z-10 bg-primary-600 rounded-full w-24 h-24 flex items-center justify-center text-white font-bold text-lg shadow-2xl"
+              className="absolute z-10 bg-primary-500 rounded-full w-24 h-24 flex items-center justify-center text-white font-bold text-lg shadow-md"
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ type: "spring", stiffness: 260, damping: 20, delay: 0.2 }}
@@ -238,7 +238,7 @@ const ConstitutionMap = ({ country = 'India' }) => {
                       className={`w-20 h-20 md:w-24 md:h-24 rounded-full flex items-center justify-center shadow-lg cursor-pointer`}
                       style={{ backgroundColor: section.color }}
                     >
-                      <div className="absolute whitespace-nowrap px-3 py-1 bg-dark-100 text-white rounded-lg text-sm font-medium pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="absolute whitespace-nowrap px-3 py-1 bg-white text-gray-700 rounded-lg text-sm font-medium pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity border border-gray-200 shadow-sm">
                         {section.title}
                       </div>
                       <span className="text-white font-medium text-center text-xs md:text-sm">
@@ -268,12 +268,12 @@ const ConstitutionMap = ({ country = 'India' }) => {
                 }}
               >
                 <Link to={`/topics/${section.linkId}`} className="block h-full">
-                  <div className="bg-dark-200 rounded-lg overflow-hidden h-full group hover:bg-dark-100 transition-colors">
+                  <div className="bg-white rounded-lg overflow-hidden h-full group hover:bg-gray-50 transition-colors border border-gray-200 shadow-sm">
                     <div className="h-2" style={{ backgroundColor: section.color }}></div>
                     <div className="p-6">
-                      <h3 className="text-white text-lg font-medium mb-2">{section.title}</h3>
+                      <h3 className="text-gray-900 text-lg font-medium mb-2">{section.title}</h3>
                       <div className="flex justify-end mt-4">
-                        <div className="flex items-center text-primary-500 text-sm font-medium group-hover:translate-x-1 transition-transform">
+                        <div className="flex items-center text-primary-600 text-sm font-medium group-hover:translate-x-1 transition-transform">
                           Explore
                           <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" viewBox="0 0 20 20" fill="currentColor">
                             <path fillRule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
@@ -290,15 +290,15 @@ const ConstitutionMap = ({ country = 'India' }) => {
         
         {/* Level Information */}
         <motion.div 
-          className="mt-12 bg-dark-200 p-6 rounded-lg"
+          className="mt-12 bg-white p-6 rounded-lg border border-gray-200 shadow-sm"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
         >
-          <h2 className="text-xl font-bold text-white mb-2">
+          <h2 className="text-xl font-bold text-gray-900 mb-2">
             {levels.find(l => l.id === selectedLevel)?.title} Level
           </h2>
-          <p className="text-gray-400">
+          <p className="text-gray-600">
             {selectedLevel === 'level0' && "The foundational aspects of the Constitution, including its history, key features, and the Preamble."}
             {selectedLevel === 'level1' && "The core structure of the Constitution, divided into Parts that cover fundamental rights, directive principles, and governmental organization."}
             {selectedLevel === 'level2' && "The supporting Schedules of the Constitution that provide detailed information on various administrative and legal matters."}

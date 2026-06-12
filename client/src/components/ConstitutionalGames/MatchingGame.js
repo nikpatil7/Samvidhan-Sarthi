@@ -166,25 +166,25 @@ const MatchingGame = ({ gameData, onComplete, isCompleted, score, onPlayAgain })
   // Handle empty data
   if (!cards || cards.length === 0) {
     return (
-      <div className="bg-dark-200 rounded-lg p-6 text-center">
+      <div className="bg-white rounded-lg p-6 text-center border border-gray-200 shadow-sm">
         <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto text-gray-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
         </svg>
-        <h3 className="text-lg font-medium text-white mb-2">No matching pairs available</h3>
-        <p className="text-gray-400">The game data is empty or invalid. Please check the configuration.</p>
+        <h3 className="text-lg font-medium text-gray-900 mb-2">No matching pairs available</h3>
+        <p className="text-gray-600">The game data is empty or invalid. Please check the configuration.</p>
       </div>
     );
   }
 
   return (
-    <div className="bg-dark-200 rounded-lg p-6">
+    <div className="bg-white rounded-lg p-6 border border-gray-200 shadow-sm">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-bold text-white">Constitutional Matching</h2>
+        <h2 className="text-xl font-bold text-gray-900">Constitutional Matching</h2>
         <div className="flex items-center space-x-4 text-sm">
-          <div className="bg-dark-300 px-3 py-1 rounded-full text-gray-300">
+          <div className="bg-surface-200 px-3 py-1 rounded-full text-gray-600 border border-gray-200">
             Moves: <span className="font-semibold text-primary-400">{moves}</span>
           </div>
-          <div className="bg-dark-300 px-3 py-1 rounded-full text-gray-300">
+          <div className="bg-surface-200 px-3 py-1 rounded-full text-gray-600 border border-gray-200">
             Time: <span className="font-semibold text-primary-400">{formatTime(elapsedTime)}</span>
           </div>
         </div>
@@ -224,7 +224,7 @@ const MatchingGame = ({ gameData, onComplete, isCompleted, score, onPlayAgain })
             </motion.div>
             
             <div className="max-w-md mx-auto mb-6">
-              <div className="bg-dark-300 rounded-lg p-4 mb-4">
+              <div className="bg-surface-200 rounded-lg p-4 mb-4 border border-gray-200">
                 <div className="flex justify-between mb-2">
                   <span className="text-gray-300">Total Moves:</span>
                   <span className="text-primary-400 font-medium">{moves}</span>
@@ -284,7 +284,7 @@ const MatchingGame = ({ gameData, onComplete, isCompleted, score, onPlayAgain })
                       }`}
                     >
                       {/* Card Back */}
-                      <div className="absolute w-full h-full backface-hidden rounded-lg flex items-center justify-center p-3 bg-dark-300 border-2 border-gray-700 shadow-md">
+                      <div className="absolute w-full h-full backface-hidden rounded-lg flex items-center justify-center p-3 bg-white border-2 border-gray-200 shadow-sm">
                         <div className={`text-sm font-medium text-center ${
                           card.type === 'term' ? 'text-primary-400' : 'text-secondary-400'
                         }`}>
@@ -293,9 +293,9 @@ const MatchingGame = ({ gameData, onComplete, isCompleted, score, onPlayAgain })
                       </div>
                       
                       {/* Card Front */}
-                      <div className="absolute w-full h-full backface-hidden rotate-y-180 rounded-lg flex items-center justify-center p-3 bg-dark-100 border-2 border-gray-600 shadow-md">
+                      <div className="absolute w-full h-full backface-hidden rotate-y-180 rounded-lg flex items-center justify-center p-3 bg-surface-200 border-2 border-gray-200 shadow-sm">
                         <div className={`overflow-y-auto max-h-full text-center ${
-                          card.type === 'term' ? 'text-primary-300 font-medium' : 'text-gray-300 text-sm'
+                          card.type === 'term' ? 'text-primary-700 font-medium' : 'text-gray-600 text-sm'
                         }`}>
                           {card.content}
                         </div>
@@ -312,7 +312,7 @@ const MatchingGame = ({ gameData, onComplete, isCompleted, score, onPlayAgain })
                         animate={{ scale: 1 }}
                         transition={{ type: "spring", stiffness: 300, damping: 20 }}
                       >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 text-white" viewBox="0 0 20 20" fill="currentColor">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 text-gray-700" viewBox="0 0 20 20" fill="currentColor">
                           <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                         </svg>
                       </motion.div>

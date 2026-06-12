@@ -138,14 +138,14 @@ const ConstitutionalTopics = () => {
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
         <div>
-          <h1 className="text-3xl font-bold text-white">Indian Constitution</h1>
-          <p className="text-gray-400 mt-1">Explore the structure and principles of the Indian Constitution</p>
+          <h1 className="text-3xl font-bold text-gray-900">Indian Constitution</h1>
+          <p className="text-gray-600 mt-1">Explore the structure and principles of the Indian Constitution</p>
         </div>
         
         <div className="flex flex-wrap gap-3 mt-4 md:mt-0">
           <Link 
             to="/constitution/games" 
-            className="px-4 py-2 flex items-center bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition"
+            className="px-4 py-2 flex items-center bg-primary-500 hover:bg-primary-600 text-white rounded-lg transition shadow-sm"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
@@ -158,7 +158,7 @@ const ConstitutionalTopics = () => {
             name="category"
             value={filters.category}
             onChange={handleFilterChange}
-            className="input bg-dark-200 text-white py-2 pl-3 pr-8"
+            className="input py-2 pl-3 pr-8"
           >
             <option value="">All Categories</option>
             {getUniqueFilterValues('category').map(category => (
@@ -170,7 +170,7 @@ const ConstitutionalTopics = () => {
             name="difficulty"
             value={filters.difficulty}
             onChange={handleFilterChange}
-            className="input bg-dark-200 text-white py-2 pl-3 pr-8"
+            className="input py-2 pl-3 pr-8"
           >
             <option value="">All Levels</option>
             <option value="Beginner">Beginner</option>
@@ -186,10 +186,10 @@ const ConstitutionalTopics = () => {
           <button
             key={level.id}
             onClick={() => handleLevelChange(level.id)}
-            className={`p-3 rounded-lg text-left transition ${
+            className={`p-3 rounded-lg text-left transition border ${
               selectedLevel === level.id
-                ? 'bg-primary-600 text-white'
-                : 'bg-dark-200 text-gray-300 hover:bg-dark-100'
+                ? 'bg-primary-50 text-primary-700 border-primary-200'
+                : 'bg-white text-gray-700 hover:bg-gray-50 border-gray-200'
             }`}
           >
             <h3 className="font-medium">{level.name}</h3>
@@ -199,7 +199,7 @@ const ConstitutionalTopics = () => {
       </div>
       
       {error && (
-        <div className="bg-red-900/30 border border-red-800 text-red-300 px-4 py-3 rounded relative" role="alert">
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded relative" role="alert">
           <span className="block sm:inline">{error}</span>
         </div>
       )}
@@ -216,8 +216,8 @@ const ConstitutionalTopics = () => {
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto text-gray-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <h3 className="text-xl font-medium text-gray-300 mb-2">No topics found</h3>
-                <p className="text-gray-400">Try changing your filters or check back later for new content.</p>
+                <h3 className="text-xl font-medium text-gray-800 mb-2">No topics found</h3>
+                <p className="text-gray-600">Try changing your filters or check back later for new content.</p>
               </div>
             </div>
           ) : (

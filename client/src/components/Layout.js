@@ -83,16 +83,16 @@ const Layout = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-dark-400">
+    <div className="flex min-h-screen bg-surface-300 text-gray-800">
       {/* Sidebar for desktop */}
       <motion.aside 
-        className="hidden md:flex flex-col w-64 bg-dark-300 border-r border-dark-200"
+        className="hidden md:flex flex-col w-64 bg-white border-r border-gray-200 shadow-sm"
         initial={{ x: -300 }}
         animate={{ x: 0 }}
         transition={{ duration: 0.4 }}
       >
-        <div className="flex items-center justify-center h-16 p-4 border-b border-dark-200">
-          <Link to="/" className="text-2xl font-bold text-primary-500">
+        <div className="flex items-center justify-center h-16 p-4 border-b border-gray-200 bg-surface-200">
+          <Link to="/" className="text-2xl font-bold text-primary-600">
             Samvidhan Sarathi
           </Link>
         </div>
@@ -105,8 +105,8 @@ const Layout = () => {
                 to={link.path}
                 className={`flex items-center px-4 py-3 text-sm font-medium rounded-lg ${
                   location.pathname === link.path 
-                    ? 'bg-primary-700/20 text-primary-400' 
-                    : 'text-gray-300 hover:bg-dark-200 hover:text-white'
+                    ? 'bg-primary-50 text-primary-600 border-l-4 border-primary-500 pl-3' 
+                    : 'text-gray-700 hover:bg-gray-50 hover:text-primary-600'
                 }`}
               >
                 <span className="mr-3">{link.icon}</span>
@@ -116,10 +116,10 @@ const Layout = () => {
           </nav>
         </div>
         
-        <div className="p-4 border-t border-dark-200">
+        <div className="p-4 border-t border-gray-200">
           <button
             onClick={handleLogout}
-            className="flex items-center w-full px-4 py-2 text-sm font-medium text-gray-300 rounded-lg hover:bg-dark-200 hover:text-white"
+            className="flex items-center w-full px-4 py-2 text-sm font-medium text-gray-700 rounded-lg hover:bg-gray-50 hover:text-primary-600"
           >
             <span className="mr-3"><LogoutIcon /></span>
             Logout
@@ -129,7 +129,7 @@ const Layout = () => {
 
       {/* Mobile menu */}
       <motion.div
-        className={`fixed inset-0 bg-black bg-opacity-50 z-20 md:hidden ${
+        className={`fixed inset-0 bg-slate-900 bg-opacity-20 z-20 md:hidden ${
           isMobileMenuOpen ? 'block' : 'hidden'
         }`}
         onClick={() => setIsMobileMenuOpen(false)}
@@ -139,15 +139,15 @@ const Layout = () => {
       />
 
       <motion.div
-        className={`fixed inset-y-0 left-0 w-64 bg-dark-300 z-30 md:hidden transform ${
+        className={`fixed inset-y-0 left-0 w-64 bg-white z-30 md:hidden transform shadow-xl border-r border-gray-200 ${
           isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
         initial={{ x: -300 }}
         animate={{ x: isMobileMenuOpen ? 0 : -300 }}
         transition={{ duration: 0.3 }}
       >
-        <div className="flex items-center justify-center h-16 p-4 border-b border-dark-200">
-          <Link to="/" className="text-xl font-bold text-primary-500">
+        <div className="flex items-center justify-center h-16 p-4 border-b border-gray-200 bg-surface-200">
+          <Link to="/" className="text-xl font-bold text-primary-600">
             Samvidhan Sarathi
           </Link>
         </div>
@@ -160,8 +160,8 @@ const Layout = () => {
                 to={link.path}
                 className={`flex items-center px-4 py-3 text-sm font-medium rounded-lg ${
                   location.pathname === link.path 
-                    ? 'bg-primary-700/20 text-primary-400' 
-                    : 'text-gray-300 hover:bg-dark-200 hover:text-white'
+                    ? 'bg-primary-50 text-primary-600 border-l-4 border-primary-500 pl-3' 
+                    : 'text-gray-700 hover:bg-gray-50 hover:text-primary-600'
                 }`}
                 onClick={() => setIsMobileMenuOpen(false)}
               >
@@ -172,10 +172,10 @@ const Layout = () => {
           </nav>
         </div>
         
-        <div className="p-4 border-t border-dark-200">
+        <div className="p-4 border-t border-gray-200">
           <button
             onClick={handleLogout}
-            className="flex items-center w-full px-4 py-2 text-sm font-medium text-gray-300 rounded-lg hover:bg-dark-200 hover:text-white"
+            className="flex items-center w-full px-4 py-2 text-sm font-medium text-gray-700 rounded-lg hover:bg-gray-50 hover:text-primary-600"
           >
             <span className="mr-3"><LogoutIcon /></span>
             Logout
@@ -186,12 +186,12 @@ const Layout = () => {
       {/* Main content */}
       <div className="flex flex-col flex-1">
         {/* Header */}
-        <header className="bg-dark-300 border-b border-dark-200">
+        <header className="bg-white border-b border-gray-200 shadow-sm">
           <div className="flex items-center justify-between h-16 px-4">
             <div className="flex items-center md:hidden">
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="p-2 text-gray-400 rounded-md hover:text-white focus:outline-none"
+                className="p-2 text-gray-600 rounded-md hover:text-primary-600 hover:bg-gray-50 focus:outline-none"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
@@ -209,7 +209,7 @@ const Layout = () => {
                   <input
                     type="text"
                     placeholder="Search constitutional topics..."
-                    className="input w-full pl-10"
+                    className="input w-full pl-10 shadow-sm"
                     value={searchQuery}
                     onChange={handleSearchChange}
                     onFocus={() => {
@@ -225,36 +225,36 @@ const Layout = () => {
               {/* Search results dropdown */}
               {showResults && (
                 <div 
-                  className="absolute top-full left-0 right-0 mt-1 bg-dark-200 rounded-lg shadow-lg z-50 border border-dark-100 overflow-hidden"
+                  className="absolute top-full left-0 right-0 mt-1 bg-white rounded-lg shadow-lg z-50 border border-gray-200 overflow-hidden"
                   onClick={e => e.stopPropagation()}
                 >
                   {isSearching ? (
                     <div className="p-4 text-center">
                       <div className="animate-spin h-5 w-5 border-t-2 border-primary-500 rounded-full mx-auto"></div>
-                      <p className="text-gray-400 text-sm mt-2">Searching...</p>
+                      <p className="text-gray-500 text-sm mt-2">Searching...</p>
                     </div>
                   ) : (
                     <>
                       {searchResults.topics.length === 0 && searchResults.content.length === 0 ? (
-                        <div className="p-4 text-center text-gray-400">
+                        <div className="p-4 text-center text-gray-500">
                           No results found for "{searchQuery}"
                         </div>
                       ) : (
                         <div>
                           {searchResults.topics.length > 0 && (
                             <div>
-                              <div className="px-4 py-2 bg-dark-300 text-xs font-medium text-gray-400 uppercase">
+                              <div className="px-4 py-2 bg-surface-200 text-xs font-medium text-gray-500 uppercase">
                                 Topics
                               </div>
-                              <div className="divide-y divide-dark-300">
+                              <div className="divide-y divide-gray-100">
                                 {searchResults.topics.map(topic => (
                                   <div 
                                     key={topic._id} 
-                                    className="px-4 py-3 hover:bg-dark-300 cursor-pointer"
+                                    className="px-4 py-3 hover:bg-gray-50 cursor-pointer"
                                     onClick={() => handleResultClick(topic)}
                                   >
-                                    <div className="font-medium text-white">{topic.title}</div>
-                                    <div className="text-sm text-gray-400 mt-1 truncate">{topic.description}</div>
+                                    <div className="font-medium text-gray-900">{topic.title}</div>
+                                    <div className="text-sm text-gray-500 mt-1 truncate">{topic.description}</div>
                                   </div>
                                 ))}
                               </div>
@@ -263,19 +263,19 @@ const Layout = () => {
                           
                           {searchResults.content.length > 0 && (
                             <div>
-                              <div className="px-4 py-2 bg-dark-300 text-xs font-medium text-gray-400 uppercase">
+                              <div className="px-4 py-2 bg-surface-200 text-xs font-medium text-gray-500 uppercase">
                                 Content
                               </div>
-                              <div className="divide-y divide-dark-300">
+                              <div className="divide-y divide-gray-100">
                                 {searchResults.content.map(content => (
                                   <div 
                                     key={content._id} 
-                                    className="px-4 py-3 hover:bg-dark-300 cursor-pointer"
+                                    className="px-4 py-3 hover:bg-gray-50 cursor-pointer"
                                     onClick={() => handleResultClick(content)}
                                   >
-                                    <div className="font-medium text-white">{content.title}</div>
-                                    <div className="text-sm text-gray-400 mt-1">
-                                      <span className="bg-primary-900/30 text-primary-400 text-xs px-2 py-1 rounded-full uppercase">
+                                    <div className="font-medium text-gray-900">{content.title}</div>
+                                    <div className="text-sm text-gray-500 mt-1">
+                                      <span className="bg-primary-50 text-primary-600 border border-primary-100 text-xs px-2 py-1 rounded-full uppercase">
                                         {content.type}
                                       </span>
                                       <span className="ml-2">in {content.topic.title}</span>
@@ -297,9 +297,9 @@ const Layout = () => {
             <div className="flex items-center">
               <div className="ml-3 relative">
                 <div className="flex items-center">
-                  <span className="mr-2 text-sm font-medium text-gray-300">{user?.name || user?.username}</span>
+                  <span className="mr-2 text-sm font-medium text-gray-700">{user?.name || user?.username}</span>
                   <Link to="/profile">
-                    <div className="h-8 w-8 rounded-full bg-primary-600 flex items-center justify-center text-white font-medium text-sm">
+                    <div className="h-8 w-8 rounded-full bg-primary-500 flex items-center justify-center text-white font-medium text-sm shadow-sm">
                       {user?.name ? user.name.charAt(0).toUpperCase() : user?.username?.charAt(0).toUpperCase()}
                     </div>
                   </Link>

@@ -356,7 +356,7 @@ const ContentDetail = () => {
                 <div className="flex justify-between items-center">
                   <h2 className="text-xl font-bold text-white">Question {currentQuizQuestion + 1} of {content.quiz.questions.length}</h2>
                   
-                  <div className="bg-dark-200 h-2 rounded-full w-48">
+                  <div className="bg-surface-200 h-2 rounded-full w-48 border border-gray-200">
                     <div 
                       className="bg-primary-500 h-2 rounded-full" 
                       style={{ width: `${((currentQuizQuestion + 1) / content.quiz.questions.length) * 100}%` }}
@@ -364,7 +364,7 @@ const ContentDetail = () => {
                   </div>
                 </div>
                 
-                <div className="bg-dark-200 rounded-lg p-6">
+                <div className="bg-white rounded-lg p-6 border border-gray-200 shadow-sm">
                   <motion.div
                     key={`question-${currentQuizQuestion}`}
                     initial={{ opacity: 0, y: 20 }}
@@ -469,7 +469,7 @@ const ContentDetail = () => {
             
             {/* Game description */}
             {content.content && (
-              <div className="bg-dark-200 rounded-xl p-5">
+              <div className="bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
                 <p className="text-gray-200 leading-relaxed">{content.content}</p>
               </div>
             )}
@@ -480,7 +480,7 @@ const ContentDetail = () => {
             </div>
             
             {/* Navigation buttons */}
-            <div className="flex justify-between pt-4 mt-6 border-t border-dark-200">
+            <div className="flex justify-between pt-4 mt-6 border-t border-gray-200">
               <Link to={`/topics/${topic?._id}`} className="btn btn-secondary">
                 Back to Topic
               </Link>
@@ -499,7 +499,7 @@ const ContentDetail = () => {
           // Video content
           <div className="space-y-6">
             {/* Video player */}
-            <div className="relative w-full bg-dark-200 rounded-xl overflow-hidden" style={{ paddingBottom: '56.25%' }}>
+            <div className="relative w-full bg-surface-200 rounded-xl overflow-hidden border border-gray-200" style={{ paddingBottom: '56.25%' }}>
               {content.content && (content.content.includes('youtube.com') || content.content.includes('youtu.be')) ? (
                 <iframe
                   className="absolute top-0 left-0 w-full h-full"
@@ -533,7 +533,7 @@ const ContentDetail = () => {
               )}
             </div>
             
-            <div className="flex justify-between pt-4 border-t border-dark-200">
+            <div className="flex justify-between pt-4 border-t border-gray-200">
               <Link to={`/topics/${topic._id}`} className="btn btn-outline">
                 Back to Topic
               </Link>
@@ -575,7 +575,7 @@ const ContentDetail = () => {
             )}
 
             {/* Main Content */}
-            <div className="prose prose-invert max-w-none leading-relaxed prose-headings:text-white prose-headings:font-semibold prose-headings:mt-8 prose-headings:mb-3 prose-h2:mt-9 prose-h3:mt-7 prose-p:mt-4 prose-li:mt-2 prose-li:text-gray-200 prose-p:text-gray-200 prose-strong:text-white prose-a:text-primary-400 prose-a:no-underline hover:prose-a:text-primary-300 prose-blockquote:border-primary-500/40 prose-blockquote:bg-dark-200/60 prose-blockquote:rounded-xl prose-blockquote:p-4 prose-blockquote:text-gray-200">
+            <div className="prose max-w-none leading-relaxed prose-headings:text-gray-900 prose-headings:font-semibold prose-headings:mt-8 prose-headings:mb-3 prose-h2:mt-9 prose-h3:mt-7 prose-p:mt-4 prose-li:mt-2 prose-li:text-gray-700 prose-p:text-gray-700 prose-strong:text-gray-900 prose-a:text-primary-600 prose-a:no-underline hover:prose-a:text-primary-700 prose-blockquote:border-primary-200 prose-blockquote:bg-primary-50 prose-blockquote:rounded-xl prose-blockquote:p-4 prose-blockquote:text-gray-700">
               <ReactMarkdown remarkPlugins={[remarkGfm]}>
                 {content.content}
               </ReactMarkdown>
@@ -629,7 +629,7 @@ const ContentDetail = () => {
               </motion.div>
             )}
             
-            <div className="flex justify-between pt-4 border-t border-dark-200">
+            <div className="flex justify-between pt-4 border-t border-gray-200">
               <Link to={`/topics/${topic._id}`} className="btn btn-outline">
                 Back to Topic
               </Link>

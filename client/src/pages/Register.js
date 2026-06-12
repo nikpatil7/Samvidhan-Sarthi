@@ -97,7 +97,7 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen bg-dark-400 px-4 sm:px-6 lg:px-10">
+    <div className="min-h-screen bg-surface-300 px-4 sm:px-6 lg:px-10">
       <div className="min-h-screen max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[1.15fr_0.85fr] gap-16 items-center">
         <motion.div
           className="relative space-y-8 overflow-hidden rounded-2xl p-2"
@@ -176,40 +176,40 @@ const Register = () => {
               <motion.div
                 variants={featureItem}
                 whileHover={{ scale: 1.03, boxShadow: '0 0 18px rgba(56,189,248,0.25)' }}
-                className="p-6 rounded-2xl bg-dark-300/80 border border-dark-200"
+                className="p-6 rounded-2xl bg-white border border-gray-200 shadow-sm"
               >
                 <div className="h-8 w-8 rounded-full border border-primary-400/40 bg-primary-500/10 flex items-center justify-center text-primary-300">
                   📘
                 </div>
-                <p className="mt-4 text-white font-semibold">Learn in Simple Language</p>
-                <p className="mt-2 text-sm text-gray-400 leading-relaxed">Clear explanations for Articles, Rights, and Duties.</p>
+                <p className="mt-4 text-gray-900 font-semibold">Learn in Simple Language</p>
+                <p className="mt-2 text-sm text-gray-600 leading-relaxed">Clear explanations for Articles, Rights, and Duties.</p>
               </motion.div>
               <motion.div
                 variants={featureItem}
                 whileHover={{ scale: 1.03, boxShadow: '0 0 18px rgba(56,189,248,0.25)' }}
-                className="p-6 rounded-2xl bg-dark-300/80 border border-dark-200"
+                className="p-6 rounded-2xl bg-white border border-gray-200 shadow-sm"
               >
                 <div className="h-8 w-8 rounded-full border border-primary-400/40 bg-primary-500/10 flex items-center justify-center text-primary-300">
                   🎮
                 </div>
-                <p className="mt-4 text-white font-semibold">Play Civic Scenarios</p>
-                <p className="mt-2 text-sm text-gray-400 leading-relaxed">Practice decisions with real-world context.</p>
+                <p className="mt-4 text-gray-900 font-semibold">Play Civic Scenarios</p>
+                <p className="mt-2 text-sm text-gray-600 leading-relaxed">Practice decisions with real-world context.</p>
               </motion.div>
               <motion.div
                 variants={featureItem}
                 whileHover={{ scale: 1.03, boxShadow: '0 0 18px rgba(56,189,248,0.25)' }}
-                className="p-6 rounded-2xl bg-dark-300/80 border border-dark-200"
+                className="p-6 rounded-2xl bg-white border border-gray-200 shadow-sm"
               >
                 <div className="h-8 w-8 rounded-full border border-primary-400/40 bg-primary-500/10 flex items-center justify-center text-primary-300">
                   🏆
                 </div>
-                <p className="mt-4 text-white font-semibold">Track Progress</p>
-                <p className="mt-2 text-sm text-gray-400 leading-relaxed">Earn levels and badges as you grow.</p>
+                <p className="mt-4 text-gray-900 font-semibold">Track Progress</p>
+                <p className="mt-2 text-sm text-gray-600 leading-relaxed">Earn levels and badges as you grow.</p>
               </motion.div>
             </motion.div>
 
             <motion.p
-              className="text-sm text-gray-400"
+              className="text-sm text-gray-500"
               animate={{ opacity: [0.6, 1, 0.6] }}
               transition={{ duration: 3.2, ease: 'easeInOut', repeat: Infinity }}
             >
@@ -219,16 +219,16 @@ const Register = () => {
         </motion.div>
 
         <motion.div
-          className="max-w-lg w-full space-y-8 p-10 bg-dark-300 rounded-2xl shadow-xl justify-self-end"
+          className="max-w-lg w-full space-y-8 p-10 bg-white rounded-2xl shadow-md border border-gray-200 justify-self-end"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
           <div>
-            <h2 className="mt-2 text-center text-3xl font-extrabold text-white">
+            <h2 className="mt-2 text-center text-3xl font-extrabold text-gray-900">
               Create your account
             </h2>
-            <p className="mt-2 text-center text-sm text-gray-400">
+            <p className="mt-2 text-center text-sm text-gray-600">
               Or{' '}
               <Link to="/login" className="font-medium text-primary-500 hover:text-primary-400">
                 sign in to your existing account
@@ -245,7 +245,7 @@ const Register = () => {
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm space-y-4">
             <div>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-300 mb-1">
+              <label htmlFor="username" className="block text-sm font-medium text-gray-600 mb-1">
                 Username
               </label>
               <input
@@ -264,7 +264,7 @@ const Register = () => {
             </div>
             
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-1">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-600 mb-1">
                 Email address
               </label>
               <input
@@ -283,7 +283,7 @@ const Register = () => {
             </div>
             
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-1">
+              <label htmlFor="name" className="block text-sm font-medium text-gray-600 mb-1">
                 Name (optional)
               </label>
               <input
@@ -299,7 +299,7 @@ const Register = () => {
             </div>
             
             <div>
-              <label htmlFor="preferredCountry" className="block text-sm font-medium text-gray-300 mb-1">
+              <label htmlFor="preferredCountry" className="block text-sm font-medium text-gray-600 mb-1">
                 Preferred Country
               </label>
               <select
@@ -316,7 +316,7 @@ const Register = () => {
             </div>
             
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-1">
+              <label htmlFor="password" className="block text-sm font-medium text-gray-600 mb-1">
                 Password
               </label>
               <input
@@ -335,7 +335,7 @@ const Register = () => {
             </div>
             
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-300 mb-1">
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-600 mb-1">
                 Confirm Password
               </label>
               <input

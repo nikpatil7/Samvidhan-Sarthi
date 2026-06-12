@@ -75,7 +75,7 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-dark-400 px-4 sm:px-6 lg:px-10">
+    <div className="min-h-screen bg-surface-300 px-4 sm:px-6 lg:px-10">
       <div className="min-h-screen max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[1.15fr_0.85fr] gap-16 items-center">
         <motion.div
           className="relative space-y-8 overflow-hidden rounded-2xl p-2"
@@ -94,22 +94,22 @@ const Login = () => {
           />
 
           <motion.span
-            className="absolute -top-10 -left-10 h-28 w-28 rounded-full bg-primary-500/20 blur-2xl"
+            className="absolute -top-10 -left-10 h-28 w-28 rounded-full bg-primary-100/70 blur-2xl"
             animate={{ y: [0, 18, 0] }}
             transition={{ duration: 12, ease: 'easeInOut', repeat: Infinity }}
           />
           <motion.span
-            className="absolute bottom-4 right-4 h-20 w-20 rounded-full bg-cyan-400/20 blur-2xl"
+            className="absolute bottom-4 right-4 h-20 w-20 rounded-full bg-secondary-100/70 blur-2xl"
             animate={{ y: [0, -14, 0] }}
             transition={{ duration: 10, ease: 'easeInOut', repeat: Infinity }}
           />
 
           <div className="relative space-y-7 px-3 sm:px-5 py-2">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-500/10 text-primary-300 border border-primary-500/30 text-xs font-semibold uppercase tracking-widest">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-50 text-primary-700 border border-primary-100 text-xs font-semibold uppercase tracking-widest">
               Gamified Constitutional Learning
             </div>
             <motion.h1
-              className="text-4xl sm:text-5xl font-extrabold text-white leading-tight"
+              className="text-4xl sm:text-5xl font-extrabold text-gray-900 leading-tight"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.1, ease: 'easeOut' }}
@@ -124,20 +124,20 @@ const Login = () => {
                 loop={true}
                 showCursor={true}
                 hideCursorWhileTyping={false}
-                cursorClassName="bg-primary-300"
-                className="block text-transparent bg-clip-text bg-gradient-to-r from-primary-300 via-primary-400 to-primary-500 drop-shadow-[0_0_18px_rgba(59,130,246,0.45)]"
+                cursorClassName="bg-primary-500"
+                className="block text-transparent bg-clip-text bg-gradient-to-r from-primary-700 via-primary-600 to-secondary-500"
               />
               <motion.span
-                className="block text-primary-200/90 mt-2 text-2xl sm:text-3xl"
+                className="block text-primary-700 mt-2 text-2xl sm:text-3xl"
                 initial={{ opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.7, delay: 0.22, ease: 'easeOut' }}
               >
-                Empowering Citizens through <span className="text-cyan-200">Constitution</span> Knowledge
+                Empowering Citizens through <span className="text-secondary-600">Constitution</span> Knowledge
               </motion.span>
             </motion.h1>
             <motion.p
-              className="text-lg text-gray-300 max-w-xl leading-relaxed"
+              className="text-lg text-gray-600 max-w-xl leading-relaxed"
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.28, ease: 'easeOut' }}
@@ -153,41 +153,41 @@ const Login = () => {
             >
               <motion.div
                 variants={featureItem}
-                whileHover={{ scale: 1.03, boxShadow: '0 0 18px rgba(56,189,248,0.25)' }}
-                className="p-6 rounded-2xl bg-dark-300/80 border border-dark-200"
+                whileHover={{ scale: 1.03, boxShadow: '0 10px 24px rgba(5,65,135,0.10)' }}
+                className="p-6 rounded-2xl bg-white border border-gray-200 shadow-sm"
               >
-                <div className="h-8 w-8 rounded-full border border-primary-400/40 bg-primary-500/10 flex items-center justify-center text-primary-300">
+                <div className="h-8 w-8 rounded-full border border-primary-100 bg-primary-50 flex items-center justify-center text-primary-700">
                   📘
                 </div>
-                <p className="mt-4 text-white font-semibold">Learn in Simple Language</p>
-                <p className="mt-2 text-sm text-gray-400 leading-relaxed">Citizen-friendly explanations of Articles and Duties.</p>
+                <p className="mt-4 text-gray-900 font-semibold">Learn in Simple Language</p>
+                <p className="mt-2 text-sm text-gray-600 leading-relaxed">Citizen-friendly explanations of Articles and Duties.</p>
               </motion.div>
               <motion.div
                 variants={featureItem}
-                whileHover={{ scale: 1.03, boxShadow: '0 0 18px rgba(56,189,248,0.25)' }}
-                className="p-6 rounded-2xl bg-dark-300/80 border border-dark-200"
+                whileHover={{ scale: 1.03, boxShadow: '0 10px 24px rgba(5,65,135,0.10)' }}
+                className="p-6 rounded-2xl bg-white border border-gray-200 shadow-sm"
               >
-                <div className="h-8 w-8 rounded-full border border-primary-400/40 bg-primary-500/10 flex items-center justify-center text-primary-300">
+                <div className="h-8 w-8 rounded-full border border-secondary-100 bg-secondary-50 flex items-center justify-center text-secondary-700">
                   🎮
                 </div>
-                <p className="mt-4 text-white font-semibold">Play Civic Scenarios</p>
-                <p className="mt-2 text-sm text-gray-400 leading-relaxed">Solve real-life situations with guided choices.</p>
+                <p className="mt-4 text-gray-900 font-semibold">Play Civic Scenarios</p>
+                <p className="mt-2 text-sm text-gray-600 leading-relaxed">Solve real-life situations with guided choices.</p>
               </motion.div>
               <motion.div
                 variants={featureItem}
-                whileHover={{ scale: 1.03, boxShadow: '0 0 18px rgba(56,189,248,0.25)' }}
-                className="p-6 rounded-2xl bg-dark-300/80 border border-dark-200"
+                whileHover={{ scale: 1.03, boxShadow: '0 10px 24px rgba(5,65,135,0.10)' }}
+                className="p-6 rounded-2xl bg-white border border-gray-200 shadow-sm"
               >
-                <div className="h-8 w-8 rounded-full border border-primary-400/40 bg-primary-500/10 flex items-center justify-center text-primary-300">
+                <div className="h-8 w-8 rounded-full border border-success-100 bg-success-50 flex items-center justify-center text-success-700">
                   🏆
                 </div>
-                <p className="mt-4 text-white font-semibold">Track Progress</p>
-                <p className="mt-2 text-sm text-gray-400 leading-relaxed">Earn levels and badges as you grow.</p>
+                <p className="mt-4 text-gray-900 font-semibold">Track Progress</p>
+                <p className="mt-2 text-sm text-gray-600 leading-relaxed">Earn levels and badges as you grow.</p>
               </motion.div>
             </motion.div>
 
             <motion.p
-              className="text-sm text-gray-400"
+              className="text-sm text-gray-500"
               animate={{ opacity: [0.6, 1, 0.6] }}
               transition={{ duration: 3.2, ease: 'easeInOut', repeat: Infinity }}
             >
@@ -197,25 +197,25 @@ const Login = () => {
         </motion.div>
 
         <motion.div
-          className="max-w-lg w-full space-y-8 p-10 bg-dark-300 rounded-2xl shadow-xl justify-self-end"
+          className="max-w-lg w-full space-y-8 p-10 bg-white rounded-2xl shadow-md border border-gray-200 justify-self-end"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
           <div>
-            <h2 className="mt-2 text-center text-3xl font-extrabold text-white">
+            <h2 className="mt-2 text-center text-3xl font-extrabold text-gray-900">
               Login to your account
             </h2>
-            <p className="mt-2 text-center text-sm text-gray-400">
+            <p className="mt-2 text-center text-sm text-gray-600">
               Or{' '}
-              <Link to="/register" className="font-medium text-primary-500 hover:text-primary-400">
+              <Link to="/register" className="font-medium text-primary-600 hover:text-primary-700">
                 register a new account
               </Link>
             </p>
           </div>
         
         {error && (
-          <div className="bg-red-900/30 border border-red-800 text-red-300 px-4 py-3 rounded relative" role="alert">
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded relative" role="alert">
             <span className="block sm:inline">{error}</span>
           </div>
         )}
@@ -235,7 +235,7 @@ const Login = () => {
                 onChange={handleChange}
               />
               {formErrors.email && (
-                <p className="mt-1 text-sm text-red-400">{formErrors.email}</p>
+                <p className="mt-1 text-sm text-red-600">{formErrors.email}</p>
               )}
             </div>
             
@@ -252,7 +252,7 @@ const Login = () => {
                 onChange={handleChange}
               />
               {formErrors.password && (
-                <p className="mt-1 text-sm text-red-400">{formErrors.password}</p>
+                <p className="mt-1 text-sm text-red-600">{formErrors.password}</p>
               )}
             </div>
           </div>
@@ -266,7 +266,7 @@ const Login = () => {
               onChange={(e) => setRememberMe(e.target.checked)}
               className="h-4 w-4 border-gray-300 rounded"
             />
-            <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-400">
+            <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-600">
               Remember me
             </label>
           </div>

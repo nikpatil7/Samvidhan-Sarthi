@@ -715,21 +715,21 @@ const ConstitutionalGamePage = () => {
   
   // Helper function to get badge color based on rarity
   const getBadgeColor = (rarity, earned) => {
-    if (!earned) return 'bg-dark-200 text-gray-400';
+    if (!earned) return 'bg-surface-200 text-gray-500 border border-gray-200';
     
     switch (rarity) {
       case 'common':
-        return 'bg-green-900/30 border-2 border-green-500 text-green-400';
+        return 'bg-success-50 border-2 border-success-200 text-success-700';
       case 'uncommon':
-        return 'bg-blue-900/30 border-2 border-blue-500 text-blue-400';
+        return 'bg-primary-50 border-2 border-primary-200 text-primary-700';
       case 'rare':
-        return 'bg-purple-900/30 border-2 border-purple-500 text-purple-400';
+        return 'bg-secondary-50 border-2 border-secondary-200 text-secondary-700';
       case 'epic':
-        return 'bg-yellow-900/30 border-2 border-yellow-500 text-yellow-400';
+        return 'bg-secondary-100 border-2 border-secondary-300 text-secondary-700';
       case 'legendary':
-        return 'bg-red-900/30 border-2 border-red-500 text-red-400';
+        return 'bg-success-50 border-2 border-success-300 text-success-700';
       default:
-        return 'bg-dark-200 text-gray-400';
+        return 'bg-surface-200 text-gray-500 border border-gray-200';
     }
   };
   
@@ -797,9 +797,9 @@ const ConstitutionalGamePage = () => {
   
   if (error) {
     return (
-      <div className="text-center p-6 bg-red-900/20 border border-red-800 rounded-lg">
-        <h2 className="text-xl font-bold text-white mb-2">Error Loading Games</h2>
-        <p className="text-red-300">{error}</p>
+      <div className="text-center p-6 bg-red-50 border border-red-200 rounded-lg">
+        <h2 className="text-xl font-bold text-gray-900 mb-2">Error Loading Games</h2>
+        <p className="text-red-700">{error}</p>
       </div>
     );
   }
@@ -809,24 +809,24 @@ const ConstitutionalGamePage = () => {
       {/* Badge notification toast */}
       {badgeNotification && (
         <motion.div 
-          className="fixed top-6 right-6 z-50 bg-gradient-to-r from-yellow-600 to-amber-600 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3"
+          className="fixed top-6 right-6 z-50 bg-white text-gray-900 px-6 py-4 rounded-xl shadow-lg border border-secondary-200 flex items-center gap-3"
           initial={{ opacity: 0, x: 100, scale: 0.8 }}
           animate={{ opacity: 1, x: 0, scale: 1 }}
           exit={{ opacity: 0, x: 100, scale: 0.8 }}
           transition={{ type: "spring", stiffness: 300, damping: 24 }}
         >
-          <div className="flex-shrink-0 bg-yellow-500/30 p-2 rounded-full">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-yellow-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div className="flex-shrink-0 bg-secondary-50 p-2 rounded-full border border-secondary-100">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-secondary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
             </svg>
           </div>
           <div>
             <p className="font-bold text-lg">{badgeNotification.message}</p>
-            <p className="text-yellow-100 text-sm">Check your achievements below!</p>
+            <p className="text-gray-600 text-sm">Check your achievements below!</p>
           </div>
           <button 
             onClick={() => setBadgeNotification(null)}
-            className="ml-2 text-yellow-200 hover:text-white"
+            className="ml-2 text-gray-500 hover:text-gray-900"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
               <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
@@ -837,8 +837,8 @@ const ConstitutionalGamePage = () => {
       
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
         <div>
-          <h1 className="text-3xl font-bold text-white">Constitutional Learning Games</h1>
-          <p className="text-gray-400 mt-1">Interactive games to test and improve your constitutional knowledge</p>
+          <h1 className="text-3xl font-bold text-gray-900">Constitutional Learning Games</h1>
+          <p className="text-gray-600 mt-1">Interactive games to test and improve your constitutional knowledge</p>
         </div>
       </div>
       
@@ -850,12 +850,12 @@ const ConstitutionalGamePage = () => {
             onClick={() => handleGameSelect(game.id)}
             className={`p-4 rounded-lg flex flex-col items-center transition ${
               selectedGame === game.id
-                ? 'bg-primary-600 text-white' 
-                : 'bg-dark-200 text-gray-300 hover:bg-dark-100'
+                ? 'bg-primary-50 text-primary-700 border border-primary-200' 
+                : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
             }`}
           >
             <div className={`p-3 rounded-full mb-2 ${
-              selectedGame === game.id ? 'bg-primary-700' : 'bg-dark-300'
+              selectedGame === game.id ? 'bg-primary-100' : 'bg-surface-200'
             }`}>
               {game.icon}
             </div>
@@ -877,7 +877,7 @@ const ConstitutionalGamePage = () => {
           // Show game selection cards
           <div className="space-y-4">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold text-white">{getGameTypeTitle()}</h2>
+              <h2 className="text-xl font-bold text-gray-900">{getGameTypeTitle()}</h2>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -887,12 +887,12 @@ const ConstitutionalGamePage = () => {
                   whileHover={{ y: -5 }}
                   transition={{ duration: 0.2 }}
                   onClick={() => handleSpecificGameSelect(game)}
-                  className="bg-dark-200 p-4 rounded-lg cursor-pointer hover:bg-dark-100"
+                  className="bg-white p-4 rounded-lg cursor-pointer hover:bg-gray-50 border border-gray-200 shadow-sm"
                 >
-                  <h3 className="font-medium text-gray-100 mb-2">{game.title}</h3>
-                  <p className="text-sm text-gray-400 mb-3">{game.description}</p>
+                  <h3 className="font-medium text-gray-900 mb-2">{game.title}</h3>
+                  <p className="text-sm text-gray-600 mb-3">{game.description}</p>
                   <div className="flex justify-end">
-                    <span className="text-primary-500 text-sm">Play</span>
+                    <span className="text-primary-600 text-sm">Play</span>
                   </div>
                 </motion.div>
               ))}
@@ -902,10 +902,10 @@ const ConstitutionalGamePage = () => {
           // Show the actual game
           <div>
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold text-white">{selectedGameData?.title}</h2>
+              <h2 className="text-xl font-bold text-gray-900">{selectedGameData?.title}</h2>
               <button 
                 onClick={handleBackToGameList}
-                className="text-sm text-primary-500 hover:text-primary-400"
+                className="text-sm text-primary-600 hover:text-primary-700"
               >
                 Back to {getGameTypeTitle()}
               </button>
@@ -918,27 +918,27 @@ const ConstitutionalGamePage = () => {
       {/* Game completion card */}
       {gameCompleted && (
         <motion.div 
-          className="card p-5 bg-gradient-to-r from-primary-600 to-primary-800"
+          className="card p-5 bg-primary-50 border border-primary-100"
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.3 }}
         >
           <div className="text-center">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 mx-auto text-yellow-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 mx-auto text-secondary-600 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
             </svg>
-            <h3 className="text-2xl font-bold text-white mb-2">Game Completed!</h3>
-            <p className="text-white/80 mb-6">Your score: {gameScore.toFixed(2)}%</p>
+            <h3 className="text-2xl font-bold text-gray-900 mb-2">Game Completed!</h3>
+            <p className="text-gray-600 mb-6">Your score: {gameScore.toFixed(2)}%</p>
             <div className="flex justify-center space-x-4">
               <button 
                 onClick={handlePlayAgain}
-                className="px-5 py-2.5 bg-white text-primary-600 font-medium rounded-lg hover:bg-white/90 transition"
+                className="px-5 py-2.5 bg-white text-primary-700 font-medium rounded-lg hover:bg-gray-50 transition border border-gray-200"
               >
                 Play Again
               </button>
               <button 
                 onClick={handleBackToGameList}
-                className="px-5 py-2.5 bg-primary-700 text-white font-medium rounded-lg hover:bg-primary-800 transition"
+                className="px-5 py-2.5 bg-primary-500 text-white font-medium rounded-lg hover:bg-primary-600 transition"
               >
                 Try Another Game
               </button>
@@ -949,7 +949,7 @@ const ConstitutionalGamePage = () => {
       
       {/* Game badges and achievements */}
       <div className="card p-5">
-        <h2 className="text-xl font-bold text-white mb-4">Your Achievements</h2>
+        <h2 className="text-xl font-bold text-gray-900 mb-4">Your Achievements</h2>
         
         {achievementsLoading ? (
           <div className="flex justify-center py-8">
@@ -963,15 +963,15 @@ const ConstitutionalGamePage = () => {
                   <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-2 ${getBadgeColor(badge.rarity, badge.earned)}`}>
                     {getBadgeIcon(badge.name)}
                   </div>
-                  <span className={`text-sm ${badge.earned ? 'text-white' : 'text-gray-400'}`}>{badge.name}</span>
+                  <span className={`text-sm ${badge.earned ? 'text-gray-900' : 'text-gray-500'}`}>{badge.name}</span>
                   {badge.earned && (
-                    <span className="text-xs text-gray-500 mt-1">Earned</span>
+                    <span className="text-xs text-gray-600 mt-1">Earned</span>
                   )}
                 </div>
               ))
             ) : (
               <div className="col-span-full text-center py-6">
-                <p className="text-gray-400">Complete games to earn achievements!</p>
+                <p className="text-gray-600">Complete games to earn achievements!</p>
               </div>
             )}
           </div>

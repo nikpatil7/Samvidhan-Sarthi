@@ -121,9 +121,9 @@ const TimelineGame = ({ gameData, onComplete, isCompleted, score, onPlayAgain })
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center mb-2">
-        <h2 className="text-xl font-bold text-white">Constitutional Timeline Challenge</h2>
+        <h2 className="text-xl font-bold text-gray-900">Constitutional Timeline Challenge</h2>
         {gameStarted && !gameEnded && (
-          <div className={`font-mono text-lg ${remainingTime < 30 ? 'text-red-400' : 'text-gray-300'}`}>
+          <div className={`font-mono text-lg ${remainingTime < 30 ? 'text-red-600' : 'text-gray-600'}`}>
             {formatTime(remainingTime)}
           </div>
         )}
@@ -131,13 +131,13 @@ const TimelineGame = ({ gameData, onComplete, isCompleted, score, onPlayAgain })
       
       {!gameStarted ? (
         <div className="card p-6 text-center">
-          <h3 className="text-lg font-semibold text-white mb-3">Arrange the Constitutional Events</h3>
-          <p className="text-gray-400 mb-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-3">Arrange the Constitutional Events</h3>
+          <p className="text-gray-600 mb-6">
             Drag and drop the events in chronological order (earliest to latest). You have 2 minutes to complete the challenge.
           </p>
           <button
             onClick={startGame}
-            className="px-6 py-2.5 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition"
+            className="px-6 py-2.5 bg-primary-500 hover:bg-primary-600 text-white rounded-lg transition"
           >
             Start Challenge
           </button>
@@ -146,11 +146,11 @@ const TimelineGame = ({ gameData, onComplete, isCompleted, score, onPlayAgain })
         <>
           {/* The timeline area (drop zone) */}
           <div 
-            className={`bg-dark-200 rounded-lg p-4 min-h-[200px] transition ${draggedEvent ? 'ring-2 ring-primary-500' : ''}`}
+            className={`bg-white rounded-lg p-4 min-h-[200px] transition border border-gray-200 shadow-sm ${draggedEvent ? 'ring-2 ring-primary-500' : ''}`}
             onDragOver={(e) => e.preventDefault()}
             onDrop={handleDrop}
           >
-            <h3 className="text-white font-medium mb-3">Your Timeline (Drop Events Here)</h3>
+            <h3 className="text-gray-900 font-medium mb-3">Your Timeline (Drop Events Here)</h3>
             
             {userArrangement.length === 0 ? (
               <div className="text-center py-8 text-gray-500 italic">
@@ -174,18 +174,18 @@ const TimelineGame = ({ gameData, onComplete, isCompleted, score, onPlayAgain })
                       {/* Timeline dot */}
                       <div className="absolute left-0 w-2 h-2 rounded-full bg-primary-500 transform -translate-x-1 mt-2.5"></div>
                       
-                      <div className="flex-grow bg-dark-300 rounded-lg p-3 flex justify-between items-start">
+                      <div className="flex-grow bg-surface-200 rounded-lg p-3 flex justify-between items-start border border-gray-200">
                         <div>
-                          <div className="text-white font-medium">{gameEnded
+                          <div className="text-gray-900 font-medium">{gameEnded
         ? `${event.year}: ${event.event}`
         : event.event}</div>
-                          <p className="text-gray-400 text-sm mt-1">{event.details}</p>
+                          <p className="text-gray-600 text-sm mt-1">{event.details}</p>
                         </div>
                         
                         {!gameEnded && (
                           <button
                             onClick={() => handleRemoveFromTimeline(event)}
-                            className="text-gray-400 hover:text-red-400 transition"
+                            className="text-gray-500 hover:text-red-600 transition"
                           >
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -202,19 +202,19 @@ const TimelineGame = ({ gameData, onComplete, isCompleted, score, onPlayAgain })
           
           {/* Available events (drag source) */}
           {!gameEnded && (
-            <div className="bg-dark-200 rounded-lg p-4">
-              <h3 className="text-white font-medium mb-3">Available Events</h3>
+            <div className="bg-white rounded-lg p-4 border border-gray-200 shadow-sm">
+              <h3 className="text-gray-900 font-medium mb-3">Available Events</h3>
               
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                 {shuffledEvents.map((event) => (
                   <div
                     key={event.year}
-                    className="bg-dark-300 rounded-lg p-3 cursor-move"
+                    className="bg-surface-200 rounded-lg p-3 cursor-move border border-gray-200"
                     draggable
                     onDragStart={() => handleDragStart(event)}
                     onDragEnd={handleDragEnd}
                   >
-                    <div className="font-medium text-white">{event.event}</div>
+                    <div className="font-medium text-gray-900">{event.event}</div>
                     {/* <div className="text-primary-400 text-sm">{event.year}</div> */}
                   </div>
                 ))}
@@ -228,7 +228,7 @@ const TimelineGame = ({ gameData, onComplete, isCompleted, score, onPlayAgain })
               <>
                 <button
                   onClick={resetGame}
-                  className="px-4 py-2 bg-dark-300 hover:bg-dark-200 text-white rounded-lg transition"
+                  className="px-4 py-2 bg-surface-200 hover:bg-gray-50 text-gray-700 rounded-lg transition border border-gray-200"
                 >
                   Reset
                 </button>
@@ -238,7 +238,7 @@ const TimelineGame = ({ gameData, onComplete, isCompleted, score, onPlayAgain })
                   className={`px-6 py-2 rounded-lg transition ${
                     userArrangement.length === gameData.length
                       ? 'bg-primary-600 hover:bg-primary-700 text-white'
-                      : 'bg-dark-300 text-gray-500 cursor-not-allowed'
+                      : 'bg-surface-200 text-gray-500 cursor-not-allowed'
                   }`}
                 >
                   Submit Answer
@@ -256,7 +256,7 @@ const TimelineGame = ({ gameData, onComplete, isCompleted, score, onPlayAgain })
             ) : (
               <button
                 onClick={onPlayAgain}
-                className="px-6 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition"
+                className="px-6 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-lg transition"
               >
                 Play Again
               </button>
@@ -277,23 +277,23 @@ const TimelineGame = ({ gameData, onComplete, isCompleted, score, onPlayAgain })
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}
             >
-              <h3 className="text-xl font-bold text-white mb-2">
+              <h3 className="text-xl font-bold text-gray-900 mb-2">
                 {feedback.correct === feedback.total 
                   ? 'Perfect Timeline!'
                   : feedback.correct >= feedback.total / 2
                     ? 'Good Attempt!'
                     : 'Try Again!'}
               </h3>
-              <p className="text-gray-300">
+              <p className="text-gray-600">
                 You correctly positioned {feedback.correct} out of {feedback.total} events.
               </p>
               
               {/* Correct order information */}
               <div className="mt-4">
-                <h4 className="text-white font-medium mb-2">Correct Order:</h4>
+                <h4 className="text-gray-900 font-medium mb-2">Correct Order:</h4>
                 <div className="text-left inline-block">
                   {[...gameData].sort((a, b) => a.year - b.year).map((event, index) => (
-                    <div key={event.year} className="text-gray-300">
+                    <div key={event.year} className="text-gray-600">
                       <span className="font-semibold">{index + 1}.</span> {event.year}: {event.event}
                     </div>
                   ))}

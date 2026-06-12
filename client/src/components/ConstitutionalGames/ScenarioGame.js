@@ -106,11 +106,11 @@ const ScenarioGame = ({ scenarioData, onComplete, isCompleted, score, onPlayAgai
   
   if (!scenarioData || scenarioData.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center h-64 bg-dark-200 rounded-lg p-6">
+      <div className="flex flex-col items-center justify-center h-64 bg-white rounded-lg p-6 border border-gray-200 shadow-sm">
         <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-gray-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
-        <div className="text-center text-gray-400">No scenario data available</div>
+        <div className="text-center text-gray-600">No scenario data available</div>
         <p className="text-center text-gray-500 text-sm mt-2">Please check the configuration for this game</p>
       </div>
     );
@@ -122,18 +122,18 @@ const ScenarioGame = ({ scenarioData, onComplete, isCompleted, score, onPlayAgai
   // Guard against missing data
   if (!currentScenarioData) {
     return (
-      <div className="flex flex-col items-center justify-center h-64 bg-dark-200 rounded-lg p-6">
+      <div className="flex flex-col items-center justify-center h-64 bg-white rounded-lg p-6 border border-gray-200 shadow-sm">
         <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-gray-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
         </svg>
-        <div className="text-center text-gray-400">Scenario data is invalid</div>
+        <div className="text-center text-gray-600">Scenario data is invalid</div>
         <p className="text-center text-gray-500 text-sm mt-2">Please check the format of your scenario configuration</p>
       </div>
     );
   }
 
   return (
-    <div className="bg-dark-200 rounded-lg p-6">
+    <div className="bg-white rounded-lg p-6 border border-gray-200 shadow-sm">
       <AnimatePresence mode="wait">
         {completed ? (
           // Results screen
@@ -144,7 +144,7 @@ const ScenarioGame = ({ scenarioData, onComplete, isCompleted, score, onPlayAgai
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5 }}
           >
-            <h2 className="text-2xl font-bold text-white mb-6">Scenario Challenge Complete!</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">Scenario Challenge Complete!</h2>
             
             <motion.div 
               className="inline-block h-40 w-40 rounded-full border-8 border-primary-500 p-3 mb-8"
@@ -158,18 +158,18 @@ const ScenarioGame = ({ scenarioData, onComplete, isCompleted, score, onPlayAgai
             </motion.div>
             
             <div className="max-w-md mx-auto mb-8">
-              <h3 className="text-xl font-medium text-white mb-4">Your Results</h3>
+              <h3 className="text-xl font-medium text-gray-900 mb-4">Your Results</h3>
               
-              <div className="bg-dark-300 rounded-lg p-4 mb-4">
+              <div className="bg-surface-200 rounded-lg p-4 mb-4 border border-gray-200">
                 <div className="flex justify-between mb-2">
-                  <span className="text-gray-300">Correct Decisions:</span>
+                  <span className="text-gray-600">Correct Decisions:</span>
                   <span className="text-green-400 font-medium">
                     {gameScore} out of {scenarioData.length}
                   </span>
                 </div>
                 
                 <div className="flex justify-between">
-                  <span className="text-gray-300">Constitutional Expertise:</span>
+                  <span className="text-gray-600">Constitutional Expertise:</span>
                   <span className={`font-medium ${
                     gameScore / scenarioData.length >= 0.7 ? 'text-green-400' : 'text-yellow-400'
                   }`}>
@@ -181,7 +181,7 @@ const ScenarioGame = ({ scenarioData, onComplete, isCompleted, score, onPlayAgai
                 </div>
               </div>
               
-              <p className="text-gray-300 mb-6">
+              <p className="text-gray-600 mb-6">
                 {gameScore / scenarioData.length >= 0.7 
                   ? 'Excellent! You have a strong understanding of constitutional principles and how they apply to real-world scenarios.' 
                   : 'Review the constitutional principles and their applications to improve your understanding of how they work in practice.'}
@@ -190,7 +190,7 @@ const ScenarioGame = ({ scenarioData, onComplete, isCompleted, score, onPlayAgai
             
             <motion.button 
               onClick={restartGame}
-              className="px-6 py-2.5 bg-primary-600 text-white rounded-lg shadow hover:bg-primary-700 transition-colors"
+              className="px-6 py-2.5 bg-primary-500 text-white rounded-lg shadow-sm hover:bg-primary-600 transition-colors"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
@@ -206,14 +206,14 @@ const ScenarioGame = ({ scenarioData, onComplete, isCompleted, score, onPlayAgai
             exit={{ opacity: 0 }}
           >
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-bold text-white">Constitutional Scenarios</h2>
+              <h2 className="text-xl font-bold text-gray-900">Constitutional Scenarios</h2>
               
               <div className="flex items-center">
-                <div className="text-sm font-medium mr-3 px-3 py-1 bg-dark-300 rounded-full">
+                <div className="text-sm font-medium mr-3 px-3 py-1 bg-surface-200 rounded-full border border-gray-200 text-gray-600">
                   {currentScenario + 1} / {scenarioData.length}
                 </div>
                 
-                <div className="w-24 bg-dark-300 h-2 rounded-full overflow-hidden">
+                <div className="w-24 bg-surface-200 h-2 rounded-full overflow-hidden border border-gray-200">
                   <motion.div 
                     className="bg-primary-500 h-2"
                     initial={{ width: `${((currentScenario) / scenarioData.length) * 100}%` }}
@@ -227,18 +227,18 @@ const ScenarioGame = ({ scenarioData, onComplete, isCompleted, score, onPlayAgai
             <div className="space-y-6">
               {/* Scenario description */}
               <motion.div 
-                className="bg-dark-300 rounded-lg p-6"
+                className="bg-white rounded-lg p-6 border border-gray-200 shadow-sm"
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3 }}
                 key={`scenario-${currentScenario}`}
                 layout
               >
-                <h3 className="text-lg font-semibold text-white mb-4">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">
                   {currentScenarioData.title || "Constitutional Scenario"}
                 </h3>
                 
-                <p className="text-gray-300 mb-4">
+                <p className="text-gray-600 mb-4">
                   {currentScenarioData.situation || currentScenarioData.description}
                 </p>
                 
@@ -321,12 +321,12 @@ const ScenarioGame = ({ scenarioData, onComplete, isCompleted, score, onPlayAgai
                               : 'border-gray-600'
                           }`}>
                             {userChoices[currentScenario] === optionIndex && (
-                              <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 text-white" viewBox="0 0 20 20" fill="currentColor">
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 text-gray-700" viewBox="0 0 20 20" fill="currentColor">
                                 <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                               </svg>
                             )}
                           </div>
-                          <span className={userChoices[currentScenario] === optionIndex ? 'text-white font-medium' : 'text-gray-300'}>
+                          <span className={userChoices[currentScenario] === optionIndex ? 'text-gray-900 font-medium' : 'text-gray-600'}>
                             {option.text}
                           </span>
                         </div>

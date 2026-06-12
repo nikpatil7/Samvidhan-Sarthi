@@ -33,3 +33,5 @@ logs
 *.njsproj
 *.sln
 *.sw? 
+
+theme

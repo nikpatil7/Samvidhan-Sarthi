@@ -114,18 +114,18 @@ const Topics = () => {
     <div className="space-y-8">
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-white">Constitutional Topics</h1>
-          <p className="text-sm text-gray-400 mt-1">Browse topics by category and continue your learning journey.</p>
+          <h1 className="text-3xl font-bold text-gray-900">Constitutional Topics</h1>
+          <p className="text-sm text-gray-600 mt-1">Browse topics by category and continue your learning journey.</p>
         </div>
         
         {countries.length > 0 && (
           <div className="flex items-center space-x-2">
-            <label htmlFor="country" className="text-sm text-gray-400">
+            <label htmlFor="country" className="text-sm text-gray-600">
               Country:
             </label>
             <select 
               id="country"
-              className="input bg-dark-200 text-sm"
+              className="input text-sm"
               value={selectedCountry}
               onChange={(e) => setSelectedCountry(e.target.value)}
             >
@@ -148,8 +148,8 @@ const Topics = () => {
       {Object.keys(topicsByCategory).length === 0 && !loading && !error && (
         <div className="text-center py-10">
           <div className="text-5xl mb-4">📚</div>
-          <h3 className="text-xl font-medium text-gray-300 mb-2">No topics available yet</h3>
-          <p className="text-gray-400">
+          <h3 className="text-xl font-medium text-gray-700 mb-2">No topics available yet</h3>
+          <p className="text-gray-600">
             Topics for {selectedCountry}'s constitution will be added soon.
           </p>
         </div>
@@ -157,7 +157,7 @@ const Topics = () => {
       
       {Object.keys(topicsByCategory).map((category) => (
         <div key={category} className="space-y-6">
-          <h2 className="text-xl font-semibold text-white">
+          <h2 className="text-xl font-semibold text-gray-900">
             {getCategoryLabel(category)}
           </h2>
           
@@ -181,7 +181,7 @@ const Topics = () => {
                   className="block h-full"
                 >
                   <div 
-                    className="rounded-2xl p-6 h-full shadow-lg text-white relative overflow-hidden border border-white/10"
+                    className="rounded-2xl p-6 h-full shadow-sm text-gray-900 relative overflow-hidden border border-gray-200 bg-white"
                     style={getTopicCardStyle(topic.color)}
                   >
                     {/* Icon */}
@@ -197,11 +197,11 @@ const Topics = () => {
                         <span className="text-xs font-semibold uppercase tracking-wider bg-black/25 px-3 py-1 rounded-full">
                           {topic.difficulty}
                         </span>
-                        <span className="text-xs text-white/80">Estimated: 5-10 min</span>
+                        <span className="text-xs text-gray-600">Estimated: 5-10 min</span>
                       </div>
                       
                       <h3 className="font-bold text-xl mt-4 mb-2 leading-snug">{topic.title}</h3>
-                      <p className="text-white/80 line-clamp-2 leading-relaxed">{topic.description}</p>
+                      <p className="text-gray-600 line-clamp-2 leading-relaxed">{topic.description}</p>
                       
                       <div className="mt-auto pt-5 flex items-center justify-between">
                         <span className="text-xs font-medium bg-black/25 px-3 py-1 rounded-full">

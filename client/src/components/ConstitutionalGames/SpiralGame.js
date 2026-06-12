@@ -172,9 +172,9 @@ const ConstitutionSpiralGame = ({ gameData, onComplete, isCompleted, score, onPl
   return (
     <div className="space-y-6 h-full">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold text-white">Constitution Spiral Explorer</h2>
-        <div className="inline-flex items-center bg-dark-300 px-3 py-1 rounded-full">
-          <div className="text-sm text-gray-300 mr-2">Explored: </div>
+        <h2 className="text-xl font-bold text-gray-900">Constitution Spiral Explorer</h2>
+        <div className="inline-flex items-center bg-surface-200 px-3 py-1 rounded-full border border-gray-200">
+          <div className="text-sm text-gray-600 mr-2">Explored: </div>
           <div className="text-sm font-medium text-primary-400">{Math.round(progress)}%</div>
         </div>
       </div>
@@ -182,7 +182,7 @@ const ConstitutionSpiralGame = ({ gameData, onComplete, isCompleted, score, onPl
       <div className="flex flex-col lg:flex-row gap-6 h-full">
         {/* Spiral visualization */}
         <div className="w-full lg:w-7/12">
-          <div className="bg-dark-200 rounded-lg p-4 h-full flex flex-col">
+          <div className="bg-white rounded-lg p-4 h-full flex flex-col border border-gray-200 shadow-sm">
             <div ref={containerRef} className="flex-grow relative" style={{ minHeight: '400px', overflow: 'hidden' }}>
               {/* Center */}
               <motion.div 
@@ -229,7 +229,7 @@ const ConstitutionSpiralGame = ({ gameData, onComplete, isCompleted, score, onPl
                   >
                     {/* Level title */}
                     <div 
-                      className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-dark-200 px-2 py-0.5 rounded-full"
+                      className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white px-2 py-0.5 rounded-full border border-gray-200 shadow-sm"
                       style={{ 
                         color: level.color, 
                         fontSize: Math.max(10, Math.min(14, spiralBaseSize * 0.1)),
@@ -253,10 +253,10 @@ const ConstitutionSpiralGame = ({ gameData, onComplete, isCompleted, score, onPl
                           key={item}
                           className={`absolute rounded-lg p-2 text-center font-medium cursor-pointer ${
                             selectedItem === item 
-                              ? 'text-white shadow-glow' 
+                              ? 'text-gray-900 shadow-sm' 
                               : isExplored
-                                ? 'text-white'
-                                : 'text-gray-400'
+                                ? 'text-gray-900'
+                                : 'text-gray-600'
                           }`}
                           style={{
                             left: `calc(50% + ${Math.cos(angle) * radius}px - ${itemSize/2}px)`,
@@ -293,7 +293,7 @@ const ConstitutionSpiralGame = ({ gameData, onComplete, isCompleted, score, onPl
             </div>
             
             <div className="mt-3 text-center">
-              <div className="flex items-center justify-center gap-2 bg-dark-300 py-2 px-4 rounded-lg text-gray-300 text-sm inline-block">
+              <div className="inline-flex items-center justify-center gap-2 bg-surface-200 py-2 px-4 rounded-lg text-gray-600 text-sm border border-gray-200">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-primary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
@@ -305,7 +305,7 @@ const ConstitutionSpiralGame = ({ gameData, onComplete, isCompleted, score, onPl
         
         {/* Details panel */}
         <div className="w-full lg:w-5/12">
-          <div className="bg-dark-200 rounded-lg p-4 h-full">
+          <div className="bg-white rounded-lg p-4 h-full border border-gray-200 shadow-sm">
             <AnimatePresence mode="wait">
               {details ? (
                 <motion.div
@@ -317,14 +317,14 @@ const ConstitutionSpiralGame = ({ gameData, onComplete, isCompleted, score, onPl
                   className="h-full flex flex-col"
                 >
                   <motion.h3 
-                    className="text-lg font-bold text-white mb-3"
+                    className="text-lg font-bold text-gray-900 mb-3"
                     initial={{ x: -10 }}
                     animate={{ x: 0 }}
                   >
                     {details.title}
                   </motion.h3>
                   <motion.p 
-                    className="text-gray-300 mb-4"
+                    className="text-gray-600 mb-4"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.1 }}
@@ -333,13 +333,13 @@ const ConstitutionSpiralGame = ({ gameData, onComplete, isCompleted, score, onPl
                   </motion.p>
                   
                   <motion.div 
-                    className="bg-dark-300 rounded-lg p-3 mt-auto"
+                    className="bg-surface-200 rounded-lg p-3 mt-auto border border-gray-200"
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.2 }}
                   >
-                    <h4 className="text-white text-sm font-semibold mb-2">Quick Facts</h4>
-                    <ul className="text-gray-400 text-sm space-y-1">
+                    <h4 className="text-gray-900 text-sm font-semibold mb-2">Quick Facts</h4>
+                    <ul className="text-gray-600 text-sm space-y-1">
                       {details.facts.map((fact, index) => (
                         <motion.li 
                           key={index} 
@@ -357,7 +357,7 @@ const ConstitutionSpiralGame = ({ gameData, onComplete, isCompleted, score, onPl
                   
                   <div className="mt-4 flex justify-center">
                     <motion.button
-                      className="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition"
+                      className="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-lg transition"
                       onClick={() => {
                         setSelectedItem(null);
                         setDetails(null);
@@ -385,8 +385,8 @@ const ConstitutionSpiralGame = ({ gameData, onComplete, isCompleted, score, onPl
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 text-gray-500 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M8 16l2.879-2.879m0 0a3 3 0 104.243-4.242 3 3 0 00-4.243 4.242zM21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <h3 className="text-lg font-medium text-gray-300 mb-2">Select a topic to explore</h3>
-                    <p className="text-gray-400 max-w-xs">Click on any item in the spiral to view detailed information about that constitutional topic</p>
+                    <h3 className="text-lg font-medium text-gray-600 mb-2">Select a topic to explore</h3>
+                    <p className="text-gray-500 max-w-xs">Click on any item in the spiral to view detailed information about that constitutional topic</p>
                   </motion.div>
                 </motion.div>
               )}
@@ -396,7 +396,7 @@ const ConstitutionSpiralGame = ({ gameData, onComplete, isCompleted, score, onPl
       </div>
       
       {/* Progress bar */}
-      <div className="bg-dark-200 h-3 rounded-full overflow-hidden">
+      <div className="bg-surface-200 h-3 rounded-full overflow-hidden border border-gray-200">
         <motion.div 
           className="h-full bg-gradient-to-r from-primary-500 to-primary-600"
           initial={{ width: '0%' }}
@@ -410,8 +410,8 @@ const ConstitutionSpiralGame = ({ gameData, onComplete, isCompleted, score, onPl
 
 // Add CSS for ensuring the spiral visualization works properly
 const styleSheet = `
-  .shadow-glow {
-    box-shadow: 0 0 15px rgba(66, 153, 225, 0.6);
+  .shadow-soft {
+    box-shadow: 0 10px 24px rgba(5, 65, 135, 0.12);
   }
   .rotate-y-180 {
     transform: rotateY(180deg);

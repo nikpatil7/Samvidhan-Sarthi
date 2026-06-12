@@ -95,7 +95,7 @@ const QuizGame = ({ quizData, onComplete }) => {
   };
   
   if (!quizData || quizData.length === 0) {
-    return <div className="text-center text-gray-400">No quiz data available</div>;
+    return <div className="text-center text-gray-600">No quiz data available</div>;
   }
 
   return (
@@ -108,21 +108,21 @@ const QuizGame = ({ quizData, onComplete }) => {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5 }}
         >
-          <h2 className="text-2xl font-bold text-white mb-6">Quiz Results</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">Quiz Results</h2>
           
           <div className="inline-block h-40 w-40 rounded-full border-8 border-primary-500 p-3 mb-8">
-            <div className="h-full w-full rounded-full bg-primary-900/30 flex items-center justify-center">
-              <span className="text-4xl font-bold text-primary-400">{score}%</span>
+            <div className="h-full w-full rounded-full bg-primary-50 flex items-center justify-center border border-primary-100">
+              <span className="text-4xl font-bold text-primary-700">{score}%</span>
             </div>
           </div>
           
           <div className="max-w-md mx-auto mb-8">
-            <h3 className="text-xl font-medium text-white mb-4">Your Performance</h3>
+            <h3 className="text-xl font-medium text-gray-900 mb-4">Your Performance</h3>
             
-            <div className="bg-dark-200 rounded-lg p-4 mb-4">
+            <div className="bg-surface-200 rounded-lg p-4 mb-4 border border-gray-200">
               <div className="flex justify-between mb-2">
-                <span className="text-gray-300">Correct Answers:</span>
-                <span className="text-green-400 font-medium">
+                <span className="text-gray-600">Correct Answers:</span>
+                <span className="text-success-700 font-medium">
                   {answers.filter((answer, index) => 
                     answer !== null && quizData[index].options[answer].isCorrect
                   ).length} 
@@ -131,16 +131,16 @@ const QuizGame = ({ quizData, onComplete }) => {
               </div>
               
               <div className="flex justify-between">
-                <span className="text-gray-300">Score:</span>
+                <span className="text-gray-600">Score:</span>
                 <span className={`font-medium ${
-                  score >= 70 ? 'text-green-400' : 'text-red-400'
+                  score >= 70 ? 'text-success-700' : 'text-red-600'
                 }`}>
                   {score}%
                 </span>
               </div>
             </div>
             
-            <p className="text-gray-300 mb-6">
+            <p className="text-gray-600 mb-6">
               {score >= 70 
                 ? 'Great job! You have a good understanding of this topic.' 
                 : 'Keep studying! You might need to review this topic again.'}
@@ -158,31 +158,31 @@ const QuizGame = ({ quizData, onComplete }) => {
         // Quiz questions
         <>
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-bold text-white">Constitutional Quiz</h2>
+            <h2 className="text-xl font-bold text-gray-900">Constitutional Quiz</h2>
             
             <div className="flex items-center gap-4">
-              <div className="text-sm text-gray-300">
+              <div className="text-sm text-gray-600">
                 Question {currentQuestion + 1} of {quizData.length}
               </div>
               
               <div className={`text-sm font-medium px-3 py-1 rounded-full ${
-                timeLeft > 10 ? 'bg-green-900/30 text-green-400' :
-                timeLeft > 5 ? 'bg-yellow-900/30 text-yellow-400' :
-                'bg-red-900/30 text-red-400'
+                timeLeft > 10 ? 'bg-success-50 text-success-700 border border-success-100' :
+                timeLeft > 5 ? 'bg-secondary-50 text-secondary-700 border border-secondary-100' :
+                'bg-red-50 text-red-700 border border-red-200'
               }`}>
                 {timeLeft}s
               </div>
             </div>
           </div>
           
-          <div className="bg-dark-200 rounded-lg p-6 mb-6">
+          <div className="bg-white rounded-lg p-6 mb-6 border border-gray-200 shadow-sm">
             <motion.div
               key={`question-${currentQuestion}`}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}
             >
-              <h3 className="text-lg font-medium text-white mb-6">
+              <h3 className="text-lg font-medium text-gray-900 mb-6">
                 {quizData[currentQuestion].question}
               </h3>
               
@@ -192,8 +192,8 @@ const QuizGame = ({ quizData, onComplete }) => {
                     key={optionIndex}
                     className={`p-4 rounded-lg border-2 cursor-pointer ${
                       answers[currentQuestion] === optionIndex
-                        ? 'border-primary-500 bg-primary-900/20'
-                        : 'border-dark-100 hover:border-dark-50'
+                        ? 'border-primary-500 bg-primary-50'
+                        : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
                     }`}
                     onClick={() => handleSelectAnswer(optionIndex)}
                   >
@@ -201,13 +201,13 @@ const QuizGame = ({ quizData, onComplete }) => {
                       <div className={`h-5 w-5 rounded-full border-2 flex items-center justify-center mr-3 ${
                         answers[currentQuestion] === optionIndex
                           ? 'border-primary-500'
-                          : 'border-gray-600'
+                          : 'border-gray-300'
                       }`}>
                         {answers[currentQuestion] === optionIndex && (
                           <div className="h-2 w-2 rounded-full bg-primary-500"></div>
                         )}
                       </div>
-                      <span className="text-gray-200">{option.text}</span>
+                      <span className="text-gray-700">{option.text}</span>
                     </div>
                   </div>
                 ))}
