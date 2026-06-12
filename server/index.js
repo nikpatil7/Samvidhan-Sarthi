@@ -8,6 +8,9 @@ const userRoutes = require('./routes/users');
 const contentRoutes = require('./routes/content');
 const progressRoutes = require('./routes/progress');
 const topicDetailsRoutes = require('./routes/topics');
+const userStoriesRoutes = require('./routes/userStories');
+
+
 
 const path = require('path');
 
@@ -40,6 +43,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/content', contentRoutes);
 app.use('/api/progress', progressRoutes);
 app.use('/api/topics', topicDetailsRoutes);
+app.use('/api/user-stories', userStoriesRoutes);
 
 // Health check route
 app.get('/health', (req, res) => {
