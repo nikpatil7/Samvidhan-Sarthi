@@ -177,15 +177,15 @@ const MatchingGame = ({ gameData, onComplete, isCompleted, score, onPlayAgain })
   }
 
   return (
-    <div className="bg-white rounded-lg p-6 border border-gray-200 shadow-sm">
+    <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-bold text-gray-900">Constitutional Matching</h2>
         <div className="flex items-center space-x-4 text-sm">
           <div className="bg-surface-200 px-3 py-1 rounded-full text-gray-600 border border-gray-200">
-            Moves: <span className="font-semibold text-primary-400">{moves}</span>
+            Moves: <span className="font-semibold text-primary-700">{moves}</span>
           </div>
           <div className="bg-surface-200 px-3 py-1 rounded-full text-gray-600 border border-gray-200">
-            Time: <span className="font-semibold text-primary-400">{formatTime(elapsedTime)}</span>
+            Time: <span className="font-semibold text-primary-700">{formatTime(elapsedTime)}</span>
           </div>
         </div>
       </div>
@@ -205,12 +205,12 @@ const MatchingGame = ({ gameData, onComplete, isCompleted, score, onPlayAgain })
               animate={{ scale: 1, rotate: 0 }}
               transition={{ type: "spring", stiffness: 200, damping: 20 }}
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 mx-auto text-green-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 mx-auto text-success-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </motion.div>
             
-            <h3 className="text-2xl font-bold text-white mb-2">Game Complete!</h3>
+            <h3 className="text-2xl font-bold text-gray-900 mb-2">Game Complete!</h3>
             
             <motion.div 
               className="inline-block h-32 w-32 rounded-full border-8 border-primary-500 p-3 mb-4"
@@ -218,24 +218,24 @@ const MatchingGame = ({ gameData, onComplete, isCompleted, score, onPlayAgain })
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2 }}
             >
-              <div className="h-full w-full rounded-full bg-primary-900/30 flex items-center justify-center">
-                <span className="text-3xl font-bold text-primary-400">{isCompleted && score !== undefined ? score : gameScore}%</span>
+              <div className="h-full w-full rounded-full bg-primary-50 flex items-center justify-center border border-primary-100">
+                <span className="text-3xl font-bold text-primary-700">{isCompleted && score !== undefined ? score : gameScore}%</span>
               </div>
             </motion.div>
             
             <div className="max-w-md mx-auto mb-6">
-              <div className="bg-surface-200 rounded-lg p-4 mb-4 border border-gray-200">
+              <div className="bg-surface-200 rounded-xl p-4 mb-4 border border-gray-200">
                 <div className="flex justify-between mb-2">
-                  <span className="text-gray-300">Total Moves:</span>
-                  <span className="text-primary-400 font-medium">{moves}</span>
+                  <span className="text-gray-600">Total Moves:</span>
+                  <span className="text-primary-700 font-medium">{moves}</span>
                 </div>
                 <div className="flex justify-between mb-2">
-                  <span className="text-gray-300">Completion Time:</span>
-                  <span className="text-primary-400 font-medium">{formatTime(elapsedTime)}</span>
+                  <span className="text-gray-600">Completion Time:</span>
+                  <span className="text-primary-700 font-medium">{formatTime(elapsedTime)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-300">Memory Rating:</span>
-                  <span className="text-green-400 font-medium">
+                  <span className="text-gray-600">Memory Rating:</span>
+                  <span className="text-success-700 font-medium">
                     {gameScore >= 90 ? 'Constitutional Master' :
                     gameScore >= 75 ? 'Constitutional Expert' :
                     gameScore >= 60 ? 'Constitutional Scholar' : 'Constitutional Student'}
@@ -260,8 +260,8 @@ const MatchingGame = ({ gameData, onComplete, isCompleted, score, onPlayAgain })
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
-            <div className="mb-4">
-              <p className="text-gray-300 text-sm">Match each constitutional term with its correct definition.</p>
+              <div className="mb-4">
+              <p className="text-gray-600 text-sm">Match each constitutional term with its correct definition.</p>
             </div>
             
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
@@ -286,7 +286,7 @@ const MatchingGame = ({ gameData, onComplete, isCompleted, score, onPlayAgain })
                       {/* Card Back */}
                       <div className="absolute w-full h-full backface-hidden rounded-lg flex items-center justify-center p-3 bg-white border-2 border-gray-200 shadow-sm">
                         <div className={`text-sm font-medium text-center ${
-                          card.type === 'term' ? 'text-primary-400' : 'text-secondary-400'
+                          card.type === 'term' ? 'text-primary-700' : 'text-secondary-700'
                         }`}>
                           {card.type === 'term' ? 'Constitutional Term' : 'Definition'}
                         </div>

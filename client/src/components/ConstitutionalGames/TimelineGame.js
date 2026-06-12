@@ -130,7 +130,7 @@ const TimelineGame = ({ gameData, onComplete, isCompleted, score, onPlayAgain })
       </div>
       
       {!gameStarted ? (
-        <div className="card p-6 text-center">
+        <div className="card p-6 text-center rounded-2xl">
           <h3 className="text-lg font-semibold text-gray-900 mb-3">Arrange the Constitutional Events</h3>
           <p className="text-gray-600 mb-6">
             Drag and drop the events in chronological order (earliest to latest). You have 2 minutes to complete the challenge.
@@ -146,7 +146,7 @@ const TimelineGame = ({ gameData, onComplete, isCompleted, score, onPlayAgain })
         <>
           {/* The timeline area (drop zone) */}
           <div 
-            className={`bg-white rounded-lg p-4 min-h-[200px] transition border border-gray-200 shadow-sm ${draggedEvent ? 'ring-2 ring-primary-500' : ''}`}
+            className={`bg-white rounded-2xl p-4 min-h-[200px] transition border border-gray-200 shadow-sm ${draggedEvent ? 'ring-2 ring-primary-500' : ''}`}
             onDragOver={(e) => e.preventDefault()}
             onDrop={handleDrop}
           >
@@ -159,7 +159,7 @@ const TimelineGame = ({ gameData, onComplete, isCompleted, score, onPlayAgain })
             ) : (
               <div className="relative">
                 {/* Timeline line */}
-                <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-gray-700"></div>
+                <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-gray-300"></div>
                 
                 {/* Timeline events */}
                 <div className="space-y-3">
@@ -174,7 +174,7 @@ const TimelineGame = ({ gameData, onComplete, isCompleted, score, onPlayAgain })
                       {/* Timeline dot */}
                       <div className="absolute left-0 w-2 h-2 rounded-full bg-primary-500 transform -translate-x-1 mt-2.5"></div>
                       
-                      <div className="flex-grow bg-surface-200 rounded-lg p-3 flex justify-between items-start border border-gray-200">
+                      <div className="flex-grow bg-surface-200 rounded-xl p-3 flex justify-between items-start border border-gray-200">
                         <div>
                           <div className="text-gray-900 font-medium">{gameEnded
         ? `${event.year}: ${event.event}`
@@ -202,14 +202,14 @@ const TimelineGame = ({ gameData, onComplete, isCompleted, score, onPlayAgain })
           
           {/* Available events (drag source) */}
           {!gameEnded && (
-            <div className="bg-white rounded-lg p-4 border border-gray-200 shadow-sm">
+            <div className="bg-white rounded-2xl p-4 border border-gray-200 shadow-sm">
               <h3 className="text-gray-900 font-medium mb-3">Available Events</h3>
               
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                 {shuffledEvents.map((event) => (
                   <div
                     key={event.year}
-                    className="bg-surface-200 rounded-lg p-3 cursor-move border border-gray-200"
+                    className="bg-surface-200 rounded-xl p-3 cursor-move border border-gray-200"
                     draggable
                     onDragStart={() => handleDragStart(event)}
                     onDragEnd={handleDragEnd}
@@ -247,7 +247,7 @@ const TimelineGame = ({ gameData, onComplete, isCompleted, score, onPlayAgain })
                   <motion.p
                     initial={{ opacity: 0, y: -5 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="text-amber-400 text-sm font-medium mt-2 w-full text-center"
+                    className="text-amber-700 text-sm font-medium mt-2 w-full text-center"
                   >
                     {warningMessage}
                   </motion.p>
@@ -266,12 +266,12 @@ const TimelineGame = ({ gameData, onComplete, isCompleted, score, onPlayAgain })
           {/* Results */}
           {feedback.show && (
             <motion.div
-              className={`p-5 rounded-lg text-center ${
+              className={`p-5 rounded-2xl text-center ${
                 feedback.correct === feedback.total 
-                  ? 'bg-green-900/30 border border-green-800' 
+                  ? 'bg-success-50 border border-success-100' 
                   : feedback.correct >= feedback.total / 2
-                    ? 'bg-yellow-900/30 border border-yellow-800'
-                    : 'bg-red-900/30 border border-red-800'
+                    ? 'bg-secondary-50 border border-secondary-100'
+                    : 'bg-red-50 border border-red-100'
               }`}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}

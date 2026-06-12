@@ -131,7 +131,7 @@ const Register = () => {
               Learn by Playing
             </div>
             <motion.h1
-              className="text-4xl sm:text-5xl font-extrabold text-white leading-tight"
+              className="text-4xl sm:text-5xl font-extrabold text-gray-900 leading-tight"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.1, ease: 'easeOut' }}

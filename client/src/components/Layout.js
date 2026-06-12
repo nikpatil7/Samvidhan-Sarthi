@@ -91,9 +91,10 @@ const Layout = () => {
         animate={{ x: 0 }}
         transition={{ duration: 0.4 }}
       >
-        <div className="flex items-center justify-center h-16 p-4 border-b border-gray-200 bg-surface-200">
-          <Link to="/" className="text-2xl font-bold text-primary-600">
-            Samvidhan Sarathi
+        <div className="flex items-center justify-center h-16 p-4 border-b border-gray-200 bg-gradient-to-r from-primary-50 to-surface-200">
+          <Link to="/" className="text-center">
+            <div className="text-2xl font-bold text-primary-700 leading-none">Samvidhan Sarathi</div>
+            <div className="mt-1 text-[10px] font-semibold uppercase tracking-[0.24em] text-gray-500">Constitutional learning platform</div>
           </Link>
         </div>
         
@@ -146,9 +147,10 @@ const Layout = () => {
         animate={{ x: isMobileMenuOpen ? 0 : -300 }}
         transition={{ duration: 0.3 }}
       >
-        <div className="flex items-center justify-center h-16 p-4 border-b border-gray-200 bg-surface-200">
-          <Link to="/" className="text-xl font-bold text-primary-600">
-            Samvidhan Sarathi
+        <div className="flex items-center justify-center h-16 p-4 border-b border-gray-200 bg-gradient-to-r from-primary-50 to-surface-200">
+          <Link to="/" className="text-center">
+            <div className="text-xl font-bold text-primary-700 leading-none">Samvidhan Sarathi</div>
+            <div className="mt-1 text-[10px] font-semibold uppercase tracking-[0.24em] text-gray-500">Constitutional learning platform</div>
           </Link>
         </div>
         
@@ -208,7 +210,7 @@ const Layout = () => {
                   </div>
                   <input
                     type="text"
-                    placeholder="Search constitutional topics..."
+                    placeholder="Search rights, duties, articles, or topics..."
                     className="input w-full pl-10 shadow-sm"
                     value={searchQuery}
                     onChange={handleSearchChange}

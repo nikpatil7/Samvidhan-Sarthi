@@ -175,14 +175,14 @@ const ConstitutionSpiralGame = ({ gameData, onComplete, isCompleted, score, onPl
         <h2 className="text-xl font-bold text-gray-900">Constitution Spiral Explorer</h2>
         <div className="inline-flex items-center bg-surface-200 px-3 py-1 rounded-full border border-gray-200">
           <div className="text-sm text-gray-600 mr-2">Explored: </div>
-          <div className="text-sm font-medium text-primary-400">{Math.round(progress)}%</div>
+          <div className="text-sm font-medium text-primary-700">{Math.round(progress)}%</div>
         </div>
       </div>
       
       <div className="flex flex-col lg:flex-row gap-6 h-full">
         {/* Spiral visualization */}
         <div className="w-full lg:w-7/12">
-          <div className="bg-white rounded-lg p-4 h-full flex flex-col border border-gray-200 shadow-sm">
+          <div className="bg-white rounded-2xl p-4 h-full flex flex-col border border-gray-200 shadow-sm">
             <div ref={containerRef} className="flex-grow relative" style={{ minHeight: '400px', overflow: 'hidden' }}>
               {/* Center */}
               <motion.div 
@@ -192,7 +192,7 @@ const ConstitutionSpiralGame = ({ gameData, onComplete, isCompleted, score, onPl
                 transition={{ delay: 0.2, type: "spring", stiffness: 260, damping: 20 }}
               >
                 <motion.div 
-                  className="bg-primary-600 rounded-full flex items-center justify-center text-white font-medium text-center p-2"
+                  className="bg-primary-600 rounded-full flex items-center justify-center text-white font-medium text-center p-2 border border-white/60"
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.95 }}
                   style={{ 
@@ -216,7 +216,7 @@ const ConstitutionSpiralGame = ({ gameData, onComplete, isCompleted, score, onPl
                 >
                   <motion.div
                     className={`relative rounded-full border-2 ${
-                      selectedLevel === index ? 'border-primary-500' : 'border-gray-700'
+                      selectedLevel === index ? 'border-primary-500' : 'border-gray-200'
                     }`}
                     style={{
                       width: `${(index + 1) * spiralBaseSize}px`,
@@ -261,7 +261,7 @@ const ConstitutionSpiralGame = ({ gameData, onComplete, isCompleted, score, onPl
                           style={{
                             left: `calc(50% + ${Math.cos(angle) * radius}px - ${itemSize/2}px)`,
                             top: `calc(50% + ${Math.sin(angle) * radius}px - ${itemSize/2}px)`,
-                            backgroundColor: selectedItem === item ? level.color : isExplored ? `${level.color}90` : 'rgba(30, 30, 35, 0.8)',
+                            backgroundColor: selectedItem === item ? level.color : isExplored ? `${level.color}20` : 'rgba(255,255,255,0.96)',
                             width: `${itemSize}px`,
                             height: `${itemSize}px`,
                             fontSize: Math.max(8, Math.min(12, spiralBaseSize * 0.08)),
@@ -269,17 +269,18 @@ const ConstitutionSpiralGame = ({ gameData, onComplete, isCompleted, score, onPl
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            boxShadow: selectedItem === item ? `0 0 15px ${level.color}` : 'none'
+                            border: '1px solid rgba(0,0,0,0.06)',
+                            boxShadow: selectedItem === item ? '0 10px 24px rgba(5, 65, 135, 0.12)' : '0 6px 16px rgba(15, 23, 42, 0.05)'
                           }}
                           onClick={(e) => {
                             e.stopPropagation();
                             handleItemSelect(item, index);
                           }}
-                          whileHover={{ scale: 1.1, boxShadow: `0 0 10px ${level.color}` }}
+                          whileHover={{ scale: 1.1, boxShadow: '0 12px 28px rgba(5, 65, 135, 0.14)' }}
                           whileTap={{ scale: 0.98 }}
                           animate={{
-                            backgroundColor: selectedItem === item ? level.color : isExplored ? `${level.color}90` : 'rgba(30, 30, 35, 0.8)',
-                            boxShadow: selectedItem === item ? `0 0 15px ${level.color}` : 'none'
+                            backgroundColor: selectedItem === item ? level.color : isExplored ? `${level.color}20` : 'rgba(255,255,255,0.96)',
+                            boxShadow: selectedItem === item ? '0 10px 24px rgba(5, 65, 135, 0.12)' : '0 6px 16px rgba(15, 23, 42, 0.05)'
                           }}
                           transition={{ duration: 0.3 }}
                         >
@@ -294,7 +295,7 @@ const ConstitutionSpiralGame = ({ gameData, onComplete, isCompleted, score, onPl
             
             <div className="mt-3 text-center">
               <div className="inline-flex items-center justify-center gap-2 bg-surface-200 py-2 px-4 rounded-lg text-gray-600 text-sm border border-gray-200">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-primary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-primary-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <span>Click on rings to navigate, then tap topics to explore details</span>
@@ -305,7 +306,7 @@ const ConstitutionSpiralGame = ({ gameData, onComplete, isCompleted, score, onPl
         
         {/* Details panel */}
         <div className="w-full lg:w-5/12">
-          <div className="bg-white rounded-lg p-4 h-full border border-gray-200 shadow-sm">
+          <div className="bg-white rounded-2xl p-4 h-full border border-gray-200 shadow-sm">
             <AnimatePresence mode="wait">
               {details ? (
                 <motion.div
@@ -333,7 +334,7 @@ const ConstitutionSpiralGame = ({ gameData, onComplete, isCompleted, score, onPl
                   </motion.p>
                   
                   <motion.div 
-                    className="bg-surface-200 rounded-lg p-3 mt-auto border border-gray-200"
+                    className="bg-surface-200 rounded-xl p-3 mt-auto border border-gray-200"
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.2 }}

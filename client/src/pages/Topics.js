@@ -22,6 +22,16 @@ const itemVariants = {
   }
 };
 
+const themeByCategory = {
+  'fundamental-rights': { accent: '#054187', label: 'Primary' },
+  'directive-principles': { accent: '#FF9933', label: 'Directive' },
+  'judiciary': { accent: '#04356F', label: 'Judicial' },
+  'legislature': { accent: '#138808', label: 'Federal' },
+  'executive': { accent: '#138808', label: 'Governance' },
+  'amendments': { accent: '#E67F00', label: 'Amendment' },
+  'other': { accent: '#054187', label: 'Foundational' }
+};
+
 const Topics = () => {
   const { user, authAxios } = useContext(AuthContext);
   const [topics, setTopics] = useState([]);
@@ -86,10 +96,11 @@ const Topics = () => {
   };
   
   // Get topic card background based on color
-  const getTopicCardStyle = (color) => {
+  const getTopicCardStyle = (categoryId) => {
+    const theme = themeByCategory[categoryId] || themeByCategory.other;
     return {
-      backgroundColor: color || '#3498db',
-      backgroundImage: 'linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(0, 0, 0, 0.1) 100%)'
+      backgroundImage: 'linear-gradient(135deg, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0.72) 55%, rgba(248,249,250,0.95) 100%)',
+      borderTopColor: theme.accent
     };
   };
   
@@ -114,8 +125,11 @@ const Topics = () => {
     <div className="space-y-8">
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
+          <div className="inline-flex items-center gap-2 rounded-full border border-primary-100 bg-primary-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-primary-700 mb-3">
+            Learn the Constitution
+          </div>
           <h1 className="text-3xl font-bold text-gray-900">Constitutional Topics</h1>
-          <p className="text-sm text-gray-600 mt-1">Browse topics by category and continue your learning journey.</p>
+          <p className="text-sm text-gray-600 mt-1">Browse topics by category and continue your civic learning journey.</p>
         </div>
         
         {countries.length > 0 && (
@@ -181,9 +195,10 @@ const Topics = () => {
                   className="block h-full"
                 >
                   <div 
-                    className="rounded-2xl p-6 h-full shadow-sm text-gray-900 relative overflow-hidden border border-gray-200 bg-white"
-                    style={getTopicCardStyle(topic.color)}
+                    className="rounded-2xl p-6 h-full shadow-sm text-gray-900 relative overflow-hidden border border-gray-200 bg-white transition-all duration-200 hover:shadow-md"
+                    style={getTopicCardStyle(topic.category)}
                   >
+                    <div className="absolute inset-x-0 top-0 h-1" style={{ backgroundColor: themeByCategory[topic.category]?.accent || themeByCategory.other.accent }} />
                     {/* Icon */}
                     <div className="absolute right-4 top-4 opacity-20">
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -194,7 +209,7 @@ const Topics = () => {
                     
                     <div className="relative z-10 flex h-full flex-col">
                       <div className="flex items-center justify-between">
-                        <span className="text-xs font-semibold uppercase tracking-wider bg-black/25 px-3 py-1 rounded-full">
+                        <span className="text-xs font-semibold uppercase tracking-wider bg-white/80 text-gray-700 px-3 py-1 rounded-full border border-gray-200">
                           {topic.difficulty}
                         </span>
                         <span className="text-xs text-gray-600">Estimated: 5-10 min</span>
@@ -204,8 +219,8 @@ const Topics = () => {
                       <p className="text-gray-600 line-clamp-2 leading-relaxed">{topic.description}</p>
                       
                       <div className="mt-auto pt-5 flex items-center justify-between">
-                        <span className="text-xs font-medium bg-black/25 px-3 py-1 rounded-full">
-                          Start here
+                        <span className="text-xs font-medium bg-white/80 text-gray-700 px-3 py-1 rounded-full border border-gray-200">
+                          {themeByCategory[topic.category]?.label || 'Foundational'}
                         </span>
                         <span className="text-sm font-semibold">Explore →</span>
                       </div>

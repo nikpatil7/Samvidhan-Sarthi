@@ -413,27 +413,27 @@ const ConstitutionalGamePage = () => {
       {
         title: "Level 0: Introduction",
         items: ["Preamble", "History", "Features"],
-        color: "#3498db"
+        color: "#054187"
       },
       {
         title: "Level 1: Basic Structure",
         items: ["Parts I-VIII", "Parts IX-XV", "Parts XVI-XXII"],
-        color: "#2ecc71"
+        color: "#138808"
       },
       {
         title: "Level 2: Schedules",
         items: ["Schedules 1-4", "Schedules 5-8", "Schedules 9-12"],
-        color: "#9b59b6"
+        color: "#FF9933"
       },
       {
         title: "Level 3: Amendments",
         items: ["1st-42nd", "43rd-86th", "87th-105th"],
-        color: "#f39c12"
+        color: "#E67F00"
       },
       {
         title: "Level 4: Advanced",
         items: ["Basic Structure", "Judicial Review", "Landmark Cases"],
-        color: "#e74c3c"
+        color: "#04356F"
       }
     ]
   };
@@ -735,11 +735,11 @@ const ConstitutionalGamePage = () => {
   
   // Game type definitions
   const gameTypes = [
-    {
-      id: 'spiral',
-      title: 'Constitution Spiral',
-      description: 'Explore the structure of the Indian Constitution through an interactive spiral',
-      icon: (
+      {
+        id: 'spiral',
+        title: 'Constitution Spiral',
+        description: 'Explore the structure of the Indian Constitution through an interactive spiral',
+        icon: (
         <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
         </svg>
@@ -835,10 +835,13 @@ const ConstitutionalGamePage = () => {
         </motion.div>
       )}
       
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
-        <div>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div className="max-w-2xl">
+          <div className="inline-flex items-center gap-2 rounded-full border border-secondary-100 bg-secondary-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-secondary-700 mb-3">
+            Learn by playing
+          </div>
           <h1 className="text-3xl font-bold text-gray-900">Constitutional Learning Games</h1>
-          <p className="text-gray-600 mt-1">Interactive games to test and improve your constitutional knowledge</p>
+          <p className="text-gray-600 mt-1">Interactive challenges that make rights, duties, and constitutional history easier to remember.</p>
         </div>
       </div>
       
@@ -848,10 +851,10 @@ const ConstitutionalGamePage = () => {
           <button
             key={game.id}
             onClick={() => handleGameSelect(game.id)}
-            className={`p-4 rounded-lg flex flex-col items-center transition ${
+            className={`p-4 rounded-2xl flex flex-col items-center transition border shadow-sm ${
               selectedGame === game.id
-                ? 'bg-primary-50 text-primary-700 border border-primary-200' 
-                : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
+                ? 'bg-primary-50 text-primary-700 border-primary-200' 
+                : 'bg-white text-gray-700 hover:bg-gray-50 border-gray-200'
             }`}
           >
             <div className={`p-3 rounded-full mb-2 ${
@@ -887,7 +890,7 @@ const ConstitutionalGamePage = () => {
                   whileHover={{ y: -5 }}
                   transition={{ duration: 0.2 }}
                   onClick={() => handleSpecificGameSelect(game)}
-                  className="bg-white p-4 rounded-lg cursor-pointer hover:bg-gray-50 border border-gray-200 shadow-sm"
+                  className="bg-white p-4 rounded-2xl cursor-pointer hover:bg-gray-50 border border-gray-200 shadow-sm"
                 >
                   <h3 className="font-medium text-gray-900 mb-2">{game.title}</h3>
                   <p className="text-sm text-gray-600 mb-3">{game.description}</p>
@@ -949,7 +952,10 @@ const ConstitutionalGamePage = () => {
       
       {/* Game badges and achievements */}
       <div className="card p-5">
-        <h2 className="text-xl font-bold text-gray-900 mb-4">Your Achievements</h2>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-bold text-gray-900">Your Achievements</h2>
+          <span className="text-xs font-semibold uppercase tracking-[0.2em] text-gray-500">Collect badges as you learn</span>
+        </div>
         
         {achievementsLoading ? (
           <div className="flex justify-center py-8">
@@ -960,7 +966,7 @@ const ConstitutionalGamePage = () => {
             {achievements.length > 0 ? (
               achievements.map(badge => (
                 <div key={badge.id} className="flex flex-col items-center">
-                  <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-2 ${getBadgeColor(badge.rarity, badge.earned)}`}>
+                  <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-2 shadow-sm ${getBadgeColor(badge.rarity, badge.earned)}`}>
                     {getBadgeIcon(badge.name)}
                   </div>
                   <span className={`text-sm ${badge.earned ? 'text-gray-900' : 'text-gray-500'}`}>{badge.name}</span>

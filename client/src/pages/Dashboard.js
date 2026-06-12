@@ -34,9 +34,12 @@ const ProgressCard = ({ title, value, maxValue, color = 'primary' }) => {
   const classes = getColorClasses(color);
   
   return (
-    <div className="card">
-      <h3 className="text-lg font-medium text-gray-200 mb-2">{title}</h3>
-      <div className="w-full bg-surface-200 rounded-full h-4 mb-2">
+    <div className="card border-t-4 border-primary-100">
+      <div className="flex items-center justify-between mb-2">
+        <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+        <span className="text-xs font-semibold uppercase tracking-wide text-gray-500">Mastery</span>
+      </div>
+      <div className="w-full bg-surface-200 rounded-full h-4 mb-3">
         <motion.div 
           className={`h-4 rounded-full ${classes.bar}`}
           initial={{ width: 0 }}
@@ -44,7 +47,7 @@ const ProgressCard = ({ title, value, maxValue, color = 'primary' }) => {
           transition={{ duration: 1, ease: "easeOut" }}
         />
       </div>
-      <div className="text-sm text-gray-600">
+      <div className="text-sm text-gray-600 font-medium">
         {value} of {maxValue} ({percentage}%)
       </div>
     </div>
@@ -56,16 +59,16 @@ const StatCard = ({ title, value, icon, color = 'primary' }) => {
 
   return (
     <motion.div 
-      className="card flex items-center"
+      className="card flex items-center gap-4 border-l-4 border-primary-100"
       whileHover={{ y: -5, boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' }}
       transition={{ duration: 0.2 }}
     >
-      <div className={`flex-shrink-0 h-12 w-12 rounded-lg ${classes.iconBg} flex items-center justify-center mr-4`}>
+      <div className={`flex-shrink-0 h-12 w-12 rounded-2xl ${classes.iconBg} flex items-center justify-center ring-1 ring-black/5`}>
         <span className={classes.iconText}>{icon}</span>
       </div>
       <div>
-        <p className="text-sm font-medium text-gray-600">{title}</p>
-        <h3 className="text-xl font-semibold text-gray-900">{value}</h3>
+        <p className="text-sm font-medium text-gray-500">{title}</p>
+        <h3 className="text-2xl font-bold text-gray-900 leading-tight">{value}</h3>
       </div>
     </motion.div>
   );
@@ -140,8 +143,11 @@ const Dashboard = () => {
     <div className="space-y-8">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-          <p className="text-sm text-gray-600 mt-1">Track your learning progress and recent activity.</p>
+          <div className="inline-flex items-center gap-2 rounded-full border border-primary-100 bg-primary-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-primary-700 mb-3">
+            Constitutional learning
+          </div>
+          <h1 className="text-3xl font-bold text-gray-900">Your learning journey</h1>
+          <p className="text-sm text-gray-600 mt-1">Track progress, revisit rights and duties, and keep building civic understanding.</p>
         </div>
         <div className="flex items-center space-x-2">
           <button
@@ -168,6 +174,54 @@ const Dashboard = () => {
       
       {dashboardData && (
         <>
+          <div className="card overflow-hidden border-primary-100 bg-gradient-to-br from-primary-50 via-white to-surface-200">
+            <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+              <div className="max-w-2xl space-y-4">
+                <div className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-secondary-700 border border-secondary-100">
+                  Learn your rights. Understand your duties.
+                </div>
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-900 leading-tight">
+                    {user?.name ? `Welcome back, ${user.name}` : 'Welcome back'}
+                  </h2>
+                  <p className="mt-2 text-gray-600 text-base leading-7">
+                    Constitutional learning works best when progress feels visible, purposeful, and rewarding.
+                    Each topic, quiz, and achievement brings you closer to becoming a more informed citizen.
+                  </p>
+                </div>
+                <div className="rounded-2xl border border-gray-200 bg-white/80 p-4 shadow-sm">
+                  <p className="text-sm font-medium text-primary-700">Civic learning reminder</p>
+                  <p className="mt-1 text-gray-700">
+                    "A constitution is not a mere lawyers' document, it is a vehicle of life and its spirit is always the spirit of the age."
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid w-full gap-3 sm:grid-cols-2 lg:w-[28rem]">
+                <div className="rounded-2xl border border-primary-100 bg-white p-4 shadow-sm">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Current progress</p>
+                  <p className="mt-2 text-3xl font-bold text-gray-900">{dashboardData.stats.overallProgress}%</p>
+                  <p className="text-sm text-gray-600">Overall constitutional mastery</p>
+                </div>
+                <div className="rounded-2xl border border-secondary-100 bg-white p-4 shadow-sm">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Topics completed</p>
+                  <p className="mt-2 text-3xl font-bold text-gray-900">{dashboardData.stats.completedTopics}/{dashboardData.stats.totalTopics}</p>
+                  <p className="text-sm text-gray-600">Across the selected country</p>
+                </div>
+                <div className="rounded-2xl border border-success-100 bg-white p-4 shadow-sm">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Average quiz score</p>
+                  <p className="mt-2 text-3xl font-bold text-gray-900">{dashboardData.stats.averageQuizScore}%</p>
+                  <p className="text-sm text-gray-600">Knowledge retention checkpoint</p>
+                </div>
+                <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Badges earned</p>
+                  <p className="mt-2 text-3xl font-bold text-gray-900">{dashboardData.stats.totalBadges}</p>
+                  <p className="text-sm text-gray-600">Rewards for consistent practice</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* Stats overview */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <StatCard 

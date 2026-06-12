@@ -15,6 +15,18 @@ const ConstitutionalTopicCard = ({ topic }) => {
     'default': 'border-gray-200 bg-surface-200 text-gray-700'
   };
 
+  const categoryAccent = {
+    'Fundamental Rights': 'bg-primary-500',
+    'Directive Principles': 'bg-secondary-500',
+    'Federal Structure': 'bg-success-500',
+    'Constitutional Bodies': 'bg-primary-600',
+    'Amendments': 'bg-secondary-600',
+    'Emergency Provisions': 'bg-success-600',
+    'Historical': 'bg-secondary-400',
+    'Judiciary': 'bg-primary-700',
+    'default': 'bg-gray-400'
+  };
+
   const difficultyStyles = {
     Beginner: 'bg-success-50 text-success-700 border-success-100',
     Intermediate: 'bg-secondary-50 text-secondary-700 border-secondary-100',
@@ -50,8 +62,9 @@ const ConstitutionalTopicCard = ({ topic }) => {
         className="block h-full"
       >
         <div 
-          className={`card h-full flex flex-col overflow-hidden border-t-4 ${categoryStyles[topic.category] ? categoryStyles[topic.category].split(' ')[0] : categoryStyles.default.split(' ')[0]}`}
+          className="card h-full flex flex-col overflow-hidden border border-gray-200 bg-white shadow-sm transition-shadow"
         >
+          <div className={`h-1 w-full ${categoryAccent[topic.category] || categoryAccent.default}`} />
           <div className="p-5 flex-grow">
             <div className="flex justify-between items-start mb-3">
               <div className="flex items-center gap-2">
@@ -68,6 +81,10 @@ const ConstitutionalTopicCard = ({ topic }) => {
             <p className="text-gray-600 text-sm mb-3 line-clamp-2">
               {topic.description}
             </p>
+
+            <div className="mb-4 rounded-xl border border-gray-200 bg-surface-200 px-3 py-2 text-xs font-medium text-gray-600">
+              Learn the constitutional idea behind {topic.category || 'this topic'}.
+            </div>
             
             <div className="mt-auto pt-3">
               <div className="flex flex-wrap gap-2">
@@ -85,7 +102,7 @@ const ConstitutionalTopicCard = ({ topic }) => {
             </div>
           </div>
           
-          <div className="px-5 py-3 border-t border-gray-200 flex justify-between items-center bg-surface-200/60">
+          <div className="px-5 py-3 border-t border-gray-200 flex justify-between items-center bg-surface-200/70">
             <div className="flex items-center text-sm text-gray-600">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />

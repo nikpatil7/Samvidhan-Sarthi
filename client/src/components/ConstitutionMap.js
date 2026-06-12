@@ -59,12 +59,18 @@ const ConstitutionMap = ({ country = 'India' }) => {
 
   // Level definitions
   const levels = [
-    { id: 'level0', title: 'Introduction', icon: '📚' },
-    { id: 'level1', title: 'Basic Structure', icon: '🏛️' },
-    { id: 'level2', title: 'Schedules', icon: '📜' },
-    { id: 'level3', title: 'Amendments', icon: '✏️' },
-    { id: 'level4', title: 'Advanced', icon: '🔍' }
+    { id: 'level0', title: 'Introduction', icon: '📚', tone: 'primary' },
+    { id: 'level1', title: 'Basic Structure', icon: '🏛️', tone: 'secondary' },
+    { id: 'level2', title: 'Schedules', icon: '📜', tone: 'success' },
+    { id: 'level3', title: 'Amendments', icon: '✏️', tone: 'primary' },
+    { id: 'level4', title: 'Advanced', icon: '🔍', tone: 'secondary' }
   ];
+
+  const levelToneStyles = {
+    primary: { selected: 'bg-primary-50 text-primary-700 border-primary-200 shadow-sm', idle: 'bg-white text-gray-700 border-gray-200' },
+    secondary: { selected: 'bg-secondary-50 text-secondary-700 border-secondary-200 shadow-sm', idle: 'bg-white text-gray-700 border-gray-200' },
+    success: { selected: 'bg-success-50 text-success-700 border-success-200 shadow-sm', idle: 'bg-white text-gray-700 border-gray-200' }
+  };
 
   // Animation variants
   const containerVariants = {
@@ -150,9 +156,12 @@ const ConstitutionMap = ({ country = 'India' }) => {
       </div>
 
       <div className="container mx-auto px-4">
-        <h1 className="text-3xl font-bold text-gray-900 mb-6 text-center">
-          {country} Constitution Map
-        </h1>
+        <div className="mx-auto mb-6 max-w-3xl text-center">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            {country} Constitution Map
+          </h1>
+          <p className="text-gray-600">Use the map to discover how constitutional ideas connect across levels and topics.</p>
+        </div>
         
         {/* Level Navigation */}
         <motion.div 
@@ -168,8 +177,8 @@ const ConstitutionMap = ({ country = 'India' }) => {
               onClick={() => setSelectedLevel(level.id)}
               className={`px-4 py-3 rounded-lg transition-all duration-300 flex items-center gap-2 ${
                 selectedLevel === level.id
-                  ? 'bg-primary-50 text-primary-700 shadow-sm border border-primary-200' 
-                  : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
+                  ? (levelToneStyles[level.tone]?.selected || levelToneStyles.primary.selected)
+                  : (levelToneStyles[level.tone]?.idle || levelToneStyles.primary.idle)
               }`}
             >
               <span className="text-xl">{level.icon}</span>
@@ -190,7 +199,8 @@ const ConstitutionMap = ({ country = 'India' }) => {
           <div className="relative flex justify-center items-center" style={{ height: '600px' }}>
             {/* Center Element */}
             <motion.div 
-              className="absolute z-10 bg-primary-500 rounded-full w-24 h-24 flex items-center justify-center text-white font-bold text-lg shadow-md"
+              className="absolute z-10 rounded-full w-24 h-24 flex items-center justify-center text-white font-bold text-lg shadow-md border-4 border-white"
+              style={{ background: 'linear-gradient(135deg, #054187 0%, #FF9933 100%)' }}
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ type: "spring", stiffness: 260, damping: 20, delay: 0.2 }}
@@ -235,13 +245,13 @@ const ConstitutionMap = ({ country = 'India' }) => {
                 >
                   <Link to={`/topics/${section.linkId}`}>
                     <motion.div 
-                      className={`w-20 h-20 md:w-24 md:h-24 rounded-full flex items-center justify-center shadow-lg cursor-pointer`}
+                      className="w-20 h-20 md:w-24 md:h-24 rounded-full flex items-center justify-center shadow-md cursor-pointer border-4 border-white"
                       style={{ backgroundColor: section.color }}
                     >
                       <div className="absolute whitespace-nowrap px-3 py-1 bg-white text-gray-700 rounded-lg text-sm font-medium pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity border border-gray-200 shadow-sm">
                         {section.title}
                       </div>
-                      <span className="text-white font-medium text-center text-xs md:text-sm">
+                      <span className="text-white font-semibold text-center text-xs md:text-sm px-2">
                         {section.title.split(':')[0]}
                       </span>
                     </motion.div>

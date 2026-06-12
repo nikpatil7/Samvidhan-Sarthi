@@ -267,15 +267,15 @@ const ContentDetail = () => {
       {/* Breadcrumb navigation */}
       {topic && (
         <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-gray-400">
-          <Link to="/topics" className="hover:text-primary-400 font-medium">
+          <Link to="/topics" className="hover:text-primary-600 font-medium">
             Topics
           </Link>
-          <span className="text-gray-600">/</span>
-          <Link to={`/topics/${topic._id}`} className="hover:text-primary-400 font-medium">
+          <span className="text-gray-400">/</span>
+          <Link to={`/topics/${topic._id}`} className="hover:text-primary-600 font-medium">
             {topic.title}
           </Link>
-          <span className="text-gray-600">/</span>
-          <span className="text-gray-200 font-semibold">
+          <span className="text-gray-400">/</span>
+          <span className="text-gray-700 font-semibold">
             {content.title}
           </span>
         </div>
@@ -283,9 +283,9 @@ const ContentDetail = () => {
       
       {/* Content title */}
       <div className="card">
-        <h1 className="text-2xl font-bold text-white mb-2">{content.title}</h1>
+        <h1 className="text-2xl font-bold text-gray-900 mb-2">{content.title}</h1>
         
-        <div className="flex items-center space-x-4 text-sm text-gray-400">
+        <div className="flex items-center space-x-4 text-sm text-gray-500">
           <span className="inline-flex items-center">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -322,15 +322,15 @@ const ContentDetail = () => {
                 transition={{ duration: 0.5 }}
               >
                 <div className="text-center py-6">
-                  <h2 className="text-2xl font-bold text-white mb-4">Quiz Results</h2>
+                  <h2 className="text-2xl font-bold text-gray-900 mb-4">Quiz Results</h2>
                   
-                  <div className="inline-block h-40 w-40 rounded-full border-8 border-primary-500 p-3 mb-4">
-                    <div className="h-full w-full rounded-full bg-primary-900/30 flex items-center justify-center">
-                      <span className="text-4xl font-bold text-primary-400">{quizScore}%</span>
+                  <div className="inline-block h-40 w-40 rounded-full border-8 border-primary-200 p-3 mb-4 bg-white shadow-sm">
+                    <div className="h-full w-full rounded-full bg-primary-50 flex items-center justify-center border border-primary-100">
+                      <span className="text-4xl font-bold text-primary-700">{quizScore}%</span>
                     </div>
                   </div>
                   
-                  <p className="text-lg text-gray-300 mb-6">
+                  <p className="text-lg text-gray-600 mb-6">
                     {quizScore >= 70 
                       ? 'Great job! You\'ve passed the quiz.' 
                       : 'You need to score at least 70% to pass. Try again!'}
@@ -354,7 +354,7 @@ const ContentDetail = () => {
               // Quiz questions
               <div className="space-y-6">
                 <div className="flex justify-between items-center">
-                  <h2 className="text-xl font-bold text-white">Question {currentQuizQuestion + 1} of {content.quiz.questions.length}</h2>
+                  <h2 className="text-xl font-bold text-gray-900">Question {currentQuizQuestion + 1} of {content.quiz.questions.length}</h2>
                   
                   <div className="bg-surface-200 h-2 rounded-full w-48 border border-gray-200">
                     <div 
@@ -371,7 +371,7 @@ const ContentDetail = () => {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.3 }}
                   >
-                    <h3 className="text-lg font-medium text-white mb-4">
+                    <h3 className="text-lg font-medium text-gray-900 mb-4">
                       {content.quiz.questions[currentQuizQuestion].question}
                     </h3>
                     
@@ -381,8 +381,8 @@ const ContentDetail = () => {
                           key={optionIndex}
                           className={`p-4 rounded-lg border-2 cursor-pointer ${
                             quizAnswers[currentQuizQuestion] === optionIndex
-                              ? 'border-primary-500 bg-primary-900/20'
-                              : 'border-gray-700 hover:border-gray-500'
+                              ? 'border-primary-500 bg-primary-50'
+                              : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
                           }`}
                           onClick={() => handleAnswerSelect(currentQuizQuestion, optionIndex)}
                         >
@@ -390,13 +390,13 @@ const ContentDetail = () => {
                             <div className={`h-5 w-5 rounded-full border-2 flex items-center justify-center mr-3 ${
                               quizAnswers[currentQuizQuestion] === optionIndex
                                 ? 'border-primary-500'
-                                : 'border-gray-600'
+                                : 'border-gray-300'
                             }`}>
                               {quizAnswers[currentQuizQuestion] === optionIndex && (
                                 <div className="h-2 w-2 rounded-full bg-primary-500"></div>
                               )}
                             </div>
-                            <span className="text-gray-200">{option.text}</span>
+                            <span className="text-gray-700">{option.text}</span>
                           </div>
                         </div>
                       ))}
@@ -429,7 +429,7 @@ const ContentDetail = () => {
           <div className="space-y-6">
             {/* Breadcrumb navigation */}
             {topic && (
-              <div className="flex items-center text-sm text-gray-400">
+              <div className="flex items-center text-sm text-gray-500">
                 <Link to="/topics" className="hover:text-primary-500">
                   Topics
                 </Link>
@@ -438,16 +438,16 @@ const ContentDetail = () => {
                   {topic.title}
                 </Link>
                 <span className="mx-2">/</span>
-                <span className="text-gray-300">{content.title}</span>
+                <span className="text-gray-700">{content.title}</span>
               </div>
             )}
             
             {/* Game header */}
             <div className="flex flex-col md:flex-row md:justify-between md:items-center space-y-4 md:space-y-0">
               <div>
-                <h1 className="text-2xl font-bold text-white">{content.title}</h1>
-                <p className="text-gray-400 mt-1">
-                  <span className="bg-primary-900/30 text-primary-400 text-xs px-2 py-1 rounded-full uppercase">
+                <h1 className="text-2xl font-bold text-gray-900">{content.title}</h1>
+                <p className="text-gray-500 mt-1">
+                  <span className="bg-primary-50 text-primary-700 text-xs px-2 py-1 rounded-full uppercase border border-primary-100">
                     Interactive Game
                   </span>
                   <span className="ml-2">·</span>
@@ -458,7 +458,7 @@ const ContentDetail = () => {
               </div>
               
               {gameCompleted && (
-                <div className="flex items-center bg-green-900/30 border border-green-800 text-green-400 px-4 py-2 rounded-lg">
+                <div className="flex items-center bg-success-50 border border-success-100 text-success-700 px-4 py-2 rounded-lg">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                   </svg>
@@ -470,7 +470,7 @@ const ContentDetail = () => {
             {/* Game description */}
             {content.content && (
               <div className="bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
-                <p className="text-gray-200 leading-relaxed">{content.content}</p>
+                <p className="text-gray-700 leading-relaxed">{content.content}</p>
               </div>
             )}
             

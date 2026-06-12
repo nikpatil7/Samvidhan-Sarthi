@@ -140,8 +140,8 @@ const TopicDetail = () => {
       <div 
         className="relative rounded-xl px-6 py-8 overflow-hidden"
         style={{ 
-          backgroundColor: topic.color || '#3498db',
-          backgroundImage: 'linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(0, 0, 0, 0.1) 100%)'
+          backgroundColor: topic.color || '#054187',
+          backgroundImage: 'linear-gradient(135deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0.02) 100%)'
         }}
       >
         <div className="absolute right-4 top-4 opacity-10">
@@ -173,10 +173,10 @@ const TopicDetail = () => {
             <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-white/70 text-gray-700 border border-gray-200">
               {topic.category}
             </span>
-            <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-black/20 text-white">
+            <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-white/70 text-gray-700 border border-gray-200">
               {topic.difficulty}
             </span>
-            <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-black/20 text-white">
+            <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-white/70 text-gray-700 border border-gray-200">
               {topic.country}
             </span>
           </div>

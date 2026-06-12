@@ -12,14 +12,37 @@ const ConstitutionMapPage = () => {
   
   return (
     <div className="container mx-auto px-4 py-8">
+      <div className="card mb-8 overflow-hidden bg-gradient-to-br from-primary-50 via-white to-surface-200 border-primary-100">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div className="max-w-2xl">
+            <div className="inline-flex items-center gap-2 rounded-full border border-primary-100 bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-primary-700 mb-3">
+              Constitutional exploration
+            </div>
+            <h1 className="text-4xl font-bold text-gray-900 mb-2">Constitution Map</h1>
+            <p className="text-gray-600 leading-7">
+              Explore the structure of the Constitution like a guided learning journey, with each level arranged to make discovery feel intentional and educational.
+            </p>
+          </div>
+          <div className="grid grid-cols-2 gap-3 sm:min-w-[18rem]">
+            <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+              <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Focus</p>
+              <p className="mt-2 text-base font-semibold text-gray-900">Rights to review</p>
+            </div>
+            <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+              <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Mode</p>
+              <p className="mt-2 text-base font-semibold text-gray-900">Structured exploration</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <h1 className="text-4xl font-bold text-gray-900 mb-2">Constitution Map</h1>
         <p className="text-gray-600 mb-8">
-          Explore the structure and organization of constitutional documents with an interactive map
+          Use the level tabs and the map view to move through constitutional content in a structured, visual sequence.
         </p>
       </motion.div>
       

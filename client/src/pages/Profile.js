@@ -259,7 +259,7 @@ const Profile = () => {
                   className="h-24 w-24 rounded-full object-cover border-2 border-primary-600"
                 />
               ) : (
-                <div className="h-24 w-24 rounded-full bg-primary-500 flex items-center justify-center text-white text-4xl font-medium shadow-sm">
+                <div className="h-24 w-24 rounded-full bg-primary-50 flex items-center justify-center text-primary-700 text-4xl font-medium shadow-sm border border-primary-100">
                   {getUserInitials()}
                 </div>
               )}
@@ -290,8 +290,8 @@ const Profile = () => {
               </label>
             </div>
             
-            <h2 className="text-xl font-bold text-white">{user?.name || user?.username}</h2>
-            <p className="text-gray-400">{user?.email}</p>
+            <h2 className="text-xl font-bold text-gray-900">{user?.name || user?.username}</h2>
+            <p className="text-gray-600">{user?.email}</p>
             <p className="text-xs text-gray-500 mt-1">Hover avatar to change photo</p>
             
             <div className="mt-6">

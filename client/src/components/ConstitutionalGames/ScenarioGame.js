@@ -133,7 +133,7 @@ const ScenarioGame = ({ scenarioData, onComplete, isCompleted, score, onPlayAgai
   }
 
   return (
-    <div className="bg-white rounded-lg p-6 border border-gray-200 shadow-sm">
+    <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
       <AnimatePresence mode="wait">
         {completed ? (
           // Results screen
@@ -152,18 +152,18 @@ const ScenarioGame = ({ scenarioData, onComplete, isCompleted, score, onPlayAgai
               animate={{ scale: 1, rotate: 360 }}
               transition={{ type: "spring", stiffness: 50, damping: 10 }}
             >
-              <div className="h-full w-full rounded-full bg-primary-900/30 flex items-center justify-center">
-                <span className="text-4xl font-bold text-primary-400">{typeof score === 'number' ? score : Math.round((gameScore / scenarioData.length) * 100)}%</span>
+              <div className="h-full w-full rounded-full bg-primary-50 flex items-center justify-center border border-primary-100">
+                <span className="text-4xl font-bold text-primary-700">{typeof score === 'number' ? score : Math.round((gameScore / scenarioData.length) * 100)}%</span>
               </div>
             </motion.div>
             
             <div className="max-w-md mx-auto mb-8">
               <h3 className="text-xl font-medium text-gray-900 mb-4">Your Results</h3>
               
-              <div className="bg-surface-200 rounded-lg p-4 mb-4 border border-gray-200">
+              <div className="bg-surface-200 rounded-xl p-4 mb-4 border border-gray-200">
                 <div className="flex justify-between mb-2">
                   <span className="text-gray-600">Correct Decisions:</span>
-                  <span className="text-green-400 font-medium">
+                  <span className="text-success-700 font-medium">
                     {gameScore} out of {scenarioData.length}
                   </span>
                 </div>
@@ -171,7 +171,7 @@ const ScenarioGame = ({ scenarioData, onComplete, isCompleted, score, onPlayAgai
                 <div className="flex justify-between">
                   <span className="text-gray-600">Constitutional Expertise:</span>
                   <span className={`font-medium ${
-                    gameScore / scenarioData.length >= 0.7 ? 'text-green-400' : 'text-yellow-400'
+                    gameScore / scenarioData.length >= 0.7 ? 'text-success-700' : 'text-secondary-700'
                   }`}>
                     {gameScore / scenarioData.length >= 0.9 ? 'Constitutional Expert' :
                      gameScore / scenarioData.length >= 0.7 ? 'Constitutional Scholar' :
@@ -227,7 +227,7 @@ const ScenarioGame = ({ scenarioData, onComplete, isCompleted, score, onPlayAgai
             <div className="space-y-6">
               {/* Scenario description */}
               <motion.div 
-                className="bg-white rounded-lg p-6 border border-gray-200 shadow-sm"
+                className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm"
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3 }}
@@ -243,13 +243,13 @@ const ScenarioGame = ({ scenarioData, onComplete, isCompleted, score, onPlayAgai
                 </p>
                 
                 <div className="flex justify-between items-center">
-                  <div className="text-primary-400 font-medium">
+                  <div className="text-primary-700 font-medium">
                     {currentScenarioData.question || "What would you decide?"}
                   </div>
                   
                   <button 
                     onClick={toggleHint}
-                    className="text-primary-400 hover:text-primary-300 text-sm flex items-center"
+                    className="text-primary-700 hover:text-primary-600 text-sm flex items-center"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -261,7 +261,7 @@ const ScenarioGame = ({ scenarioData, onComplete, isCompleted, score, onPlayAgai
                 <AnimatePresence>
                   {showHint && (
                     <motion.div 
-                      className="mt-4 p-3 bg-primary-900/20 border border-primary-800 rounded-lg"
+                      className="mt-4 p-3 bg-primary-50 border border-primary-100 rounded-lg"
                       initial={{ opacity: 0, height: 0, marginTop: 0 }}
                       animate={{ opacity: 1, height: 'auto', marginTop: 16 }}
                       exit={{ opacity: 0, height: 0, marginTop: 0 }}
@@ -296,29 +296,29 @@ const ScenarioGame = ({ scenarioData, onComplete, isCompleted, score, onPlayAgai
                         className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${
                           feedback !== null && userChoices[currentScenario] === optionIndex
                             ? isOptionCorrect
-                                ? 'border-green-500 bg-green-900/20'
-                                : 'border-red-500 bg-red-900/20'
+                                ? 'border-success-500 bg-success-50'
+                                : 'border-red-500 bg-red-50'
                             : userChoices[currentScenario] === optionIndex
-                              ? 'border-primary-500 bg-primary-900/20'
-                              : 'border-gray-700 hover:border-gray-500'
+                              ? 'border-primary-500 bg-primary-50'
+                              : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
                         }`}
                         onClick={() => handleSelectOption(optionIndex)}
                         whileHover={feedback === null ? { scale: 1.01, borderColor: '#6c5ce7' } : {}}
                         animate={
                           feedback !== null && userChoices[currentScenario] === optionIndex
                             ? isOptionCorrect
-                              ? { borderColor: '#2ecc71', backgroundColor: 'rgba(46, 204, 113, 0.1)' }
-                              : { borderColor: '#e74c3c', backgroundColor: 'rgba(231, 76, 60, 0.1)' }
+                              ? { borderColor: '#138808', backgroundColor: 'rgba(19, 136, 8, 0.08)' }
+                              : { borderColor: '#dc2626', backgroundColor: 'rgba(220, 38, 38, 0.08)' }
                             : {}
                         }
                       >
                         <div className="flex items-center">
                           <div className={`h-5 w-5 rounded-full border-2 flex items-center justify-center mr-3 ${
                             userChoices[currentScenario] === optionIndex
-                              ? (feedback !== null ? 
-                                  isOptionCorrect ? 'border-green-500 bg-green-500' : 'border-red-500 bg-red-500' 
+                                ? (feedback !== null ? 
+                                  isOptionCorrect ? 'border-success-500 bg-success-500' : 'border-red-500 bg-red-500' 
                                   : 'border-primary-500 bg-primary-500')
-                              : 'border-gray-600'
+                                : 'border-gray-300'
                           }`}>
                             {userChoices[currentScenario] === optionIndex && (
                               <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 text-gray-700" viewBox="0 0 20 20" fill="currentColor">
@@ -335,7 +335,7 @@ const ScenarioGame = ({ scenarioData, onComplete, isCompleted, score, onPlayAgai
                         <AnimatePresence>
                           {feedback !== null && userChoices[currentScenario] === optionIndex && (
                             <motion.div 
-                              className={`mt-3 pt-3 border-t ${isOptionCorrect ? 'border-green-500/30 text-green-400' : 'border-red-500/30 text-red-400'}`}
+                              className={`mt-3 pt-3 border-t ${isOptionCorrect ? 'border-success-200 text-success-700' : 'border-red-200 text-red-600'}`}
                               initial={{ opacity: 0, height: 0, marginTop: 0, paddingTop: 0 }}
                               animate={{ opacity: 1, height: 'auto', marginTop: 12, paddingTop: 12 }}
                               transition={{ duration: 0.3, delay: 0.2 }}
@@ -357,7 +357,7 @@ const ScenarioGame = ({ scenarioData, onComplete, isCompleted, score, onPlayAgai
                     className={`px-6 py-2.5 rounded-lg transition-colors ${
                       userChoices[currentScenario] !== null 
                         ? 'bg-primary-600 hover:bg-primary-700 text-white'
-                        : 'bg-gray-700 text-gray-400 cursor-not-allowed'
+                        : 'bg-gray-200 text-gray-500 cursor-not-allowed'
                     }`}
                     onClick={handleSubmitAnswer}
                     disabled={userChoices[currentScenario] === null}
