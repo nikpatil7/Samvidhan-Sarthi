@@ -1,154 +1,319 @@
 
-const mongoose = require('mongoose');
+
+require('dotenv').config({
+  path: require('path').resolve(__dirname, '../.env')
+});
 
 const UserStory = require('../models/UserStory');
+const mongoose = require('mongoose');
 
-
+const MONGO_URI = 'mongodb://127.0.0.1:27017/samvidhan_sarthi'; // replace with your actual URI
 
 const stories = [
-  {
-    title: 'How RTI Helped a Village Get Clean Drinking Water',
-    author: 'Ramesh Patil',
-    category: 'Right to Information',
-    imageUrl: '',
-    content: `
-      Ramesh Patil lived in a small village where residents faced severe drinking water shortages.
-The local administration had repeatedly claimed that funds had been allocated for a new water pipeline,
-but no visible work had been completed.
+{
+  title: "A Farmer Used RTI to Track Delayed Irrigation Funds",
+  author: "Mahesh Jadhav, Solapur, Maharashtra",
+  category: "Right to Information",
+  imageUrl: "",
+  content: `
+Problem Faced
 
-After learning about the Right to Information Act, Ramesh filed an RTI application seeking details
-about the sanctioned budget, contractor information, and project status.
+Mahesh Jadhav, a farmer from Solapur, depended on seasonal rainfall for irrigation. A government scheme had promised funding for a local canal project, but work remained incomplete for years.
 
-The information revealed that funds had already been released months earlier.
-With this evidence, villagers approached district authorities and demanded accountability.
+How Constitutional Awareness Helped
 
-An inquiry was initiated, construction resumed, and within a few months the village received
-a functioning water supply system.
+During a village awareness program, Mahesh learned about the Right to Information Act. He filed an RTI application seeking details regarding sanctioned funds, project timelines, and contractor information.
 
-This story demonstrates how constitutional principles of transparency and accountability empower
-citizens to participate in governance and ensure public resources are used properly.
+Outcome
+
+The documents revealed delays and administrative negligence. After presenting the findings to district authorities, work resumed and the canal project was completed.
+
+Impact
+
+The improved irrigation system benefited hundreds of farmers and increased agricultural productivity across nearby villages.
+
+Constitutional Principle
+
+Transparency, Accountability and Citizen Participation.
 `
-  },
+},
 
-  {
-    title: 'A Girl’s Journey to Education Through Constitutional Rights',
-    author: 'Priya Sharma',
-    category: 'Right to Education',
-    imageUrl: '',
-    content: `
-Priya belonged to a financially disadvantaged family.
-When her parents struggled to pay school fees, there was a possibility that she would have to leave school.
+{
+  title: "A Student Continued Her Education Through Awareness of Article 21A",
+  author: "Sneha Kulkarni, Nagpur, Maharashtra",
+  category: "Right to Education",
+  imageUrl: "",
+  content: `
+Problem Faced
 
-A local teacher informed the family about Article 21A of the Constitution,
-which guarantees the Right to Education for children.
+Sneha's family faced financial difficulties and considered discontinuing her education after secondary school.
 
-With support from local authorities and government educational programs,
-Priya was able to continue her studies without interruption.
+How Constitutional Awareness Helped
 
-She completed her schooling, earned a scholarship, and later became the first engineer in her family.
+A school teacher informed the family about Article 21A and government educational assistance programs available for economically weaker sections.
 
-Her story highlights how constitutional provisions are not merely legal principles;
-they create opportunities that can transform lives and help break cycles of poverty.
+Outcome
+
+Sneha received support through scholarships and educational schemes, allowing her to continue her studies.
+
+Impact
+
+She successfully completed higher education and became the first graduate in her family.
+
+Constitutional Principle
+
+Right to Education and Equal Opportunity.
 `
-  },
+},
 
-  {
-    title: 'Using Freedom of Speech to Raise Community Concerns',
-    author: 'Arjun Deshmukh',
-    category: 'Freedom of Speech',
-    imageUrl: '',
-    content: `
-Arjun noticed dangerous potholes and damaged roads in his locality.
-Several accidents had occurred, but the issue remained unresolved.
+{
+  title: "Citizens Improved Road Safety Through Freedom of Expression",
+  author: "Arjun Deshmukh, Pune, Maharashtra",
+  category: "Freedom of Speech",
+  imageUrl: "",
+  content: `
+Problem Faced
 
-Using his constitutional right to freedom of speech and expression under Article 19,
-he organized awareness campaigns and shared evidence with local authorities.
+Several accidents occurred on a poorly maintained road in Arjun's locality.
 
-Citizens joined together, signed petitions, and participated in community meetings.
+How Constitutional Awareness Helped
 
-The growing public attention encouraged the municipal administration to take action.
-Repairs were completed, and road safety improved significantly.
+Arjun organized meetings, collected citizen feedback, and submitted representations to local authorities while exercising his freedom of speech and expression.
 
-This experience showed how democratic participation and constitutional freedoms
-allow citizens to voice concerns and contribute positively to society.
+Outcome
+
+Municipal authorities inspected the area and initiated repairs.
+
+Impact
+
+Road conditions improved significantly, reducing accidents and improving public safety.
+
+Constitutional Principle
+
+Freedom of Speech and Democratic Participation.
 `
-  },
+},
 
-  {
-    title: 'Equal Opportunity Through Constitutional Protection',
-    author: 'Neha Verma',
-    category: 'Right to Equality',
-    imageUrl: '',
-    content: `
-Neha applied for a local training program but felt she had been treated unfairly during the selection process.
+{
+  title: "Fair Recruitment Achieved Through Awareness of Equality Rights",
+  author: "Neha Verma, Jaipur, Rajasthan",
+  category: "Right to Equality",
+  imageUrl: "",
+  content: `
+Problem Faced
 
-After learning about Articles 14, 15, and 16 of the Constitution,
-which guarantee equality before law and prohibit discrimination,
-she sought clarification from the authorities.
+Neha noticed inconsistencies during a local recruitment process and felt candidates were not being evaluated fairly.
 
-The review revealed inconsistencies in the selection process.
-The organization corrected the procedure and implemented transparent evaluation criteria.
+How Constitutional Awareness Helped
 
-Neha eventually secured admission through the revised process.
+After learning about Articles 14, 15 and 16, she requested clarification regarding the recruitment criteria.
 
-Her story demonstrates how constitutional guarantees of equality help create fair opportunities
-and protect individuals from arbitrary treatment.
+Outcome
+
+The process was reviewed and transparent evaluation standards were introduced.
+
+Impact
+
+The revised system ensured equal opportunity for all applicants.
+
+Constitutional Principle
+
+Equality Before Law and Equal Opportunity.
 `
-  },
+},
 
-  {
-    title: 'Protecting a Local Lake Through Environmental Rights',
-    author: 'Sanjay Kulkarni',
-    category: 'Environmental Protection',
-    imageUrl: '',
-    content: `
-Residents of a town noticed increasing pollution in a nearby lake that served as a major source of water.
+{
+  title: "Women Used Constitutional Awareness to Start a Self-Help Initiative",
+  author: "Shalini Devi, Gaya, Bihar",
+  category: "Women Empowerment",
+  imageUrl: "",
+  content: `
+Problem Faced
 
-Sanjay and other citizens studied legal provisions related to environmental protection
-and learned that the Supreme Court has interpreted Article 21
-(Right to Life) to include the right to a clean and healthy environment.
+Many women in the village lacked access to financial resources and employment opportunities.
 
-The community gathered evidence, filed complaints, and worked with local authorities.
+How Constitutional Awareness Helped
 
-Cleanup measures were introduced, waste disposal practices improved,
-and awareness programs were conducted across the town.
+A local NGO conducted sessions on equality, dignity and women's rights guaranteed under the Constitution.
 
-The lake gradually recovered, benefiting both residents and local wildlife.
+Outcome
 
-This story illustrates how constitutional rights can support environmental protection
-and encourage collective civic action.
+The women formed self-help groups, received skill training and started small businesses.
+
+Impact
+
+Household incomes increased and more women actively participated in community decision-making.
+
+Constitutional Principle
+
+Equality, Dignity and Empowerment.
 `
-  }
+},
+
+{
+  title: "Saving a Community Lake Through Environmental Awareness",
+  author: "Sanjay Kulkarni, Nashik, Maharashtra",
+  category: "Environmental Protection",
+  imageUrl: "",
+  content: `
+Problem Faced
+
+A local lake was being polluted by improper waste disposal.
+
+How Constitutional Awareness Helped
+
+Residents learned that the right to life under Article 21 includes the right to a clean and healthy environment.
+
+Outcome
+
+Citizens organized awareness drives and submitted complaints to authorities.
+
+Impact
+
+Cleanup measures were implemented and the lake ecosystem gradually recovered.
+
+Constitutional Principle
+
+Right to Life and Environmental Protection.
+`
+},
+
+{
+  title: "A Gram Sabha Meeting Changed Village Development Priorities",
+  author: "Ravi Kumar, Belagavi, Karnataka",
+  category: "Local Governance",
+  imageUrl: "",
+  content: `
+Problem Faced
+
+Basic infrastructure projects in Ravi's village remained pending despite repeated requests.
+
+How Constitutional Awareness Helped
+
+Ravi encouraged villagers to actively participate in Gram Sabha meetings and voice their concerns.
+
+Outcome
+
+The community collectively prioritized road repairs and sanitation projects.
+
+Impact
+
+Several pending development works were approved and completed.
+
+Constitutional Principle
+
+Decentralized Governance and Citizen Participation.
+`
+},
+
+{
+  title: "First-Time Voters Increased Electoral Participation",
+  author: "Ananya Sharma, Bhopal, Madhya Pradesh",
+  category: "Voting Rights",
+  imageUrl: "",
+  content: `
+Problem Faced
+
+Many young citizens in Ananya's locality were unaware of voter registration procedures.
+
+How Constitutional Awareness Helped
+
+Ananya organized voter awareness sessions and helped eligible citizens complete registration.
+
+Outcome
+
+Hundreds of first-time voters participated in elections.
+
+Impact
+
+The initiative strengthened democratic participation within the community.
+
+Constitutional Principle
+
+Democracy and Universal Adult Suffrage.
+`
+},
+
+{
+  title: "Parents Ensured Better School Facilities Through Collective Action",
+  author: "Rakesh Yadav, Lucknow, Uttar Pradesh",
+  category: "Education Rights",
+  imageUrl: "",
+  content: `
+Problem Faced
+
+A government school lacked proper sanitation and classroom infrastructure.
+
+How Constitutional Awareness Helped
+
+Parents approached education authorities and highlighted students' rights to quality education.
+
+Outcome
+
+Additional funds were sanctioned and facilities were upgraded.
+
+Impact
+
+Students benefited from a safer and more effective learning environment.
+
+Constitutional Principle
+
+Right to Education and Child Welfare.
+`
+},
+
+{
+  title: "Citizens Resolved Public Service Delays Through Awareness and Accountability",
+  author: "Meena Patel, Ahmedabad, Gujarat",
+  category: "Good Governance",
+  imageUrl: "",
+  content: `
+Problem Faced
+
+Residents experienced repeated delays in obtaining important public service documents.
+
+How Constitutional Awareness Helped
+
+Citizens collectively approached officials, requested status updates and demanded transparent procedures.
+
+Outcome
+
+Administrative processes were streamlined and service delivery improved.
+
+Impact
+
+People received documents more efficiently and confidence in local governance increased.
+
+Constitutional Principle
+
+Accountability, Transparency and Good Governance.
+`
+}
+
 ];
 
-mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/samvidhan_sarthi', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-  }).then(() => {
-    console.log('Connected to MongoDB');
-  }).catch(err => {
-    console.error('Error connecting to MongoDB:', err);
-    process.exit(1);
-  });
-  
 async function seedUserStories() {
   try {
-    
+    await mongoose.connect(
+        process.env.MONGO_URI || 'mongodb://localhost:27017/samvidhan_sarthi'
+      );
+  
+      console.log('Connected to MongoDB');
+  
+      await UserStory.deleteMany({});
+      console.log('Existing stories removed');
+  
+      await UserStory.insertMany(stories);
+      console.log(`${stories.length} user stories added successfully`);
+  
+      await mongoose.connection.close();
+  
+      process.exit(0);
 
-    console.log('Connected to MongoDB');
-
-    await UserStory.deleteMany({});
-    console.log('Existing stories removed');
-
-    await UserStory.insertMany(stories);
-    console.log(`${stories.length} user stories added successfully`);
-
-    process.exit(0);
   } catch (error) {
-    console.error('Error seeding user stories:', error);
+    console.error('❌ Error seeding user stories:', error);
     process.exit(1);
   }
 }
 
 seedUserStories();
-
