@@ -44,6 +44,12 @@ const contentSchema = new mongoose.Schema(
         }],
         explanation: {
           type: String
+        },
+        // NEW — classifies the question; legacy documents default to 'recall'
+        questionType: {
+          type: String,
+          enum: ['recall', 'application'],
+          default: 'recall'
         }
       }]
     },
@@ -53,6 +59,27 @@ const contentSchema = new mongoose.Schema(
     isActive: {
       type: Boolean,
       default: true
+    },
+    // NEW — one of seven Module_Step identifiers; absent on legacy documents
+    moduleStep: {
+      type: String,
+      enum: [
+        'why-it-matters',
+        'real-life-scenario',
+        'constitutional-concept',
+        'case-example',
+        'interactive-assessment',
+        'reinforcement-activity',
+        'key-takeaways',
+        'pre-test',
+        'post-test'
+      ],
+      default: undefined
+    },
+    // NEW — marks content as validated for plain language
+    plainLanguageValidated: {
+      type: Boolean,
+      default: false
     }
   },
   { timestamps: true }

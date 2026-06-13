@@ -118,6 +118,46 @@ const TopicDetail = () => {
     return labels[type] || type;
   };
 
+  // Module step configuration for experiential learning
+  const moduleSteps = [
+    { key: 'why-it-matters', label: 'Why It Matters', icon: '💡', description: 'Understand the importance of this topic' },
+    { key: 'real-life-scenario', label: 'Real-Life Scenario', icon: '🌍', description: 'Explore a real-world situation' },
+    { key: 'constitutional-concept', label: 'Constitutional Concept', icon: '📚', description: 'Learn the core constitutional principles' },
+    { key: 'case-example', label: 'Case Example', icon: '⚖️', description: 'Study a relevant case or example' },
+    { key: 'interactive-assessment', label: 'Interactive Assessment', icon: '📝', description: 'Test your understanding' },
+    { key: 'reinforcement-activity', label: 'Reinforcement Activity', icon: '🎮', description: 'Practice with interactive activities' },
+    { key: 'key-takeaways', label: 'Key Takeaways', icon: '✨', description: 'Review important points' }
+  ];
+
+  // Check if topic uses module-based learning (has migrationStatus and content with moduleStep)
+  const usesModuleBasedLearning = topic?.migrationStatus && topic.migrationStatus !== 'legacy' && 
+    content.some(item => item.moduleStep);
+
+  // Group content by module step
+  const contentByModuleStep = () => {
+    const grouped = {};
+    moduleSteps.forEach(step => {
+      grouped[step.key] = content.filter(item => item.moduleStep === step.key);
+    });
+    return grouped;
+  };
+
+  // Calculate module step completion
+  const getModuleStepCompletion = (stepKey) => {
+    if (!progress) return 0;
+    const stepContent = content.filter(item => item.moduleStep === stepKey);
+    if (stepContent.length === 0) return 0;
+    
+    const completedCount = stepContent.filter(item => isContentCompleted(item._id)).length;
+    return Math.round((completedCount / stepContent.length) * 100);
+  };
+
+  // Get module step icon
+  const getModuleStepIcon = (stepKey) => {
+    const step = moduleSteps.find(s => s.key === stepKey);
+    return step ? step.icon : '📄';
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-80">
@@ -201,15 +241,96 @@ const TopicDetail = () => {
         </div>
       )}
       
-      {/* Content list */}
+      {/* Content list - Module-based or Linear */}
       <div className="card">
-        <h2 className="text-xl font-bold text-white mb-4">Learning Content</h2>
+        <h2 className="text-xl font-bold text-white mb-4">
+          {usesModuleBasedLearning ? 'Learning Journey' : 'Learning Content'}
+        </h2>
         
         {content.length === 0 ? (
           <div className="text-center py-6 text-gray-400">
             <p>No content available for this topic yet.</p>
           </div>
+        ) : usesModuleBasedLearning ? (
+          // Module-based learning view
+          <div className="space-y-6">
+            {moduleSteps.map((step, stepIndex) => {
+              const stepContent = content.filter(item => item.moduleStep === step.key);
+              if (stepContent.length === 0) return null;
+              
+              const stepCompletion = getModuleStepCompletion(step.key);
+              
+              return (
+                <motion.div
+                  key={step.key}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: stepIndex * 0.1 }}
+                  className="border border-dark-200 rounded-lg overflow-hidden"
+                >
+                  {/* Module step header */}
+                  <div className="bg-dark-200 px-4 py-3 flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <span className="text-2xl">{step.icon}</span>
+                      <div>
+                        <h3 className="text-lg font-semibold text-white">{step.label}</h3>
+                        <p className="text-sm text-gray-400">{step.description}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <span className="text-sm text-gray-400">{stepCompletion}%</span>
+                      <div className="w-20 bg-dark-300 rounded-full h-2">
+                        <div 
+                          className="h-2 rounded-full bg-primary-500"
+                          style={{ width: `${stepCompletion}%` }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Module step content */}
+                  <div className="p-4 space-y-2">
+                    {stepContent.map((item) => (
+                      <Link
+                        key={item._id}
+                        to={`/content/${item._id}`}
+                        className="flex items-center p-3 rounded-lg bg-dark-100 hover:bg-dark-50 transition-colors"
+                      >
+                        <div className="flex-shrink-0 h-8 w-8 rounded-lg bg-primary-600/20 flex items-center justify-center mr-3">
+                          <span className="text-primary-500 text-sm">
+                            {getContentTypeIcon(item.type)}
+                          </span>
+                        </div>
+                        
+                        <div className="flex-1 min-w-0">
+                          <h4 className="text-sm font-medium text-white truncate">{item.title}</h4>
+                          <p className="text-xs text-gray-400">
+                            {getContentTypeLabel(item.type)} • {item.estimatedTime} min
+                          </p>
+                        </div>
+                        
+                        <div className="ml-3 flex-shrink-0">
+                          {isContentCompleted(item._id) ? (
+                            <span className="text-green-400">
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                              </svg>
+                            </span>
+                          ) : (
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                            </svg>
+                          )}
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                </motion.div>
+              );
+            })}
+          </div>
         ) : (
+          // Linear content view (backward compatible)
           <motion.div 
             className="space-y-2"
             initial="hidden"

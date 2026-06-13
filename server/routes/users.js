@@ -352,8 +352,50 @@ async function checkAndAwardAchievements(userId) {
         );
         return total + constitutionalQuizzes.length;
       }, 0),
-      totalActivities: userProgress.reduce((total, p) => total + p.activities.length, 0)
+      totalActivities: userProgress.reduce((total, p) => total + p.activities.length, 0),
+      // New experiential learning stats
+      scenarioPerformanceScores: userProgress.map(p => p.scenarioPerformanceScore).filter(s => s !== null),
+      moduleStepCompletions: {},
+      applicationQuestionScores: [],
+      preTestScores: [],
+      postTestScores: []
     };
+    
+    // Calculate module step completions
+    userProgress.forEach(p => {
+      contents.filter(c => c._id.toString() && c.moduleStep).forEach(c => {
+        const step = c.moduleStep;
+        const isCompleted = p.activities.some(a => a.activityId.toString() === c._id.toString() && a.completed) ||
+                          p.quizScores.some(q => q.quizId.toString() === c._id.toString());
+        if (!stats.moduleStepCompletions[step]) {
+          stats.moduleStepCompletions[step] = new Set();
+        }
+        if (isCompleted) {
+          stats.moduleStepCompletions[step].add(p.topic.toString());
+        }
+      });
+    });
+    
+    // Convert Sets to counts
+    Object.keys(stats.moduleStepCompletions).forEach(step => {
+      stats.moduleStepCompletions[step] = stats.moduleStepCompletions[step].size;
+    });
+    
+    // Calculate application question scores
+    userProgress.forEach(p => {
+      p.quizScores.forEach(qs => {
+        const content = contents.find(c => c._id.toString() === qs.quizId.toString());
+        if (content && content.quiz && content.quiz.questions) {
+          const applicationQuestions = content.quiz.questions.filter(q => q.questionType === 'application');
+          if (applicationQuestions.length > 0) {
+            stats.applicationQuestionScores.push({
+              score: qs.score,
+              applicationCount: applicationQuestions.length
+            });
+          }
+        }
+      });
+    });
     
     // Check each badge requirement and award if eligible
     const newBadges = [];
@@ -399,6 +441,89 @@ async function checkAndAwardAchievements(userId) {
                           q.score >= 80)
             )
           );
+          break;
+        // New experiential learning badges
+        case 'Scenario Master':
+          const highScenarioPerformance = stats.scenarioPerformanceScores.filter(s => s >= 80).length;
+          eligible = highScenarioPerformance >= (badge.requirements.minTopics || 5);
+          break;
+        case 'First Steps':
+          eligible = (stats.moduleStepCompletions['why-it-matters'] || 0) >= (badge.requirements.minTopics || 3);
+          break;
+        case 'Constitutional Reasoner':
+          const highApplicationScores = stats.applicationQuestionScores.filter(s => s.score >= 80).length;
+          eligible = highApplicationScores >= (badge.requirements.minQuizzes || 5);
+          break;
+        case 'Module Journey Complete':
+          // Check if any topic has all 7 module steps completed
+          eligible = userProgress.some(p => {
+            const completedSteps = new Set();
+            contents.filter(c => c.topic.toString() === p.topic.toString() && c.moduleStep).forEach(c => {
+              const isCompleted = p.activities.some(a => a.activityId.toString() === c._id.toString() && a.completed) ||
+                                p.quizScores.some(q => q.quizId.toString() === c._id.toString());
+              if (isCompleted) completedSteps.add(c.moduleStep);
+            });
+            return completedSteps.size >= 7;
+          });
+          break;
+        case 'Learning Journey Expert':
+          const topicsWithAllSteps = userProgress.filter(p => {
+            const completedSteps = new Set();
+            contents.filter(c => c.topic.toString() === p.topic.toString() && c.moduleStep).forEach(c => {
+              const isCompleted = p.activities.some(a => a.activityId.toString() === c._id.toString() && a.completed) ||
+                                p.quizScores.some(q => q.quizId.toString() === c._id.toString());
+              if (isCompleted) completedSteps.add(c.moduleStep);
+            });
+            return completedSteps.size >= 7;
+          }).length;
+          eligible = topicsWithAllSteps >= (badge.requirements.minTopics || 5);
+          break;
+        case 'Case Study Analyst':
+          eligible = (stats.moduleStepCompletions['case-example'] || 0) >= (badge.requirements.minTopics || 3);
+          break;
+        case 'Reinforcement Champion':
+          eligible = (stats.moduleStepCompletions['reinforcement-activity'] || 0) >= (badge.requirements.minTopics || 5);
+          break;
+        case 'Pre-Test Achiever':
+          const preTestHighScores = userProgress.filter(p => {
+            const preTestContent = contents.find(c => c.topic.toString() === p.topic.toString() && c.moduleStep === 'pre-test');
+            if (!preTestContent) return false;
+            const preTestScore = p.quizScores.find(q => q.quizId.toString() === preTestContent._id.toString());
+            return preTestScore && preTestScore.score >= 70;
+          }).length;
+          eligible = preTestHighScores >= (badge.requirements.minTopics || 3);
+          break;
+        case 'Learning Growth':
+          // Check for improvement between pre-test and post-test
+          eligible = userProgress.some(p => {
+            const preTestContent = contents.find(c => c.topic.toString() === p.topic.toString() && c.moduleStep === 'pre-test');
+            const postTestContent = contents.find(c => c.topic.toString() === p.topic.toString() && c.moduleStep === 'post-test');
+            if (!preTestContent || !postTestContent) return false;
+            
+            const preTestScore = p.quizScores.find(q => q.quizId.toString() === preTestContent._id.toString());
+            const postTestScore = p.quizScores.find(q => q.quizId.toString() === postTestContent._id.toString());
+            
+            if (!preTestScore || !postTestScore) return false;
+            
+            const improvement = postTestScore.score - preTestScore.score;
+            return improvement >= (badge.requirements.improvementPercentage || 20);
+          });
+          break;
+        case 'Key Takeaways Master':
+          eligible = (stats.moduleStepCompletions['key-takeaways'] || 0) >= (badge.requirements.minTopics || 5);
+          break;
+        case 'Application Expert':
+          const totalCorrectApplication = stats.applicationQuestionScores.reduce((sum, s) => {
+            const correctCount = Math.round((s.score / 100) * s.applicationCount);
+            return sum + correctCount;
+          }, 0);
+          eligible = totalCorrectApplication >= (badge.requirements.correctAnswers || 50);
+          break;
+        case 'Experiential Learner':
+          const hasScenario = stats.moduleStepCompletions['real-life-scenario'] > 0 || 
+                            stats.moduleStepCompletions['case-example'] > 0;
+          const hasReinforcement = stats.moduleStepCompletions['reinforcement-activity'] > 0;
+          eligible = hasScenario && hasReinforcement;
           break;
         // Add more badge checks here
         default:
@@ -451,6 +576,295 @@ router.post('/process-achievements', authenticateToken, async (req, res) => {
   } catch (error) {
     console.error('Error processing achievements:', error);
     res.status(500).json({ message: 'Error processing achievements', error: error.message });
+  }
+});
+
+// Get learning analytics for experiential learning
+router.get('/analytics', authenticateToken, async (req, res) => {
+  try {
+    const { country } = req.query;
+    
+    const filter = { user: req.user.id };
+    if (country) {
+      filter.country = country;
+    }
+    
+    const progress = await Progress.find(filter).populate('topic');
+    const contents = await Content.find({});
+    
+    // Calculate enhanced experiential learning analytics
+    const analytics = {
+      scenarioPerformance: {
+        averageScore: 0,
+        totalScenarios: 0,
+        highPerformanceCount: 0,
+        lowPerformanceCount: 0,
+        scoreDistribution: { excellent: 0, good: 0, average: 0, needsImprovement: 0 }
+      },
+      moduleStepProgress: {},
+      moduleStepEffectiveness: {},
+      applicationQuestionPerformance: {
+        averageScore: 0,
+        totalQuestions: 0,
+        correctRate: 0,
+        difficultyAnalysis: { easy: 0, medium: 0, hard: 0 }
+      },
+      learningImprovement: {
+        preTestScores: [],
+        postTestScores: [],
+        averageImprovement: 0,
+        significantImprovementCount: 0,
+        regressionCount: 0
+      },
+      learningPathAnalysis: {
+        mostCommonPath: [],
+        completionRateByStep: {},
+        averageTimePerStep: {}
+      },
+      engagementMetrics: {
+        totalActivitiesCompleted: 0,
+        averageSessionLength: 0,
+        mostEngagingContentTypes: {},
+        peakLearningTimes: []
+      },
+      topicMasteryAnalysis: {
+        averageMastery: 0,
+        masteryDistribution: { expert: 0, proficient: 0, developing: 0, beginner: 0 },
+        strongestTopics: [],
+        weakestTopics: []
+      },
+      personalizedInsights: {
+        recommendedNextSteps: [],
+        areasForImprovement: [],
+        strengths: [],
+        learningStyle: ''
+      }
+    };
+    
+    // Enhanced scenario performance analysis
+    const scenarioScores = progress.map(p => p.scenarioPerformanceScore).filter(s => s !== null);
+    if (scenarioScores.length > 0) {
+      analytics.scenarioPerformance.averageScore = Math.round(scenarioScores.reduce((a, b) => a + b, 0) / scenarioScores.length);
+      analytics.scenarioPerformance.totalScenarios = scenarioScores.length;
+      analytics.scenarioPerformance.highPerformanceCount = scenarioScores.filter(s => s >= 80).length;
+      analytics.scenarioPerformance.lowPerformanceCount = scenarioScores.filter(s => s < 50).length;
+      
+      // Score distribution
+      scenarioScores.forEach(score => {
+        if (score >= 90) analytics.scenarioPerformance.scoreDistribution.excellent++;
+        else if (score >= 75) analytics.scenarioPerformance.scoreDistribution.good++;
+        else if (score >= 60) analytics.scenarioPerformance.scoreDistribution.average++;
+        else analytics.scenarioPerformance.scoreDistribution.needsImprovement++;
+      });
+    }
+    
+    // Module step progress with effectiveness
+    const moduleSteps = ['why-it-matters', 'real-life-scenario', 'constitutional-concept', 'case-example', 'interactive-assessment', 'reinforcement-activity', 'key-takeaways'];
+    moduleSteps.forEach(step => {
+      const stepCompletions = new Set();
+      const stepScores = [];
+      progress.forEach(p => {
+        contents.filter(c => c.topic.toString() === p.topic.toString() && c.moduleStep === step).forEach(c => {
+          const isCompleted = p.activities.some(a => a.activityId.toString() === c._id.toString() && a.completed) ||
+                            p.quizScores.some(q => q.quizId.toString() === c._id.toString());
+          if (isCompleted) {
+            stepCompletions.add(p.topic.toString());
+            const quizScore = p.quizScores.find(q => q.quizId.toString() === c._id.toString());
+            if (quizScore) stepScores.push(quizScore.score);
+          }
+        });
+      });
+      analytics.moduleStepProgress[step] = stepCompletions.size;
+      
+      // Calculate effectiveness for this step
+      if (stepScores.length > 0) {
+        analytics.moduleStepEffectiveness[step] = {
+          averageScore: Math.round(stepScores.reduce((a, b) => a + b, 0) / stepScores.length),
+          completionRate: Math.round((stepCompletions.size / progress.length) * 100),
+          sampleSize: stepScores.length
+        };
+      }
+    });
+    
+    // Enhanced application question performance
+    let totalApplicationScore = 0;
+    let totalApplicationCount = 0;
+    let totalCorrectAnswers = 0;
+    let totalApplicationQuestions = 0;
+    
+    progress.forEach(p => {
+      p.quizScores.forEach(qs => {
+        const content = contents.find(c => c._id.toString() === qs.quizId.toString());
+        if (content && content.quiz && content.quiz.questions) {
+          const applicationQuestions = content.quiz.questions.filter(q => q.questionType === 'application');
+          if (applicationQuestions.length > 0) {
+            totalApplicationScore += qs.score;
+            totalApplicationCount++;
+            // Estimate correct answers based on score
+            totalCorrectAnswers += Math.round((qs.score / 100) * applicationQuestions.length);
+            totalApplicationQuestions += applicationQuestions.length;
+          }
+        }
+      });
+    });
+    
+    if (totalApplicationCount > 0) {
+      analytics.applicationQuestionPerformance.averageScore = Math.round(totalApplicationScore / totalApplicationCount);
+      analytics.applicationQuestionPerformance.totalQuestions = totalApplicationCount;
+      analytics.applicationQuestionPerformance.correctRate = Math.round((totalCorrectAnswers / totalApplicationQuestions) * 100);
+      
+      // Difficulty analysis based on performance
+      if (analytics.applicationQuestionPerformance.correctRate >= 80) {
+        analytics.applicationQuestionPerformance.difficultyAnalysis.easy = totalApplicationCount;
+      } else if (analytics.applicationQuestionPerformance.correctRate >= 60) {
+        analytics.applicationQuestionPerformance.difficultyAnalysis.medium = totalApplicationCount;
+      } else {
+        analytics.applicationQuestionPerformance.difficultyAnalysis.hard = totalApplicationCount;
+      }
+    }
+    
+    // Enhanced learning improvement analysis
+    progress.forEach(p => {
+      const preTestContent = contents.find(c => c.topic.toString() === p.topic.toString() && c.moduleStep === 'pre-test');
+      const postTestContent = contents.find(c => c.topic.toString() === p.topic.toString() && c.moduleStep === 'post-test');
+      
+      if (preTestContent && postTestContent) {
+        const preTestScore = p.quizScores.find(q => q.quizId.toString() === preTestContent._id.toString());
+        const postTestScore = p.quizScores.find(q => q.quizId.toString() === postTestContent._id.toString());
+        
+        if (preTestScore && postTestScore) {
+          analytics.learningImprovement.preTestScores.push(preTestScore.score);
+          analytics.learningImprovement.postTestScores.push(postTestScore.score);
+          
+          const improvement = postTestScore.score - preTestScore.score;
+          if (improvement >= 20) analytics.learningImprovement.significantImprovementCount++;
+          if (improvement < 0) analytics.learningImprovement.regressionCount++;
+        }
+      }
+    });
+    
+    if (analytics.learningImprovement.preTestScores.length > 0) {
+      const avgPreTest = analytics.learningImprovement.preTestScores.reduce((a, b) => a + b, 0) / analytics.learningImprovement.preTestScores.length;
+      const avgPostTest = analytics.learningImprovement.postTestScores.reduce((a, b) => a + b, 0) / analytics.learningImprovement.postTestScores.length;
+      analytics.learningImprovement.averageImprovement = Math.round(avgPostTest - avgPreTest);
+    }
+    
+    // Learning path analysis
+    progress.forEach(p => {
+      const completedSteps = [];
+      moduleSteps.forEach(step => {
+        const stepContent = contents.find(c => c.topic.toString() === p.topic.toString() && c.moduleStep === step);
+        if (stepContent) {
+          const isCompleted = p.activities.some(a => a.activityId.toString() === stepContent._id.toString() && a.completed) ||
+                            p.quizScores.some(q => q.quizId.toString() === stepContent._id.toString());
+          if (isCompleted) completedSteps.push(step);
+        }
+      });
+      if (completedSteps.length > 0) {
+        analytics.learningPathAnalysis.mostCommonPath.push(completedSteps);
+      }
+    });
+    
+    // Calculate completion rate by step
+    moduleSteps.forEach(step => {
+      const totalTopics = progress.length;
+      const completedTopics = analytics.moduleStepProgress[step];
+      analytics.learningPathAnalysis.completionRateByStep[step] = totalTopics > 0 ? Math.round((completedTopics / totalTopics) * 100) : 0;
+    });
+    
+    // Engagement metrics
+    progress.forEach(p => {
+      analytics.engagementMetrics.totalActivitiesCompleted += p.activities.filter(a => a.completed).length;
+      analytics.engagementMetrics.totalActivitiesCompleted += p.quizScores.length;
+    });
+    
+    // Content type engagement
+    contents.forEach(content => {
+      const contentType = content.type;
+      if (!analytics.engagementMetrics.mostEngagingContentTypes[contentType]) {
+        analytics.engagementMetrics.mostEngagingContentTypes[contentType] = 0;
+      }
+      
+      progress.forEach(p => {
+        if (content.topic.toString() === p.topic.toString()) {
+          const isEngaged = p.activities.some(a => a.activityId.toString() === content._id.toString()) ||
+                          p.quizScores.some(q => q.quizId.toString() === content._id.toString());
+          if (isEngaged) analytics.engagementMetrics.mostEngagingContentTypes[contentType]++;
+        }
+      });
+    });
+    
+    // Topic mastery analysis
+    const masteryScores = progress.map(p => p.topicMastery).filter(m => m !== null);
+    if (masteryScores.length > 0) {
+      analytics.topicMasteryAnalysis.averageMastery = Math.round(masteryScores.reduce((a, b) => a + b, 0) / masteryScores.length);
+      
+      // Mastery distribution
+      masteryScores.forEach(score => {
+        if (score >= 90) analytics.topicMasteryAnalysis.masteryDistribution.expert++;
+        else if (score >= 75) analytics.topicMasteryAnalysis.masteryDistribution.proficient++;
+        else if (score >= 60) analytics.topicMasteryAnalysis.masteryDistribution.developing++;
+        else analytics.topicMasteryAnalysis.masteryDistribution.beginner++;
+      });
+      
+      // Identify strongest and weakest topics
+      const topicMastery = progress.map(p => ({
+        topic: p.topic?.title || 'Unknown',
+        mastery: p.topicMastery || 0
+      })).filter(t => t.mastery > 0);
+      
+      topicMastery.sort((a, b) => b.mastery - a.mastery);
+      analytics.topicMasteryAnalysis.strongestTopics = topicMastery.slice(0, 3).map(t => ({ topic: t.topic, mastery: t.mastery }));
+      analytics.topicMasteryAnalysis.weakestTopics = topicMastery.slice(-3).reverse().map(t => ({ topic: t.topic, mastery: t.mastery }));
+    }
+    
+    // Generate personalized insights
+    if (analytics.scenarioPerformance.averageScore < 60) {
+      analytics.personalizedInsights.areasForImprovement.push('Practice more scenarios to improve application skills');
+    }
+    if (analytics.applicationQuestionPerformance.correctRate < 70) {
+      analytics.personalizedInsights.areasForImprovement.push('Focus on application questions to strengthen understanding');
+    }
+    if (analytics.learningImprovement.averageImprovement < 10) {
+      analytics.personalizedInsights.areasForImprovement.push('Review pre-test content to maximize learning improvement');
+    }
+    
+    if (analytics.scenarioPerformance.averageScore >= 80) {
+      analytics.personalizedInsights.strengths.push('Strong scenario performance');
+    }
+    if (analytics.applicationQuestionPerformance.correctRate >= 80) {
+      analytics.personalizedInsights.strengths.push('Excellent application question skills');
+    }
+    if (analytics.learningImprovement.averageImprovement >= 20) {
+      analytics.personalizedInsights.strengths.push('Significant learning improvement');
+    }
+    
+    // Determine learning style based on engagement
+    const engagementTypes = Object.entries(analytics.engagementMetrics.mostEngagingContentTypes);
+    if (engagementTypes.length > 0) {
+      const mostEngaged = engagementTypes.sort((a, b) => b[1] - a[1])[0][0];
+      if (mostEngaged === 'game') analytics.personalizedInsights.learningStyle = 'Interactive learner';
+      else if (mostEngaged === 'quiz') analytics.personalizedInsights.learningStyle = 'Assessment-focused learner';
+      else if (mostEngaged === 'lesson') analytics.personalizedInsights.learningStyle = 'Reading-focused learner';
+      else analytics.personalizedInsights.learningStyle = 'Balanced learner';
+    }
+    
+    // Generate recommended next steps
+    if (analytics.moduleStepProgress['reinforcement-activity'] < progress.length * 0.5) {
+      analytics.personalizedInsights.recommendedNextSteps.push('Complete reinforcement activities to solidify learning');
+    }
+    if (analytics.moduleStepProgress['case-example'] < progress.length * 0.5) {
+      analytics.personalizedInsights.recommendedNextSteps.push('Review case examples to understand practical applications');
+    }
+    if (analytics.topicMasteryAnalysis.weakestTopics.length > 0) {
+      const weakest = analytics.topicMasteryAnalysis.weakestTopics[0];
+      analytics.personalizedInsights.recommendedNextSteps.push(`Focus on improving mastery in "${weakest.topic}"`);
+    }
+    
+    res.json(analytics);
+  } catch (error) {
+    console.error('Error fetching analytics:', error);
+    res.status(500).json({ message: 'Error fetching analytics', error: error.message });
   }
 });
 

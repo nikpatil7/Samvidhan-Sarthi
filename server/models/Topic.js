@@ -51,6 +51,11 @@ const topicSchema = new mongoose.Schema(
       index: true,
       sparse: true,
       unique: true
+    },
+    migrationStatus: {
+      type: String,
+      enum: ['legacy', 'partial', 'complete'],
+      default: 'legacy'
     }
   },
   { timestamps: true }

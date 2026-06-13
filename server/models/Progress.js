@@ -35,6 +35,10 @@ const progressSchema = new mongoose.Schema(
       date: {
         type: Date,
         default: Date.now
+      },
+      // NEW — tags quiz score entries created for Module_Step assessments
+      stepType: {
+        type: String
       }
     }],
     activities: [{
@@ -55,11 +59,49 @@ const progressSchema = new mongoose.Schema(
       date: {
         type: Date,
         default: Date.now
+      },
+      // NEW — optional fields for Module_Step scenario/game interactions
+      activityType: {
+        type: String
+      },
+      scenarioIndex: {
+        type: Number
+      },
+      chosenOptionIndex: {
+        type: Number
+      },
+      isCorrect: {
+        type: Boolean
+      },
+      isFirstAttempt: {
+        type: Boolean
+      },
+      completedAt: {
+        type: Date
       }
     }],
     lastUpdated: {
       type: Date,
       default: Date.now
+    },
+    // NEW — per-topic scenario performance: (first-attempt-correct / total) * 100
+    scenarioPerformanceScore: {
+      type: Number,
+      min: 0,
+      max: 100,
+      default: null
+    },
+    // NEW — set when the seventh Module_Step is completed
+    completedAt: {
+      type: Date,
+      default: null
+    },
+    // NEW — topic mastery score based on quiz, scenario, and game performance
+    topicMastery: {
+      type: Number,
+      min: 0,
+      max: 100,
+      default: null
     }
   },
   { timestamps: true }

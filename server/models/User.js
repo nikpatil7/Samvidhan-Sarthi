@@ -47,6 +47,14 @@ const userSchema = new mongoose.Schema(
     lastLogin: {
       type: Date,
       default: Date.now
+    },
+    learningStreak: {
+      type: Number,
+      default: 0
+    },
+    lastActivityDate: {
+      type: Date,
+      default: null
     }
   },
   { timestamps: true }

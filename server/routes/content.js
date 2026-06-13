@@ -560,20 +560,22 @@ router.post('/track', authenticateToken, async (req, res) => {
         });
       }
     } else {
-      // Add activity
+      // Add activity - only if score is provided or completed is true
       const existingActivityIndex = progress.activities.findIndex(
         a => a.activityId.toString() === contentId
       );
       
       if (existingActivityIndex >= 0) {
         progress.activities[existingActivityIndex].completed = completed;
-        progress.activities[existingActivityIndex].score = score || 0;
+        if (score !== undefined && score !== null) {
+          progress.activities[existingActivityIndex].score = score;
+        }
         progress.activities[existingActivityIndex].date = Date.now();
       } else {
         progress.activities.push({
           activityId: contentId,
           completed: completed,
-          score: score || 0,
+          score: score !== undefined && score !== null ? score : 0,
           date: Date.now()
         });
       }
@@ -597,6 +599,59 @@ router.post('/track', authenticateToken, async (req, res) => {
       const completedContent = completedQuizzes + completedActivities;
       progress.completionPercentage = Math.round((completedContent / totalContentCount) * 100);
     }
+    
+    // Calculate scenario performance score based on scenario game activities
+    const scenarioGames = allContent.filter(c => 
+      c.type === 'game' && 
+      c.gameConfig && 
+      c.gameConfig.type === 'scenario'
+    );
+    
+    if (scenarioGames.length > 0) {
+      const scenarioActivityIds = scenarioGames.map(g => g._id.toString());
+      const scenarioActivities = progress.activities.filter(a => 
+        scenarioActivityIds.includes(a.activityId.toString()) && a.completed
+      );
+      
+      if (scenarioActivities.length > 0) {
+        const scenarioScores = scenarioActivities.map(a => a.score).filter(s => s > 0);
+        if (scenarioScores.length > 0) {
+          progress.scenarioPerformanceScore = Math.round(scenarioScores.reduce((a, b) => a + b, 0) / scenarioScores.length);
+        }
+      }
+    }
+    
+    // Calculate game score based on all game activities
+    const allGames = allContent.filter(c => c.type === 'game');
+    if (allGames.length > 0) {
+      const gameActivityIds = allGames.map(g => g._id.toString());
+      const gameActivities = progress.activities.filter(a => 
+        gameActivityIds.includes(a.activityId.toString()) && a.completed
+      );
+      
+      if (gameActivities.length > 0) {
+        const gameScores = gameActivities.map(a => a.score).filter(s => s > 0);
+        if (gameScores.length > 0) {
+          progress.gameScore = Math.round(gameScores.reduce((a, b) => a + b, 0) / gameScores.length);
+        }
+      }
+    }
+    
+    // Calculate quiz score average
+    if (progress.quizScores.length > 0) {
+      const quizScores = progress.quizScores.map(q => q.score).filter(s => s > 0);
+      if (quizScores.length > 0) {
+        progress.quizScore = Math.round(quizScores.reduce((a, b) => a + b, 0) / quizScores.length);
+      }
+    }
+    
+    // Calculate topic mastery using the utility function
+    const { computeTopicMastery } = require('../utils/topicMastery');
+    progress.topicMastery = computeTopicMastery({
+      quizScore: progress.quizScore,
+      scenarioPerformanceScore: progress.scenarioPerformanceScore,
+      gameScore: progress.gameScore
+    });
     
     progress.lastUpdated = Date.now();
     await progress.save();
