@@ -13,6 +13,7 @@ const CardSortGame = ({
   const [placements, setPlacements] = useState({});
   const [gameComplete, setGameComplete] = useState(false);
   const [gameScore, setGameScore] = useState(0);
+  const [incorrectAnswers, setIncorrectAnswers] = useState([]);
 
   useEffect(() => {
     if (!gameData) return;
@@ -58,6 +59,7 @@ const CardSortGame = ({
   const handleSubmit = () => {
     let correct = 0;
     let total = 0;
+    const wrongAnswers = [];
 
     Object.keys(placements).forEach(category => {
       placements[category].forEach(card => {
@@ -65,6 +67,12 @@ const CardSortGame = ({
 
         if (card.category === category) {
           correct++;
+        } else {
+          wrongAnswers.push({
+            card: card.text,
+            selectedCategory: category,
+            correctCategory: card.category
+          });
         }
       });
     });
@@ -72,6 +80,7 @@ const CardSortGame = ({
     const finalScore = total === 0 ? 0 : Math.round((correct / total) * 100);
 
     setGameScore(finalScore);
+    setIncorrectAnswers(wrongAnswers);
     setGameComplete(true);
 
     if (onComplete) {
@@ -123,6 +132,42 @@ const CardSortGame = ({
         <p className="text-gray-300 mb-6">
           You correctly classified constitutional articles.
         </p>
+        {incorrectAnswers.length > 0 && (
+          <div className="mt-6 text-left">
+            <h3 className="text-xl font-bold text-red-400 mb-4">
+              Review Incorrect Answers
+            </h3>
+
+            <div className="space-y-3">
+              {incorrectAnswers.map((item, index) => (
+                <div
+                  key={index}
+                  className="bg-dark-300 p-4 rounded-lg"
+                >
+                  <p className="text-white">
+                    <strong>{item.card}</strong>
+                  </p>
+
+                  <p className="text-red-400">
+                    Your Answer: {item.selectedCategory}
+                  </p>
+
+                  <p className="text-green-400">
+                    Correct Answer: {item.correctCategory}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {incorrectAnswers.length === 0 && (
+          <div className="bg-green-900/30 border border-green-500 p-4 rounded-lg mt-4">
+            <p className="text-green-300 font-semibold">
+              Perfect Score! All classifications are correct.
+            </p>
+          </div>
+        )}
 
         <button
           onClick={resetGame}
@@ -152,8 +197,8 @@ const CardSortGame = ({
               whileTap={{ scale: 0.95 }}
               onClick={() => handleCardSelect(card)}
               className={`px-4 py-2 rounded-lg border text-white ${selectedCard?.text === card.text
-                  ? 'bg-primary-600 border-primary-400'
-                  : 'bg-dark-300 border-gray-700'
+                ? 'bg-primary-600 border-primary-400'
+                : 'bg-dark-300 border-gray-700'
                 }`}
             >
               {card.text}
@@ -193,8 +238,8 @@ const CardSortGame = ({
           disabled={availableCards.length > 0}
           onClick={handleSubmit}
           className={`px-6 py-3 rounded-lg text-white ${availableCards.length > 0
-              ? 'bg-gray-600 cursor-not-allowed'
-              : 'bg-green-600'
+            ? 'bg-gray-600 cursor-not-allowed'
+            : 'bg-green-600'
             }`}
         >
           Submit Answers
