@@ -7,6 +7,7 @@ const Badge = require('../models/Badge');
 const Progress = require('../models/Progress');
 const Content = require('../models/Content');
 const Topic = require('../models/Topic');
+const { computeProgressMetrics, averageMetric } = require('../utils/progressMetrics');
 const router = express.Router();
 
 // Ensure uploads directory exists
@@ -163,6 +164,35 @@ router.get('/dashboard', authenticateToken, async (req, res) => {
     
     // Filter out progress entries where topic was deleted
     const validProgress = progress.filter(p => p.topic != null);
+
+    const topicIds = validProgress.map((p) => p.topic._id);
+    const allContent = topicIds.length > 0
+      ? await Content.find({ topic: { $in: topicIds }, isActive: true })
+      : [];
+    const contentByTopic = new Map();
+    allContent.forEach((item) => {
+      const key = item.topic.toString();
+      if (!contentByTopic.has(key)) {
+        contentByTopic.set(key, []);
+      }
+      contentByTopic.get(key).push(item);
+    });
+
+    const enrichedProgress = validProgress.map((p) => {
+      const topicContent = contentByTopic.get(p.topic._id.toString()) || [];
+      const metrics = computeProgressMetrics(p, topicContent);
+      return {
+        topicId: p.topic._id,
+        topicTitle: p.topic.title,
+        completionPercentage: p.completionPercentage ?? 0,
+        topicMastery: metrics.topicMastery,
+        quizScore: metrics.quizScore,
+        gameScore: metrics.gameScore,
+        scenarioPerformanceScore: metrics.scenarioPerformanceScore,
+        country: p.country,
+        lastUpdated: p.lastUpdated
+      };
+    });
     
     // Get total topic count from DB for accurate stats
     const topicFilter = country ? { country, isActive: true, parentTopic: null } : { isActive: true, parentTopic: null };
@@ -202,10 +232,13 @@ router.get('/dashboard', authenticateToken, async (req, res) => {
       })))
       .sort((a, b) => new Date(b.date) - new Date(a.date));
     
-    // Calculate average quiz score
-    const averageQuizScore = quizScores.length > 0
-      ? Math.round(quizScores.reduce((sum, q) => sum + q.score, 0) / quizScores.length)
-      : 0;
+    // Calculate average quiz score from computed per-topic metrics
+    const averageQuizScore = averageMetric(enrichedProgress.map((p) => p.quizScore));
+    const averageTopicMastery = averageMetric(enrichedProgress.map((p) => p.topicMastery));
+    const averageScenarioPerformance = averageMetric(
+      enrichedProgress.map((p) => p.scenarioPerformanceScore)
+    );
+    const averageGameScore = averageMetric(enrichedProgress.map((p) => p.gameScore));
     
     // Get total activities and games completed
     const totalActivitiesCompleted = validProgress.reduce(
@@ -223,19 +256,16 @@ router.get('/dashboard', authenticateToken, async (req, res) => {
         startedTopics,
         overallProgress,
         averageQuizScore,
+        averageTopicMastery,
+        averageScenarioPerformance,
+        averageGameScore,
         totalBadges: user.badges.length,
         totalActivitiesCompleted,
         totalQuizzesTaken
       },
       recentActivities,
       quizScores: quizScores.slice(0, 5),
-      progress: validProgress.map(p => ({
-        topicId: p.topic._id,
-        topicTitle: p.topic.title,
-        completionPercentage: p.completionPercentage,
-        country: p.country,
-        lastUpdated: p.lastUpdated
-      })).slice(0, 10)
+      progress: enrichedProgress.slice(0, 10)
     });
   } catch (error) {
     console.error('Error fetching dashboard:', error);
@@ -590,8 +620,17 @@ router.get('/analytics', authenticateToken, async (req, res) => {
     }
     
     const progress = await Progress.find(filter).populate('topic');
+    const validProgress = progress.filter((p) => p.topic != null);
     const contents = await Content.find({});
-    
+
+    const progressWithMetrics = validProgress.map((p) => {
+      const topicContent = contents.filter(
+        (c) => c.topic.toString() === p.topic._id.toString() && c.isActive !== false
+      );
+      const metrics = computeProgressMetrics(p, topicContent);
+      return { progress: p, metrics };
+    });
+
     // Calculate enhanced experiential learning analytics
     const analytics = {
       scenarioPerformance: {
@@ -642,10 +681,10 @@ router.get('/analytics', authenticateToken, async (req, res) => {
     };
     
     // Enhanced scenario performance analysis
-    const scenarioScores = progress.map(p => p.scenarioPerformanceScore).filter(s => s !== null);
+    const scenarioScores = progressWithMetrics.map((entry) => entry.metrics.scenarioPerformanceScore);
     if (scenarioScores.length > 0) {
-      analytics.scenarioPerformance.averageScore = Math.round(scenarioScores.reduce((a, b) => a + b, 0) / scenarioScores.length);
-      analytics.scenarioPerformance.totalScenarios = scenarioScores.length;
+      analytics.scenarioPerformance.averageScore = averageMetric(scenarioScores);
+      analytics.scenarioPerformance.totalScenarios = scenarioScores.filter((s) => s > 0).length;
       analytics.scenarioPerformance.highPerformanceCount = scenarioScores.filter(s => s >= 80).length;
       analytics.scenarioPerformance.lowPerformanceCount = scenarioScores.filter(s => s < 50).length;
       
@@ -663,7 +702,7 @@ router.get('/analytics', authenticateToken, async (req, res) => {
     moduleSteps.forEach(step => {
       const stepCompletions = new Set();
       const stepScores = [];
-      progress.forEach(p => {
+      progressWithMetrics.forEach(({ progress: p }) => {
         contents.filter(c => c.topic.toString() === p.topic.toString() && c.moduleStep === step).forEach(c => {
           const isCompleted = p.activities.some(a => a.activityId.toString() === c._id.toString() && a.completed) ||
                             p.quizScores.some(q => q.quizId.toString() === c._id.toString());
@@ -680,7 +719,7 @@ router.get('/analytics', authenticateToken, async (req, res) => {
       if (stepScores.length > 0) {
         analytics.moduleStepEffectiveness[step] = {
           averageScore: Math.round(stepScores.reduce((a, b) => a + b, 0) / stepScores.length),
-          completionRate: Math.round((stepCompletions.size / progress.length) * 100),
+          completionRate: Math.round((stepCompletions.size / validProgress.length) * 100),
           sampleSize: stepScores.length
         };
       }
@@ -692,7 +731,7 @@ router.get('/analytics', authenticateToken, async (req, res) => {
     let totalCorrectAnswers = 0;
     let totalApplicationQuestions = 0;
     
-    progress.forEach(p => {
+    progressWithMetrics.forEach(({ progress: p }) => {
       p.quizScores.forEach(qs => {
         const content = contents.find(c => c._id.toString() === qs.quizId.toString());
         if (content && content.quiz && content.quiz.questions) {
@@ -724,7 +763,7 @@ router.get('/analytics', authenticateToken, async (req, res) => {
     }
     
     // Enhanced learning improvement analysis
-    progress.forEach(p => {
+    progressWithMetrics.forEach(({ progress: p }) => {
       const preTestContent = contents.find(c => c.topic.toString() === p.topic.toString() && c.moduleStep === 'pre-test');
       const postTestContent = contents.find(c => c.topic.toString() === p.topic.toString() && c.moduleStep === 'post-test');
       
@@ -750,7 +789,7 @@ router.get('/analytics', authenticateToken, async (req, res) => {
     }
     
     // Learning path analysis
-    progress.forEach(p => {
+    progressWithMetrics.forEach(({ progress: p }) => {
       const completedSteps = [];
       moduleSteps.forEach(step => {
         const stepContent = contents.find(c => c.topic.toString() === p.topic.toString() && c.moduleStep === step);
@@ -767,13 +806,13 @@ router.get('/analytics', authenticateToken, async (req, res) => {
     
     // Calculate completion rate by step
     moduleSteps.forEach(step => {
-      const totalTopics = progress.length;
+      const totalTopics = validProgress.length;
       const completedTopics = analytics.moduleStepProgress[step];
       analytics.learningPathAnalysis.completionRateByStep[step] = totalTopics > 0 ? Math.round((completedTopics / totalTopics) * 100) : 0;
     });
     
     // Engagement metrics
-    progress.forEach(p => {
+    progressWithMetrics.forEach(({ progress: p }) => {
       analytics.engagementMetrics.totalActivitiesCompleted += p.activities.filter(a => a.completed).length;
       analytics.engagementMetrics.totalActivitiesCompleted += p.quizScores.length;
     });
@@ -785,7 +824,7 @@ router.get('/analytics', authenticateToken, async (req, res) => {
         analytics.engagementMetrics.mostEngagingContentTypes[contentType] = 0;
       }
       
-      progress.forEach(p => {
+      progressWithMetrics.forEach(({ progress: p }) => {
         if (content.topic.toString() === p.topic.toString()) {
           const isEngaged = p.activities.some(a => a.activityId.toString() === content._id.toString()) ||
                           p.quizScores.some(q => q.quizId.toString() === content._id.toString());
@@ -795,9 +834,9 @@ router.get('/analytics', authenticateToken, async (req, res) => {
     });
     
     // Topic mastery analysis
-    const masteryScores = progress.map(p => p.topicMastery).filter(m => m !== null);
+    const masteryScores = progressWithMetrics.map((entry) => entry.metrics.topicMastery);
     if (masteryScores.length > 0) {
-      analytics.topicMasteryAnalysis.averageMastery = Math.round(masteryScores.reduce((a, b) => a + b, 0) / masteryScores.length);
+      analytics.topicMasteryAnalysis.averageMastery = averageMetric(masteryScores);
       
       // Mastery distribution
       masteryScores.forEach(score => {
@@ -808,14 +847,21 @@ router.get('/analytics', authenticateToken, async (req, res) => {
       });
       
       // Identify strongest and weakest topics
-      const topicMastery = progress.map(p => ({
+      const topicMastery = progressWithMetrics.map(({ progress: p, metrics }) => ({
         topic: p.topic?.title || 'Unknown',
-        mastery: p.topicMastery || 0
-      })).filter(t => t.mastery > 0);
+        mastery: metrics.topicMastery
+      }));
       
       topicMastery.sort((a, b) => b.mastery - a.mastery);
-      analytics.topicMasteryAnalysis.strongestTopics = topicMastery.slice(0, 3).map(t => ({ topic: t.topic, mastery: t.mastery }));
-      analytics.topicMasteryAnalysis.weakestTopics = topicMastery.slice(-3).reverse().map(t => ({ topic: t.topic, mastery: t.mastery }));
+      analytics.topicMasteryAnalysis.strongestTopics = topicMastery
+        .filter((t) => t.mastery > 0)
+        .slice(0, 3)
+        .map(t => ({ topic: t.topic, mastery: t.mastery }));
+      analytics.topicMasteryAnalysis.weakestTopics = [...topicMastery]
+        .filter((t) => t.mastery > 0)
+        .slice(-3)
+        .reverse()
+        .map(t => ({ topic: t.topic, mastery: t.mastery }));
     }
     
     // Generate personalized insights
@@ -850,10 +896,10 @@ router.get('/analytics', authenticateToken, async (req, res) => {
     }
     
     // Generate recommended next steps
-    if (analytics.moduleStepProgress['reinforcement-activity'] < progress.length * 0.5) {
+    if (analytics.moduleStepProgress['reinforcement-activity'] < validProgress.length * 0.5) {
       analytics.personalizedInsights.recommendedNextSteps.push('Complete reinforcement activities to solidify learning');
     }
-    if (analytics.moduleStepProgress['case-example'] < progress.length * 0.5) {
+    if (analytics.moduleStepProgress['case-example'] < validProgress.length * 0.5) {
       analytics.personalizedInsights.recommendedNextSteps.push('Review case examples to understand practical applications');
     }
     if (analytics.topicMasteryAnalysis.weakestTopics.length > 0) {

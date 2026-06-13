@@ -6,6 +6,56 @@ const Progress = require('../models/Progress');
 const router = express.Router();
 
 const escapeRegex = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const { MODULE_STEP_ORDER } = require('../utils/constants');
+const { computeTopicMastery } = require('../utils/topicMastery');
+const {
+  calculateScenarioPerformanceScore,
+  calculateAverageGameScore,
+  calculateAverageQuizScore,
+  getScenarioFallbackAverage
+} = require('../utils/progressMetrics');
+
+function resolveActivityType(content, override) {
+  if (override) return override;
+  if (content?.gameConfig?.type) return content.gameConfig.type;
+  return content?.type || 'activity';
+}
+
+function hasPriorScenarioAttempt(activities, contentId, scenarioIndex) {
+  return activities.some(
+    (activity) =>
+      activity.activityId?.toString() === contentId &&
+      activity.scenarioIndex === scenarioIndex
+  );
+}
+
+function hasPriorCompletedActivity(activities, contentId) {
+  return activities.some(
+    (activity) => activity.activityId?.toString() === contentId && activity.completed
+  );
+}
+
+function getCompletedModuleSteps(progress, allContent) {
+  const contentById = new Map(allContent.map((item) => [item._id.toString(), item]));
+  const completedSteps = new Set();
+
+  progress.quizScores.forEach((quizScore) => {
+    const item = contentById.get(quizScore.quizId?.toString());
+    if (item?.moduleStep) {
+      completedSteps.add(item.moduleStep);
+    }
+  });
+
+  progress.activities.forEach((activity) => {
+    if (!activity.completed) return;
+    const item = contentById.get(activity.activityId?.toString());
+    if (item?.moduleStep) {
+      completedSteps.add(item.moduleStep);
+    }
+  });
+
+  return completedSteps;
+}
 
 // ==================== COUNTRIES ROUTES ====================
 // Get all countries
@@ -486,7 +536,20 @@ router.get('/search', async (req, res) => {
 // Track content completion (requires auth)
 router.post('/track', authenticateToken, async (req, res) => {
   try {
-    let { topicId, contentId, type, score, completed } = req.body;
+    let {
+      topicId,
+      contentId,
+      type,
+      score,
+      completed,
+      stepType,
+      activityType,
+      isFirstAttempt,
+      isCorrect,
+      scenarioIndex,
+      chosenOptionIndex,
+      scenarioAttempts
+    } = req.body;
     
     // If topicId is missing or invalid, try to get it from the content
     let topic = null;
@@ -532,139 +595,142 @@ router.post('/track', authenticateToken, async (req, res) => {
       });
     }
     
-    // Get the content to determine if it's a game
     const content = await Content.findById(contentId);
+    const resolvedActivityType = resolveActivityType(content, activityType);
+    const resolvedStepType = stepType || content?.moduleStep || null;
+    const contentIdStr = contentId?.toString();
+
     let isGame = false;
-    
     if (content) {
-      isGame = type === 'quiz' || 
-              (content.type === 'game' || 
-               (content.gameConfig && 
-                ['quiz', 'scenario', 'matching', 'spiral', 'timeline','card-sort'].includes(content.gameConfig.type)));
+      isGame = type === 'quiz' ||
+              (content.type === 'game' ||
+               (content.gameConfig &&
+                ['quiz', 'scenario', 'matching', 'spiral', 'timeline', 'card-sort'].includes(content.gameConfig.type)));
     }
     
     if (type === 'quiz') {
-      // Add quiz score
       const existingQuizIndex = progress.quizScores.findIndex(
-        q => q.quizId.toString() === contentId
+        (quiz) => quiz.quizId.toString() === contentId
       );
       
+      const quizEntry = {
+        quizId: contentId,
+        score: score,
+        date: Date.now(),
+        ...(resolvedStepType ? { stepType: resolvedStepType } : {})
+      };
+
       if (existingQuizIndex >= 0) {
         progress.quizScores[existingQuizIndex].score = score;
         progress.quizScores[existingQuizIndex].date = Date.now();
+        if (resolvedStepType) {
+          progress.quizScores[existingQuizIndex].stepType = resolvedStepType;
+        }
       } else {
-        progress.quizScores.push({
-          quizId: contentId,
-          score: score,
-          date: Date.now()
-        });
+        progress.quizScores.push(quizEntry);
       }
     } else {
-      // Add activity - only if score is provided or completed is true
+      if (Array.isArray(scenarioAttempts) && scenarioAttempts.length > 0) {
+        scenarioAttempts.forEach((attempt) => {
+          const attemptIndex = attempt.scenarioIndex;
+          const firstAttempt = !hasPriorScenarioAttempt(progress.activities, contentIdStr, attemptIndex);
+
+          progress.activities.push({
+            activityId: contentId,
+            completed: false,
+            score: attempt.isCorrect ? 100 : 0,
+            date: Date.now(),
+            activityType: 'scenario',
+            scenarioIndex: attemptIndex,
+            chosenOptionIndex: attempt.chosenOptionIndex,
+            isCorrect: Boolean(attempt.isCorrect),
+            isFirstAttempt: firstAttempt
+          });
+        });
+      }
+
       const existingActivityIndex = progress.activities.findIndex(
-        a => a.activityId.toString() === contentId
+        (activity) =>
+          activity.activityId.toString() === contentId &&
+          activity.completed &&
+          activity.scenarioIndex == null
       );
+
+      const resolvedFirstAttempt =
+        isFirstAttempt != null
+          ? Boolean(isFirstAttempt)
+          : !hasPriorCompletedActivity(progress.activities, contentIdStr);
+
+      const activityEntry = {
+        activityId: contentId,
+        completed: Boolean(completed),
+        score: score !== undefined && score !== null ? score : 0,
+        date: Date.now(),
+        activityType: resolvedActivityType,
+        ...(scenarioIndex != null ? { scenarioIndex } : {}),
+        ...(chosenOptionIndex != null ? { chosenOptionIndex } : {}),
+        ...(isCorrect != null ? { isCorrect: Boolean(isCorrect) } : {}),
+        isFirstAttempt: resolvedFirstAttempt,
+        ...(completed ? { completedAt: Date.now() } : {})
+      };
       
       if (existingActivityIndex >= 0) {
-        progress.activities[existingActivityIndex].completed = completed;
-        if (score !== undefined && score !== null) {
-          progress.activities[existingActivityIndex].score = score;
-        }
-        progress.activities[existingActivityIndex].date = Date.now();
+        Object.assign(progress.activities[existingActivityIndex], activityEntry);
       } else {
-        progress.activities.push({
-          activityId: contentId,
-          completed: completed,
-          score: score !== undefined && score !== null ? score : 0,
-          date: Date.now()
-        });
+        progress.activities.push(activityEntry);
       }
     }
     
-    // Calculate completion percentage based on all content for this topic
     const allContent = await Content.find({ topic: topicId, isActive: true });
     const totalContentCount = allContent.length;
     
     if (totalContentCount > 0) {
-      // Calculate how many content items are completed
-      const allContentIds = allContent.map(c => c._id.toString());
+      const allContentIds = allContent.map((item) => item._id.toString());
       const completedQuizzes = progress.quizScores
-        .filter(q => allContentIds.includes(q.quizId.toString()))
+        .filter((quiz) => allContentIds.includes(quiz.quizId.toString()))
         .length;
       
       const completedActivities = progress.activities
-        .filter(a => a.completed && allContentIds.includes(a.activityId.toString()))
+        .filter((activity) => activity.completed && allContentIds.includes(activity.activityId.toString()))
         .length;
       
       const completedContent = completedQuizzes + completedActivities;
       progress.completionPercentage = Math.round((completedContent / totalContentCount) * 100);
     }
     
-    // Calculate scenario performance score based on scenario game activities
-    const scenarioGames = allContent.filter(c => 
-      c.type === 'game' && 
-      c.gameConfig && 
-      c.gameConfig.type === 'scenario'
+    const scenarioGames = allContent.filter(
+      (item) => item.type === 'game' && item.gameConfig && item.gameConfig.type === 'scenario'
     );
-    
-    if (scenarioGames.length > 0) {
-      const scenarioActivityIds = scenarioGames.map(g => g._id.toString());
-      const scenarioActivities = progress.activities.filter(a => 
-        scenarioActivityIds.includes(a.activityId.toString()) && a.completed
-      );
-      
-      if (scenarioActivities.length > 0) {
-        const scenarioScores = scenarioActivities.map(a => a.score).filter(s => s > 0);
-        if (scenarioScores.length > 0) {
-          progress.scenarioPerformanceScore = Math.round(scenarioScores.reduce((a, b) => a + b, 0) / scenarioScores.length);
-        }
-      }
-    }
-    
-    // Calculate game score based on all game activities
-    const allGames = allContent.filter(c => c.type === 'game');
-    if (allGames.length > 0) {
-      const gameActivityIds = allGames.map(g => g._id.toString());
-      const gameActivities = progress.activities.filter(a => 
-        gameActivityIds.includes(a.activityId.toString()) && a.completed
-      );
-      
-      if (gameActivities.length > 0) {
-        const gameScores = gameActivities.map(a => a.score).filter(s => s > 0);
-        if (gameScores.length > 0) {
-          progress.gameScore = Math.round(gameScores.reduce((a, b) => a + b, 0) / gameScores.length);
-        }
-      }
-    }
-    
-    // Calculate quiz score average
-    if (progress.quizScores.length > 0) {
-      const quizScores = progress.quizScores.map(q => q.score).filter(s => s > 0);
-      if (quizScores.length > 0) {
-        progress.quizScore = Math.round(quizScores.reduce((a, b) => a + b, 0) / quizScores.length);
-      }
-    }
-    
-    // Calculate topic mastery using the utility function
-    const { computeTopicMastery } = require('../utils/topicMastery');
+
+    const scenarioFallbackAverage = getScenarioFallbackAverage(progress.activities, scenarioGames);
+
+    progress.scenarioPerformanceScore = calculateScenarioPerformanceScore(
+      progress.activities,
+      scenarioGames,
+      scenarioFallbackAverage
+    );
+
+    progress.gameScore = calculateAverageGameScore(progress.activities, allContent);
+    progress.quizScore = calculateAverageQuizScore(progress.quizScores);
     progress.topicMastery = computeTopicMastery({
       quizScore: progress.quizScore,
       scenarioPerformanceScore: progress.scenarioPerformanceScore,
       gameScore: progress.gameScore
     });
+
+    const completedModuleSteps = getCompletedModuleSteps(progress, allContent);
+    if (completedModuleSteps.size >= MODULE_STEP_ORDER.length) {
+      progress.completedAt = progress.completedAt || Date.now();
+    }
     
     progress.lastUpdated = Date.now();
     await progress.save();
     
-    // Check for achievements if it's a game and it's completed or has a high score
     let achievementsChecked = false;
     let newBadges = 0;
     
     if (isGame && (completed || (type === 'quiz' && score >= 80))) {
-      // Import the checkAndAwardAchievements function
       const { checkAndAwardAchievements } = require('./users');
-      
-      // Check for new achievements
       newBadges = await checkAndAwardAchievements(req.user.id);
       achievementsChecked = true;
     }
