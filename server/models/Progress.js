@@ -102,6 +102,18 @@ const progressSchema = new mongoose.Schema(
       min: 0,
       max: 100,
       default: null
+    },
+    quizScore: {
+      type: Number,
+      min: 0,
+      max: 100,
+      default: null
+    },
+    gameScore: {
+      type: Number,
+      min: 0,
+      max: 100,
+      default: null
     }
   },
   { timestamps: true }

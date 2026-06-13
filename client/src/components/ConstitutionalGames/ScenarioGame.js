@@ -71,15 +71,22 @@ const ScenarioGame = ({ scenarioData, onComplete, isCompleted, score, onPlayAgai
     if (currentScenario < normalizedScenarios.length - 1) {
       setCurrentScenario(currentScenario + 1);
     } else {
-      // Game completed
       setCompleted(true);
-      
-      // Calculate final percentage
-      const finalScore = Math.round((gameScore / normalizedScenarios.length) * 100);
-      
-      // Call onComplete callback if provided
+
+      const correctCount = userChoices.reduce((count, choiceIndex, index) => {
+        if (choiceIndex === null) return count;
+        const option = normalizedScenarios[index]?.options?.[choiceIndex];
+        return count + (option?.isCorrect ? 1 : 0);
+      }, 0);
+      const finalScore = Math.round((correctCount / normalizedScenarios.length) * 100);
+      const scenarioAttempts = userChoices.map((choiceIndex, index) => ({
+        scenarioIndex: index,
+        chosenOptionIndex: choiceIndex,
+        isCorrect: Boolean(normalizedScenarios[index]?.options?.[choiceIndex]?.isCorrect)
+      }));
+
       if (onComplete) {
-        onComplete(finalScore);
+        onComplete({ score: finalScore, scenarioAttempts });
       }
     }
   };

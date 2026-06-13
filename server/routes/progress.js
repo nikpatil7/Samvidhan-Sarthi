@@ -2,9 +2,29 @@ const express = require('express');
 const { authenticateToken } = require('./auth');
 const Progress = require('../models/Progress');
 const Topic = require('../models/Topic');
+const Content = require('../models/Content');
 const Badge = require('../models/Badge');
 const User = require('../models/User');
+const { computeProgressMetrics } = require('../utils/progressMetrics');
 const router = express.Router();
+
+async function withComputedMetrics(progressDoc, topicId) {
+  if (!progressDoc) {
+    return null;
+  }
+
+  const plain = progressDoc.toObject ? progressDoc.toObject() : progressDoc;
+  const topicContent = await Content.find({ topic: topicId, isActive: true });
+  const metrics = computeProgressMetrics(plain, topicContent);
+
+  return {
+    ...plain,
+    topicMastery: metrics.topicMastery,
+    quizScore: metrics.quizScore,
+    gameScore: metrics.gameScore,
+    scenarioPerformanceScore: metrics.scenarioPerformanceScore
+  };
+}
 
 // Get user progress for all topics
 router.get('/', authenticateToken, async (req, res) => {
@@ -108,7 +128,11 @@ router.get('/:topicId', authenticateToken, async (req, res) => {
           topic: topicId,
           completionPercentage: 0,
           quizScores: [],
-          activities: []
+          activities: [],
+          topicMastery: 0,
+          quizScore: 0,
+          gameScore: 0,
+          scenarioPerformanceScore: 0
         });
       }
     }
@@ -124,11 +148,15 @@ router.get('/:topicId', authenticateToken, async (req, res) => {
         topic: topicId,
         completionPercentage: 0,
         quizScores: [],
-        activities: []
+        activities: [],
+        topicMastery: 0,
+        quizScore: 0,
+        gameScore: 0,
+        scenarioPerformanceScore: 0
       });
     }
     
-    res.json(progress);
+    res.json(await withComputedMetrics(progress, resolvedTopicId));
   } catch (error) {
     console.error('Error fetching topic progress:', error);
     res.status(500).json({ message: 'Error fetching topic progress', error: error.message });
