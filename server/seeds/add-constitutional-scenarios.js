@@ -54,7 +54,8 @@ async function addConstitutionalScenarios() {
           }
         },
         topic: topic._id,
-        order: 6,
+        order: 20,
+        moduleStep: 'real-life-scenario',
         isActive: true
       },
       {
@@ -70,7 +71,8 @@ async function addConstitutionalScenarios() {
           }
         },
         topic: topic._id,
-        order: 7,
+        order: 20,
+        moduleStep: 'real-life-scenario',
         isActive: true
       },
       {
@@ -86,7 +88,8 @@ async function addConstitutionalScenarios() {
           }
         },
         topic: topic._id,
-        order: 8,
+        order: 20,
+        moduleStep: 'real-life-scenario',
         isActive: true
       }
     ];
@@ -103,6 +106,8 @@ async function addConstitutionalScenarios() {
       if (existingScenario) {
         console.log(`⚠️ Scenario '${scenario.title}' already exists. Updating...`);
         existingScenario.gameConfig = scenario.gameConfig;
+        existingScenario.moduleStep = scenario.moduleStep;
+        existingScenario.order = scenario.order;
         await existingScenario.save();
         console.log(`✅ Updated scenario: ${scenario.title}`);
         createdCount++;

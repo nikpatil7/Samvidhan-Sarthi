@@ -274,33 +274,34 @@ const TopicDetail = () => {
           <div className="flex items-center justify-between mb-2">
             <h3 className="text-lg font-medium text-white">Your Progress</h3>
             <div className="flex items-center gap-4">
-              {progress.topicMastery != null && (
-                <span className="text-sm text-gray-400">
-                  Mastery:{' '}
-                  <span className="font-semibold text-primary-400">{progress.topicMastery}%</span>
-                </span>
-              )}
-              <span className="text-lg font-semibold text-primary-500">{progress.completionPercentage}%</span>
+              <span className="text-sm text-gray-400">
+                Mastery:{' '}
+                <span className="font-semibold text-primary-400">{progress.topicMastery ?? 0}%</span>
+              </span>
+              <span className="text-lg font-semibold text-primary-500">{progress.completionPercentage ?? 0}%</span>
             </div>
           </div>
           <div className="w-full bg-dark-200 rounded-full h-4">
             <motion.div 
               className="h-4 rounded-full bg-primary-600"
               initial={{ width: 0 }}
-              animate={{ width: `${progress.completionPercentage}%` }}
+              animate={{ width: `${progress.completionPercentage ?? 0}%` }}
               transition={{ duration: 1, ease: "easeOut" }}
             />
           </div>
-          {progress.topicMastery != null && (
-            <div className="w-full bg-dark-200 rounded-full h-2 mt-2">
-              <motion.div
-                className="h-2 rounded-full bg-emerald-500"
-                initial={{ width: 0 }}
-                animate={{ width: `${progress.topicMastery}%` }}
-                transition={{ duration: 1, ease: 'easeOut', delay: 0.2 }}
-              />
-            </div>
-          )}
+          <div className="w-full bg-dark-200 rounded-full h-2 mt-2">
+            <motion.div
+              className="h-2 rounded-full bg-emerald-500"
+              initial={{ width: 0 }}
+              animate={{ width: `${progress.topicMastery ?? 0}%` }}
+              transition={{ duration: 1, ease: 'easeOut', delay: 0.2 }}
+            />
+          </div>
+          <div className="grid grid-cols-3 gap-3 mt-3 text-xs text-gray-400">
+            <span>Quiz: {progress.quizScore ?? 0}%</span>
+            <span>Scenario: {progress.scenarioPerformanceScore ?? 0}%</span>
+            <span>Games: {progress.gameScore ?? 0}%</span>
+          </div>
         </div>
       )}
       
