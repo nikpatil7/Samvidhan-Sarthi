@@ -220,7 +220,11 @@ const ContentDetail = () => {
       case 'scenario':
         return (
           <ScenarioGame 
-            scenarioData={gameConfig.scenarios || []} 
+            scenarioData={
+              gameConfig.scenarios
+              || (gameConfig.scenario ? [gameConfig.scenario] : [])
+              || []
+            }
             onComplete={handleGameComplete} 
             isCompleted={gameCompleted}
             score={gameScore}

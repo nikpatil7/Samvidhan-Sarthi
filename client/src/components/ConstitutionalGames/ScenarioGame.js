@@ -1,7 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { normalizeScenarioData } from '../../utils/normalizeScenarioData';
 
 const ScenarioGame = ({ scenarioData, onComplete, isCompleted, score, onPlayAgain }) => {
+  const normalizedScenarios = useMemo(
+    () => normalizeScenarioData(scenarioData),
+    [scenarioData]
+  );
   const [currentScenario, setCurrentScenario] = useState(0);
   const [userChoices, setUserChoices] = useState([]);
   const [feedback, setFeedback] = useState(null);
@@ -19,10 +24,10 @@ const ScenarioGame = ({ scenarioData, onComplete, isCompleted, score, onPlayAgai
   
   // Initialize user choices array
   useEffect(() => {
-    if (scenarioData && scenarioData.length > 0) {
-      setUserChoices(new Array(scenarioData.length).fill(null));
+    if (normalizedScenarios.length > 0) {
+      setUserChoices(new Array(normalizedScenarios.length).fill(null));
     }
-  }, [scenarioData]);
+  }, [normalizedScenarios]);
   
   // Handle selecting an option
   const handleSelectOption = (optionIndex) => {
@@ -38,15 +43,10 @@ const ScenarioGame = ({ scenarioData, onComplete, isCompleted, score, onPlayAgai
   const handleSubmitAnswer = () => {
     if (userChoices[currentScenario] === null) return;
     
-    const scenario = scenarioData[currentScenario];
+    const scenario = normalizedScenarios[currentScenario];
     const selectedOption = scenario.options[userChoices[currentScenario]];
     
-    // Check if the option has isCorrect or correct property (for backward compatibility)
-    const isCorrect = selectedOption.isCorrect != null 
-      ? selectedOption.isCorrect 
-      : selectedOption.correct != null
-        ? selectedOption.correct
-        : false;
+    const isCorrect = selectedOption.isCorrect;
     
     // Set feedback
     setFeedback({
@@ -68,14 +68,14 @@ const ScenarioGame = ({ scenarioData, onComplete, isCompleted, score, onPlayAgai
     setFeedback(null);
     setShowHint(false);
     
-    if (currentScenario < scenarioData.length - 1) {
+    if (currentScenario < normalizedScenarios.length - 1) {
       setCurrentScenario(currentScenario + 1);
     } else {
       // Game completed
       setCompleted(true);
       
       // Calculate final percentage
-      const finalScore = Math.round((gameScore / scenarioData.length) * 100);
+      const finalScore = Math.round((gameScore / normalizedScenarios.length) * 100);
       
       // Call onComplete callback if provided
       if (onComplete) {
@@ -92,7 +92,7 @@ const ScenarioGame = ({ scenarioData, onComplete, isCompleted, score, onPlayAgai
   // Restart game
   const restartGame = () => {
     setCurrentScenario(0);
-    setUserChoices(new Array(scenarioData.length).fill(null));
+    setUserChoices(new Array(normalizedScenarios.length).fill(null));
     setFeedback(null);
     setGameScore(0);
     setCompleted(false);
@@ -104,7 +104,7 @@ const ScenarioGame = ({ scenarioData, onComplete, isCompleted, score, onPlayAgai
     }
   };
   
-  if (!scenarioData || scenarioData.length === 0) {
+  if (!normalizedScenarios || normalizedScenarios.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center h-64 bg-dark-200 rounded-lg p-6">
         <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-gray-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -117,7 +117,7 @@ const ScenarioGame = ({ scenarioData, onComplete, isCompleted, score, onPlayAgai
   }
 
   // Get the current scenario
-  const currentScenarioData = scenarioData[currentScenario];
+  const currentScenarioData = normalizedScenarios[currentScenario];
   
   // Guard against missing data
   if (!currentScenarioData) {
@@ -153,7 +153,7 @@ const ScenarioGame = ({ scenarioData, onComplete, isCompleted, score, onPlayAgai
               transition={{ type: "spring", stiffness: 50, damping: 10 }}
             >
               <div className="h-full w-full rounded-full bg-primary-900/30 flex items-center justify-center">
-                <span className="text-4xl font-bold text-primary-400">{typeof score === 'number' ? score : Math.round((gameScore / scenarioData.length) * 100)}%</span>
+                <span className="text-4xl font-bold text-primary-400">{typeof score === 'number' ? score : Math.round((gameScore / normalizedScenarios.length) * 100)}%</span>
               </div>
             </motion.div>
             
@@ -164,25 +164,25 @@ const ScenarioGame = ({ scenarioData, onComplete, isCompleted, score, onPlayAgai
                 <div className="flex justify-between mb-2">
                   <span className="text-gray-300">Correct Decisions:</span>
                   <span className="text-green-400 font-medium">
-                    {gameScore} out of {scenarioData.length}
+                    {gameScore} out of {normalizedScenarios.length}
                   </span>
                 </div>
                 
                 <div className="flex justify-between">
                   <span className="text-gray-300">Constitutional Expertise:</span>
                   <span className={`font-medium ${
-                    gameScore / scenarioData.length >= 0.7 ? 'text-green-400' : 'text-yellow-400'
+                    gameScore / normalizedScenarios.length >= 0.7 ? 'text-green-400' : 'text-yellow-400'
                   }`}>
-                    {gameScore / scenarioData.length >= 0.9 ? 'Constitutional Expert' :
-                     gameScore / scenarioData.length >= 0.7 ? 'Constitutional Scholar' :
-                     gameScore / scenarioData.length >= 0.5 ? 'Constitutional Student' :
+                    {gameScore / normalizedScenarios.length >= 0.9 ? 'Constitutional Expert' :
+                     gameScore / normalizedScenarios.length >= 0.7 ? 'Constitutional Scholar' :
+                     gameScore / normalizedScenarios.length >= 0.5 ? 'Constitutional Student' :
                      'Constitutional Novice'}
                   </span>
                 </div>
               </div>
               
               <p className="text-gray-300 mb-6">
-                {gameScore / scenarioData.length >= 0.7 
+                {gameScore / normalizedScenarios.length >= 0.7
                   ? 'Excellent! You have a strong understanding of constitutional principles and how they apply to real-world scenarios.' 
                   : 'Review the constitutional principles and their applications to improve your understanding of how they work in practice.'}
               </p>
@@ -210,14 +210,14 @@ const ScenarioGame = ({ scenarioData, onComplete, isCompleted, score, onPlayAgai
               
               <div className="flex items-center">
                 <div className="text-sm font-medium mr-3 px-3 py-1 bg-dark-300 rounded-full">
-                  {currentScenario + 1} / {scenarioData.length}
+                  {currentScenario + 1} / {normalizedScenarios.length}
                 </div>
                 
                 <div className="w-24 bg-dark-300 h-2 rounded-full overflow-hidden">
                   <motion.div 
                     className="bg-primary-500 h-2"
-                    initial={{ width: `${((currentScenario) / scenarioData.length) * 100}%` }}
-                    animate={{ width: `${((currentScenario + 1) / scenarioData.length) * 100}%` }}
+                    initial={{ width: `${((currentScenario) / normalizedScenarios.length) * 100}%` }}
+                    animate={{ width: `${((currentScenario + 1) / normalizedScenarios.length) * 100}%` }}
                     transition={{ duration: 0.3 }}
                   ></motion.div>
                 </div>
@@ -278,12 +278,7 @@ const ScenarioGame = ({ scenarioData, onComplete, isCompleted, score, onPlayAgai
               {/* Options */}
               <div className="space-y-3">
                 {currentScenarioData.options.map((option, optionIndex) => {
-                  // Determine if this option is correct
-                  const isOptionCorrect = option.isCorrect != null 
-                    ? option.isCorrect 
-                    : option.correct != null 
-                      ? option.correct 
-                      : false;
+                  const isOptionCorrect = option.isCorrect;
                   
                   return (
                     <motion.div 
@@ -376,7 +371,7 @@ const ScenarioGame = ({ scenarioData, onComplete, isCompleted, score, onPlayAgai
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ type: "spring", stiffness: 400, damping: 17 }}
                   >
-                    {currentScenario < scenarioData.length - 1 ? 'Next Scenario' : 'Complete Challenge'}
+                    {currentScenario < normalizedScenarios.length - 1 ? 'Next Scenario' : 'Complete Challenge'}
                   </motion.button>
                 )}
               </div>
