@@ -9,7 +9,7 @@ const ConstitutionSpiralGame = ({ gameData, onComplete, isCompleted, score, onPl
   const [exploredItems, setExploredItems] = useState([]);
   const containerRef = useRef(null);
   const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
-  
+
   // Calculate container size based on screen
   useEffect(() => {
     const updateSize = () => {
@@ -18,42 +18,42 @@ const ConstitutionSpiralGame = ({ gameData, onComplete, isCompleted, score, onPl
         setContainerSize({ width, height });
       }
     };
-    
+
     updateSize();
     window.addEventListener('resize', updateSize);
     return () => window.removeEventListener('resize', updateSize);
   }, []);
-  
+
   // Calculate progress
   useEffect(() => {
     if (gameData && gameData.levels) {
       const totalItems = gameData.levels.reduce((acc, level) => acc + level.items.length, 0);
       const progressPercentage = (exploredItems.length / totalItems) * 100;
       setProgress(progressPercentage);
-      
+
       // If all items are explored, complete the game
       if (progressPercentage >= 100 && !isCompleted) {
         onComplete(100);
       }
     }
   }, [exploredItems, gameData, onComplete, isCompleted]);
-  
+
   // Handle level selection
   const handleLevelSelect = (level, index) => {
     setSelectedLevel(index);
     setSelectedItem(null);
     setDetails(null);
   };
-  
+
   // Handle item selection
   const handleItemSelect = (item, levelIndex) => {
     // Mark item as explored if not already
     if (!exploredItems.includes(`${levelIndex}-${item}`)) {
       setExploredItems([...exploredItems, `${levelIndex}-${item}`]);
     }
-    
+
     setSelectedItem(item);
-    
+
     // Set details based on the selected item
     // In a real application, these would come from a database
     const detailsMap = {
@@ -73,7 +73,7 @@ const ConstitutionSpiralGame = ({ gameData, onComplete, isCompleted, score, onPl
         content: "The Indian Constitution is the longest written constitution of any sovereign country in the world. It contains 395 articles in 22 parts, 12 schedules, and 105 amendments.",
         facts: ["It is a mixture of federalism and unitary features", "Inspired by constitutions from many countries including UK, USA, Ireland, etc."]
       },
-      
+
       // Level 1
       "Parts I-VIII": {
         title: "Parts I-VIII",
@@ -90,7 +90,7 @@ const ConstitutionSpiralGame = ({ gameData, onComplete, isCompleted, score, onPl
         content: "These parts cover Special Provisions for certain classes, Official Language, Emergency Provisions, Amendments, Temporary Provisions, and more.",
         facts: ["Part XVIII covers three types of emergencies", "Part XX (Article 368) deals with the power to amend the Constitution"]
       },
-      
+
       // Level 2
       "Schedules 1-4": {
         title: "Schedules 1-4",
@@ -107,7 +107,7 @@ const ConstitutionSpiralGame = ({ gameData, onComplete, isCompleted, score, onPl
         content: "Schedule 9: Laws immune from judicial review. Schedule 10: Anti-defection provisions. Schedule 11: Panchayat powers. Schedule 12: Municipality powers.",
         facts: ["Ninth Schedule was added by the First Amendment in 1951", "Tenth Schedule contains provisions for disqualification on grounds of defection"]
       },
-      
+
       // Level 3
       "1st-42nd": {
         title: "Amendments 1-42",
@@ -124,7 +124,7 @@ const ConstitutionSpiralGame = ({ gameData, onComplete, isCompleted, score, onPl
         content: "Recent amendments include the 101st (GST), 102nd (National Commission for Backward Classes), and 103rd (10% reservation for Economically Weaker Sections).",
         facts: ["101st Amendment (2016) introduced Goods and Services Tax", "103rd Amendment (2019) provided for 10% reservation for economically weaker sections"]
       },
-      
+
       // Level 4
       "Basic Structure": {
         title: "Basic Structure Doctrine",
@@ -142,61 +142,80 @@ const ConstitutionSpiralGame = ({ gameData, onComplete, isCompleted, score, onPl
         facts: ["Kesavananda Bharati case (1973) established the Basic Structure doctrine", "Maneka Gandhi case (1978) expanded the scope of Article 21"]
       }
     };
-    
+
     setDetails(detailsMap[item] || {
       title: item,
       content: "Detailed information about this topic will be available soon.",
       facts: ["This is a part of the Indian Constitution", "Explore more to learn about this topic"]
     });
   };
-  
+
   // Get the right visualization size based on container
   const getVisualizationSize = () => {
-    if (!containerSize.width) return 120;
-    
-    // Calculate based on container size
-    const smallerDimension = Math.min(containerSize.width * 0.8, containerSize.height * 0.8);
+    if (!containerSize.width || !containerSize.height) return 120;
+
+    const smallerDimension = Math.min(containerSize.width, containerSize.height) * 0.9;
     const maxLevels = gameData?.levels?.length || 5;
-    
-    return Math.max(60, smallerDimension / (maxLevels + 1));
+
+    return Math.max(70, smallerDimension / Math.max(3.2, maxLevels + 0.3));
   };
-  
+
   const spiralBaseSize = getVisualizationSize();
-  
+
   // Prepare data if empty
   const preparedGameData = {
     centerTitle: gameData?.centerTitle || "Indian Constitution",
     levels: gameData?.levels || []
   };
-  
+  const selectedLevelData = selectedLevel !== null ? preparedGameData.levels[selectedLevel] : null;
+  const selectedLevelCount = selectedLevelData?.items?.length || 0;
+
   return (
     <div className="space-y-6 h-full">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold text-white">Constitution Spiral Explorer</h2>
-        <div className="inline-flex items-center bg-dark-300 px-3 py-1 rounded-full">
-          <div className="text-sm text-gray-300 mr-2">Explored: </div>
-          <div className="text-sm font-medium text-primary-400">{Math.round(progress)}%</div>
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between mb-4">
+        <div className="space-y-2">
+          <h2 className="text-2xl font-bold text-white">Constitution Spiral Explorer</h2>
+          <p className="text-gray-400 max-w-3xl">Explore the Constitution in a layered spiral. Choose a ring to reveal its themes, then tap topics to unlock clear explanations and quick facts.</p>
+        </div>
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+          <div className="inline-flex items-center bg-dark-300 px-3 py-2 rounded-full">
+            <div className="text-sm text-gray-300 mr-2">Explored</div>
+            <div className="text-sm font-medium text-primary-400">{Math.round(progress)}%</div>
+          </div>
+          <div className="inline-flex items-center bg-dark-300 px-3 py-2 rounded-full">
+            <div className="text-sm text-gray-300 mr-2">Selected</div>
+            <div className="text-sm font-medium text-white">{selectedLevel !== null ? `L${selectedLevel}` : '--'}</div>
+          </div>
+          <div className="inline-flex items-center bg-dark-300 px-3 py-2 rounded-full">
+            <div className="text-sm text-gray-300 mr-2">Topics</div>
+            <div className="text-sm font-medium text-white">{selectedLevel !== null ? selectedLevelCount : preparedGameData.levels.reduce((acc, level) => acc + (level.items?.length || 0), 0)}</div>
+          </div>
         </div>
       </div>
-      
-      <div className="flex flex-col lg:flex-row gap-6 h-full">
+
+      <div className="grid gap-6 h-full lg:grid-cols-[2.1fr_1fr]">
         {/* Spiral visualization */}
-        <div className="w-full lg:w-7/12">
+        <div className="w-full">
           <div className="bg-dark-200 rounded-lg p-4 h-full flex flex-col">
-            <div ref={containerRef} className="flex-grow relative" style={{ minHeight: '400px', overflow: 'hidden' }}>
+            <div ref={containerRef}
+              className="flex-grow relative"
+              style={{
+                minHeight: '620px',
+                overflow: 'hidden'
+              }}>
               {/* Center */}
-              <motion.div 
+              <motion.div
                 className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50"
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ delay: 0.2, type: "spring", stiffness: 260, damping: 20 }}
               >
-                <motion.div 
+                <motion.div
                   className="bg-primary-600 rounded-full flex items-center justify-center text-white font-medium text-center p-2"
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.95 }}
-                  style={{ 
-                    width: Math.max(60, spiralBaseSize * 0.3), 
+                  style={{
+                    width: Math.max(60, spiralBaseSize * 0.3),
                     height: Math.max(60, spiralBaseSize * 0.3),
                     fontSize: Math.max(10, spiralBaseSize * 0.08)
                   }}
@@ -204,7 +223,7 @@ const ConstitutionSpiralGame = ({ gameData, onComplete, isCompleted, score, onPl
                   {preparedGameData.centerTitle}
                 </motion.div>
               </motion.div>
-              
+
               {/* Levels */}
               {preparedGameData.levels.map((level, index) => (
                 <motion.div
@@ -215,9 +234,8 @@ const ConstitutionSpiralGame = ({ gameData, onComplete, isCompleted, score, onPl
                   transition={{ delay: 0.2 + (index * 0.1), duration: 0.5 }}
                 >
                   <motion.div
-                    className={`relative rounded-full border-2 ${
-                      selectedLevel === index ? 'border-primary-500' : 'border-gray-700'
-                    }`}
+                    className={`relative rounded-full border-2 ${selectedLevel === index ? 'border-primary-500' : 'border-gray-700'
+                      }`}
                     style={{
                       width: `${(index + 1) * spiralBaseSize}px`,
                       height: `${(index + 1) * spiralBaseSize}px`,
@@ -228,39 +246,38 @@ const ConstitutionSpiralGame = ({ gameData, onComplete, isCompleted, score, onPl
                     whileHover={{ borderColor: level.color }}
                   >
                     {/* Level title */}
-                    <div 
+                    <div
                       className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-dark-200 px-2 py-0.5 rounded-full"
-                      style={{ 
-                        color: level.color, 
+                      style={{
+                        color: level.color,
                         fontSize: Math.max(10, Math.min(14, spiralBaseSize * 0.1)),
                         whiteSpace: 'nowrap'
                       }}
                     >
                       {level.title}
                     </div>
-                    
+
                     {/* Items around this level */}
                     {level.items && level.items.map((item, itemIndex) => {
                       const totalItems = level.items.length;
                       const angle = (itemIndex * (360 / totalItems)) * (Math.PI / 180);
                       const radius = ((index + 1) * spiralBaseSize) / 2;
-                      
+
                       const isExplored = exploredItems.includes(`${index}-${item}`);
                       const itemSize = Math.max(40, Math.min(60, spiralBaseSize * 0.45));
-                      
+
                       return (
                         <motion.div
                           key={item}
-                          className={`absolute rounded-lg p-2 text-center font-medium cursor-pointer ${
-                            selectedItem === item 
-                              ? 'text-white shadow-glow' 
-                              : isExplored
-                                ? 'text-white'
-                                : 'text-gray-400'
-                          }`}
+                          className={`absolute rounded-lg p-2 text-center font-medium cursor-pointer ${selectedItem === item
+                            ? 'text-white shadow-glow'
+                            : isExplored
+                              ? 'text-white'
+                              : 'text-gray-400'
+                            }`}
                           style={{
-                            left: `calc(50% + ${Math.cos(angle) * radius}px - ${itemSize/2}px)`,
-                            top: `calc(50% + ${Math.sin(angle) * radius}px - ${itemSize/2}px)`,
+                            left: `calc(50% + ${Math.cos(angle) * radius}px - ${itemSize / 2}px)`,
+                            top: `calc(50% + ${Math.sin(angle) * radius}px - ${itemSize / 2}px)`,
                             backgroundColor: selectedItem === item ? level.color : isExplored ? `${level.color}90` : 'rgba(30, 30, 35, 0.8)',
                             width: `${itemSize}px`,
                             height: `${itemSize}px`,
@@ -291,7 +308,7 @@ const ConstitutionSpiralGame = ({ gameData, onComplete, isCompleted, score, onPl
                 </motion.div>
               ))}
             </div>
-            
+
             <div className="mt-3 text-center">
               <div className="flex items-center justify-center gap-2 bg-dark-300 py-2 px-4 rounded-lg text-gray-300 text-sm inline-block">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-primary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -302,10 +319,10 @@ const ConstitutionSpiralGame = ({ gameData, onComplete, isCompleted, score, onPl
             </div>
           </div>
         </div>
-        
+
         {/* Details panel */}
-        <div className="w-full lg:w-5/12">
-          <div className="bg-dark-200 rounded-lg p-4 h-full">
+        <div className="w-full ">
+          <div className="bg-dark-200 rounded-lg p-4 h-full w-full">
             <AnimatePresence mode="wait">
               {details ? (
                 <motion.div
@@ -316,88 +333,194 @@ const ConstitutionSpiralGame = ({ gameData, onComplete, isCompleted, score, onPl
                   transition={{ duration: 0.3 }}
                   className="h-full flex flex-col"
                 >
-                  <motion.h3 
-                    className="text-lg font-bold text-white mb-3"
-                    initial={{ x: -10 }}
-                    animate={{ x: 0 }}
-                  >
-                    {details.title}
-                  </motion.h3>
-                  <motion.p 
-                    className="text-gray-300 mb-4"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.1 }}
-                  >
-                    {details.content}
-                  </motion.p>
-                  
-                  <motion.div 
-                    className="bg-dark-300 rounded-lg p-3 mt-auto"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 }}
-                  >
-                    <h4 className="text-white text-sm font-semibold mb-2">Quick Facts</h4>
-                    <ul className="text-gray-400 text-sm space-y-1">
-                      {details.facts.map((fact, index) => (
-                        <motion.li 
-                          key={index} 
-                          className="flex items-start"
-                          initial={{ opacity: 0, x: -5 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: 0.3 + (index * 0.1) }}
-                        >
-                          <span className="inline-block mr-2 mt-0.5 text-primary-500">•</span>
-                          <span>{fact}</span>
-                        </motion.li>
-                      ))}
-                    </ul>
-                  </motion.div>
-                  
-                  <div className="mt-4 flex justify-center">
+                  <div className="mb-6">
+                    <div className="inline-flex items-center px-3 py-1 rounded-full bg-primary-500/20 text-primary-400 text-xs font-semibold mb-3">
+                      CONSTITUTIONAL TOPIC
+                    </div>
+
+                    <h2 className="text-3xl font-bold text-white mb-3">
+                      {details.title}
+                    </h2>
+
+                    <div className="h-1 w-20 bg-primary-500 rounded-full"></div>
+                  </div>
+
+                  <div className="space-y-5 flex-grow overflow-y-auto pr-2">
+
+                    <div className="bg-dark-300 rounded-2xl p-5">
+                      <h3 className="text-primary-400 font-bold mb-3">
+                        📖 Overview
+                      </h3>
+
+                      <p className="text-gray-300 leading-relaxed">
+                        {details.content}
+                      </p>
+                    </div>
+
+                    <div className="bg-dark-300 rounded-2xl p-5">
+                      <h3 className="text-green-400 font-bold mb-3">
+                        🎯 Why It Matters
+                      </h3>
+
+                      <div className="space-y-2 text-gray-300">
+                        <div>✓ Important constitutional concept</div>
+                        <div>✓ Frequently asked in exams and interviews</div>
+                        <div>✓ Helps understand governance and citizenship</div>
+                      </div>
+                    </div>
+
+                    <div className="bg-dark-300 rounded-2xl p-5">
+                      <h3 className="text-yellow-400 font-bold mb-3">
+                        ⚡ Quick Facts
+                      </h3>
+
+                      <div className="space-y-3">
+                        {details.facts.map((fact, index) => (
+                          <div
+                            key={index}
+                            className="flex items-start gap-3"
+                          >
+                            <div className="w-2 h-2 rounded-full bg-primary-500 mt-2"></div>
+
+                            <div className="text-gray-300">
+                              {fact}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="bg-gradient-to-r from-primary-500/10 to-primary-700/10 border border-primary-500/30 rounded-2xl p-5">
+                      <h3 className="text-primary-300 font-bold mb-2">
+                        🏛 Constitution Insight
+                      </h3>
+
+                      <p className="text-gray-300 italic">
+                        Understanding this topic strengthens constitutional
+                        literacy and helps citizens better understand their
+                        rights, duties and democratic institutions.
+                      </p>
+                    </div>
+
+                  </div>
+
+                  <div className="mt-5">
                     <motion.button
-                      className="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition"
+                      className="w-full py-3 bg-primary-600 hover:bg-primary-700 rounded-xl text-white font-medium"
                       onClick={() => {
                         setSelectedItem(null);
                         setDetails(null);
                       }}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
                     >
-                      Explore More
+                      Explore Another Topic
                     </motion.button>
                   </div>
                 </motion.div>
+              ) : selectedLevel !== null ? (
+                <motion.div
+                  key="level-overview"
+                  className="h-full flex flex-col"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                >
+                  <div className="mb-6">
+                    <div className="inline-flex items-center px-3 py-1 rounded-full bg-primary-500/20 text-primary-400 text-xs font-semibold mb-3">
+                      LEVEL OVERVIEW
+                    </div>
+
+                    <h2 className="text-3xl font-bold text-white">
+                      {selectedLevelData?.title}
+                    </h2>
+
+                    <p className="text-gray-400 mt-3">
+                      Explore the constitutional concepts available in this level.
+                    </p>
+                  </div>
+
+                  <div className="space-y-3 overflow-y-auto">
+                    {selectedLevelData?.items?.map((topic) => {
+                      const isExplored =
+                        exploredItems.includes(`${selectedLevel}-${topic}`);
+
+                      return (
+                        <motion.button
+                          key={topic}
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          className={`w-full text-left rounded-2xl p-4 border transition ${isExplored
+                            ? 'border-primary-500 bg-primary-500/10'
+                            : 'border-gray-700 bg-dark-300'
+                            }`}
+                          onClick={() =>
+                            handleItemSelect(topic, selectedLevel)
+                          }
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="text-white font-medium">
+                              {topic}
+                            </span>
+
+                            <span
+                              className={`text-xs px-3 py-1 rounded-full ${isExplored
+                                ? 'bg-primary-500 text-white'
+                                : 'bg-gray-700 text-gray-300'
+                                }`}
+                            >
+                              {isExplored
+                                ? 'Explored'
+                                : 'Explore'}
+                            </span>
+                          </div>
+                        </motion.button>
+                      );
+                    })}
+                  </div>
+                </motion.div>
               ) : (
-                <motion.div 
+                <motion.div
                   key="empty-state"
-                  className="h-full flex flex-col items-center justify-center text-center"
+                  className="h-full flex flex-col justify-center items-center text-center px-6"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
                 >
-                  <motion.div
-                    initial={{ y: 10, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.2 }}
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 text-gray-500 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M8 16l2.879-2.879m0 0a3 3 0 104.243-4.242 3 3 0 00-4.243 4.242zM21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <h3 className="text-lg font-medium text-gray-300 mb-2">Select a topic to explore</h3>
-                    <p className="text-gray-400 max-w-xs">Click on any item in the spiral to view detailed information about that constitutional topic</p>
-                  </motion.div>
+                  <div className="text-6xl mb-5">
+                    🏛
+                  </div>
+
+                  <h2 className="text-3xl font-bold text-white mb-4">
+                    Explore the Constitution
+                  </h2>
+
+                  <p className="text-gray-400 leading-relaxed max-w-md">
+                    Select any ring from the Constitution Spiral to discover
+                    important constitutional concepts, historical context,
+                    amendments, landmark cases and key facts.
+                  </p>
+
+                  <div className="mt-8 bg-dark-300 rounded-2xl p-5 max-w-md">
+                    <div className="text-primary-400 font-semibold mb-2">
+                      💡 Learning Tip
+                    </div>
+
+                    <p className="text-gray-300 text-sm">
+                      Start from the inner rings and gradually move outward
+                      to understand the Constitution from basics to advanced
+                      concepts.
+                    </p>
+                  </div>
                 </motion.div>
               )}
             </AnimatePresence>
           </div>
         </div>
       </div>
-      
+
       {/* Progress bar */}
       <div className="bg-dark-200 h-3 rounded-full overflow-hidden">
-        <motion.div 
+        <motion.div
           className="h-full bg-gradient-to-r from-primary-500 to-primary-600"
           initial={{ width: '0%' }}
           animate={{ width: `${progress}%` }}
@@ -434,4 +557,4 @@ if (typeof document !== 'undefined') {
   }
 }
 
-export default ConstitutionSpiralGame; 
+export default ConstitutionSpiralGame;
