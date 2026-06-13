@@ -7,13 +7,7 @@ const router = express.Router();
 
 const escapeRegex = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 const { MODULE_STEP_ORDER } = require('../utils/constants');
-const { computeTopicMastery } = require('../utils/topicMastery');
-const {
-  calculateScenarioPerformanceScore,
-  calculateAverageGameScore,
-  calculateAverageQuizScore,
-  getScenarioFallbackAverage
-} = require('../utils/progressMetrics');
+const { persistProgressMetrics } = require('../utils/progressMetrics');
 
 function resolveActivityType(content, override) {
   if (override) return override;
@@ -690,25 +684,7 @@ router.post('/track', authenticateToken, async (req, res) => {
       progress.completionPercentage = Math.round((completedContent / totalContentCount) * 100);
     }
     
-    const scenarioGames = allContent.filter(
-      (item) => item.type === 'game' && item.gameConfig && item.gameConfig.type === 'scenario'
-    );
-
-    const scenarioFallbackAverage = getScenarioFallbackAverage(progress.activities, scenarioGames);
-
-    progress.scenarioPerformanceScore = calculateScenarioPerformanceScore(
-      progress.activities,
-      scenarioGames,
-      scenarioFallbackAverage
-    );
-
-    progress.gameScore = calculateAverageGameScore(progress.activities, allContent);
-    progress.quizScore = calculateAverageQuizScore(progress.quizScores);
-    progress.topicMastery = computeTopicMastery({
-      quizScore: progress.quizScore,
-      scenarioPerformanceScore: progress.scenarioPerformanceScore,
-      gameScore: progress.gameScore
-    });
+    persistProgressMetrics(progress, allContent);
 
     const completedModuleSteps = getCompletedModuleSteps(progress, allContent);
     if (completedModuleSteps.size >= MODULE_STEP_ORDER.length) {

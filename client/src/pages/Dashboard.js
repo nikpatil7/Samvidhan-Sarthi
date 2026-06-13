@@ -7,21 +7,25 @@ import { AuthContext } from '../contexts/AuthContext';
 const colorClasses = {
   primary: {
     bar: 'bg-primary-600',
+    barHover: '#0ea5e9',
     iconBg: 'bg-primary-600/20',
     iconText: 'text-primary-500'
   },
   secondary: {
     bar: 'bg-secondary-600',
+    barHover: '#d946ef',
     iconBg: 'bg-secondary-600/20',
     iconText: 'text-secondary-500'
   },
   green: {
     bar: 'bg-green-600',
+    barHover: '#22c55e',
     iconBg: 'bg-green-600/20',
     iconText: 'text-green-500'
   },
   yellow: {
     bar: 'bg-yellow-600',
+    barHover: '#eab308',
     iconBg: 'bg-yellow-600/20',
     iconText: 'text-yellow-500'
   }
@@ -49,7 +53,7 @@ const ProgressCard = ({ title, value, maxValue, color = 'primary' }) => {
           initial={{ width: 0 }}
           animate={{ width: `${percentage}%` }}
           transition={{ duration: 1, ease: "easeOut" }}
-          whileHover={{ backgroundColor: isHovered ? classes.bar.replace('600', '500') : classes.bar }}
+          whileHover={isHovered ? { backgroundColor: classes.barHover } : undefined}
         />
       </div>
       <motion.div 
@@ -364,7 +368,7 @@ const Dashboard = () => {
                 />
                 <StatCard 
                   title="Module Steps Completed" 
-                  value={Object.values(analyticsData.moduleStepProgress).reduce((a, b) => a + b, 0)} 
+                  value={analyticsData.totalModuleStepCompletions ?? Object.values(analyticsData.moduleStepProgress || {}).reduce((a, b) => a + b, 0)} 
                   icon={
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />

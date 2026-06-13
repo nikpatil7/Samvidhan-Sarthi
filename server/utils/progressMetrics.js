@@ -1,12 +1,20 @@
 const { computeTopicMastery } = require('./topicMastery');
 
 function calculateScenarioPerformanceScore(activities, scenarioGames, fallbackAverage) {
-  const scenarioAttempts = activities.filter(
+  const scenarioAttempts = (activities || []).filter(
     (activity) => activity.activityType === 'scenario' && activity.scenarioIndex != null
   );
-  const firstAttempts = scenarioAttempts.filter((activity) => activity.isFirstAttempt);
 
-  if (firstAttempts.length > 0) {
+  if (scenarioAttempts.length > 0) {
+    const firstAttemptByIndex = new Map();
+    scenarioAttempts.forEach((activity) => {
+      const key = activity.scenarioIndex;
+      if (!firstAttemptByIndex.has(key)) {
+        firstAttemptByIndex.set(key, activity);
+      }
+    });
+
+    const firstAttempts = Array.from(firstAttemptByIndex.values());
     const correct = firstAttempts.filter((activity) => activity.isCorrect).length;
     return Math.round((correct / firstAttempts.length) * 100);
   }
@@ -28,7 +36,7 @@ function calculateAverageGameScore(activities, allContent) {
   }
 
   const gameActivityIds = nonScenarioGames.map((game) => game._id.toString());
-  const gameActivities = activities.filter(
+  const gameActivities = (activities || []).filter(
     (activity) =>
       gameActivityIds.includes(activity.activityId?.toString()) && activity.completed
   );
@@ -46,7 +54,7 @@ function calculateAverageGameScore(activities, allContent) {
 }
 
 function calculateAverageQuizScore(quizScores) {
-  if (quizScores.length === 0) {
+  if (!quizScores || quizScores.length === 0) {
     return null;
   }
 
@@ -64,60 +72,75 @@ function getScenarioFallbackAverage(activities, scenarioGames) {
   }
 
   const scenarioActivityIds = scenarioGames.map((game) => game._id.toString());
-  const scenarioActivities = activities.filter(
-    (activity) =>
-      scenarioActivityIds.includes(activity.activityId?.toString()) && activity.completed
+  const scenarioActivities = (activities || []).filter((activity) =>
+    scenarioActivityIds.includes(activity.activityId?.toString())
   );
 
   if (scenarioActivities.length === 0) {
     return null;
   }
 
-  const scenarioScores = scenarioActivities
-    .map((activity) => activity.score)
-    .filter((value) => value > 0);
+  const perGameScores = scenarioActivityIds
+    .map((gameId) => {
+      const gameActivities = scenarioActivities.filter(
+        (activity) => activity.activityId?.toString() === gameId
+      );
+      if (gameActivities.length === 0) return null;
 
-  if (scenarioScores.length === 0) {
+      const indexedAttempts = gameActivities.filter(
+        (activity) => activity.scenarioIndex != null
+      );
+      if (indexedAttempts.length > 0) {
+        const firstByIndex = new Map();
+        indexedAttempts.forEach((activity) => {
+          if (!firstByIndex.has(activity.scenarioIndex)) {
+            firstByIndex.set(activity.scenarioIndex, activity);
+          }
+        });
+        const attempts = Array.from(firstByIndex.values());
+        const correct = attempts.filter((activity) => activity.isCorrect).length;
+        return Math.round((correct / attempts.length) * 100);
+      }
+
+      const completed = gameActivities.find((activity) => activity.completed);
+      if (completed && completed.score > 0) {
+        return completed.score;
+      }
+
+      return null;
+    })
+    .filter((score) => score != null && score > 0);
+
+  if (perGameScores.length === 0) {
     return null;
   }
 
   return Math.round(
-    scenarioScores.reduce((sum, value) => sum + value, 0) / scenarioScores.length
+    perGameScores.reduce((sum, value) => sum + value, 0) / perGameScores.length
   );
 }
 
 /**
- * Compute mastery-related scores for dashboard display.
- * Recalculates from raw progress when stored aggregates are missing.
+ * Always derive display metrics from raw progress + content.
+ * Stored aggregate fields may be stale or zero-filled.
  */
 function computeProgressMetrics(progress, allContent) {
   const scenarioGames = allContent.filter(
     (item) => item.type === 'game' && item.gameConfig?.type === 'scenario'
   );
 
-  const quizScore =
-    progress.quizScore != null
-      ? progress.quizScore
-      : calculateAverageQuizScore(progress.quizScores || []);
-
-  const scenarioPerformanceScore =
-    progress.scenarioPerformanceScore != null
-      ? progress.scenarioPerformanceScore
-      : calculateScenarioPerformanceScore(
-          progress.activities || [],
-          scenarioGames,
-          getScenarioFallbackAverage(progress.activities || [], scenarioGames)
-        );
-
-  const gameScore =
-    progress.gameScore != null
-      ? progress.gameScore
-      : calculateAverageGameScore(progress.activities || [], allContent);
-
-  const topicMastery =
-    progress.topicMastery != null
-      ? progress.topicMastery
-      : computeTopicMastery({ quizScore, scenarioPerformanceScore, gameScore });
+  const quizScore = calculateAverageQuizScore(progress.quizScores || []);
+  const scenarioPerformanceScore = calculateScenarioPerformanceScore(
+    progress.activities || [],
+    scenarioGames,
+    getScenarioFallbackAverage(progress.activities || [], scenarioGames)
+  );
+  const gameScore = calculateAverageGameScore(progress.activities || [], allContent);
+  const topicMastery = computeTopicMastery({
+    quizScore,
+    scenarioPerformanceScore,
+    gameScore
+  });
 
   return {
     quizScore: quizScore ?? 0,
@@ -127,12 +150,24 @@ function computeProgressMetrics(progress, allContent) {
   };
 }
 
-function averageMetric(values) {
-  const valid = values.filter((value) => value != null && !Number.isNaN(value));
+function averageMetric(values, { excludeZero = false } = {}) {
+  let valid = values.filter((value) => value != null && !Number.isNaN(value));
+  if (excludeZero) {
+    valid = valid.filter((value) => value > 0);
+  }
   if (valid.length === 0) {
     return 0;
   }
   return Math.round(valid.reduce((sum, value) => sum + value, 0) / valid.length);
+}
+
+function persistProgressMetrics(progress, allContent) {
+  const metrics = computeProgressMetrics(progress, allContent);
+  progress.quizScore = metrics.quizScore;
+  progress.gameScore = metrics.gameScore;
+  progress.scenarioPerformanceScore = metrics.scenarioPerformanceScore;
+  progress.topicMastery = metrics.topicMastery;
+  return metrics;
 }
 
 module.exports = {
@@ -141,5 +176,6 @@ module.exports = {
   calculateAverageQuizScore,
   getScenarioFallbackAverage,
   computeProgressMetrics,
-  averageMetric
+  averageMetric,
+  persistProgressMetrics
 };

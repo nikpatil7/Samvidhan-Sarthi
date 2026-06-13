@@ -9,6 +9,14 @@ const Content = require('../models/Content');
 const Topic = require('../models/Topic');
 const { computeProgressMetrics, averageMetric } = require('../utils/progressMetrics');
 const {
+  buildModuleStepProgress,
+  countTotalModuleStepCompletions,
+  buildEngagementByContentType,
+  buildLearningImprovement,
+  getProgressTopicId,
+  isContentCompletedInProgress
+} = require('../utils/analyticsHelpers');
+const {
   buildBadgeStats,
   countTopicsWithFullJourney,
   getCompletedCoreSteps
@@ -242,7 +250,8 @@ router.get('/dashboard', authenticateToken, async (req, res) => {
     const averageQuizScore = averageMetric(enrichedProgress.map((p) => p.quizScore));
     const averageTopicMastery = averageMetric(enrichedProgress.map((p) => p.topicMastery));
     const averageScenarioPerformance = averageMetric(
-      enrichedProgress.map((p) => p.scenarioPerformanceScore)
+      enrichedProgress.map((p) => p.scenarioPerformanceScore),
+      { excludeZero: true }
     );
     const averageGameScore = averageMetric(enrichedProgress.map((p) => p.gameScore));
     
@@ -605,6 +614,7 @@ router.get('/analytics', authenticateToken, async (req, res) => {
         scoreDistribution: { excellent: 0, good: 0, average: 0, needsImprovement: 0 }
       },
       moduleStepProgress: {},
+      totalModuleStepCompletions: 0,
       moduleStepEffectiveness: {},
       applicationQuestionPerformance: {
         averageScore: 0,
@@ -647,13 +657,13 @@ router.get('/analytics', authenticateToken, async (req, res) => {
     // Enhanced scenario performance analysis
     const scenarioScores = progressWithMetrics.map((entry) => entry.metrics.scenarioPerformanceScore);
     if (scenarioScores.length > 0) {
-      analytics.scenarioPerformance.averageScore = averageMetric(scenarioScores);
+      analytics.scenarioPerformance.averageScore = averageMetric(scenarioScores, { excludeZero: true });
       analytics.scenarioPerformance.totalScenarios = scenarioScores.filter((s) => s > 0).length;
       analytics.scenarioPerformance.highPerformanceCount = scenarioScores.filter(s => s >= 80).length;
-      analytics.scenarioPerformance.lowPerformanceCount = scenarioScores.filter(s => s < 50).length;
+      analytics.scenarioPerformance.lowPerformanceCount = scenarioScores.filter(s => s > 0 && s < 50).length;
       
-      // Score distribution
-      scenarioScores.forEach(score => {
+      // Score distribution (topics with scenario data only)
+      scenarioScores.filter((score) => score > 0).forEach(score => {
         if (score >= 90) analytics.scenarioPerformance.scoreDistribution.excellent++;
         else if (score >= 75) analytics.scenarioPerformance.scoreDistribution.good++;
         else if (score >= 60) analytics.scenarioPerformance.scoreDistribution.average++;
@@ -662,28 +672,28 @@ router.get('/analytics', authenticateToken, async (req, res) => {
     }
     
     // Module step progress with effectiveness
-    const moduleSteps = ['why-it-matters', 'real-life-scenario', 'constitutional-concept', 'case-example', 'interactive-assessment', 'reinforcement-activity', 'key-takeaways'];
+    const moduleSteps = [...MODULE_STEP_ORDER];
+    analytics.moduleStepProgress = buildModuleStepProgress(validProgress, contents, moduleSteps);
+    analytics.totalModuleStepCompletions = countTotalModuleStepCompletions(analytics.moduleStepProgress);
+
     moduleSteps.forEach(step => {
-      const stepCompletions = new Set();
       const stepScores = [];
       progressWithMetrics.forEach(({ progress: p }) => {
-        contents.filter(c => c.topic.toString() === p.topic.toString() && c.moduleStep === step).forEach(c => {
-          const isCompleted = p.activities.some(a => a.activityId.toString() === c._id.toString() && a.completed) ||
-                            p.quizScores.some(q => q.quizId.toString() === c._id.toString());
-          if (isCompleted) {
-            stepCompletions.add(p.topic.toString());
-            const quizScore = p.quizScores.find(q => q.quizId.toString() === c._id.toString());
+        const topicId = getProgressTopicId(p);
+        contents
+          .filter((c) => c.topic?.toString() === topicId && c.moduleStep === step)
+          .forEach((c) => {
+            const quizScore = p.quizScores?.find((q) => q.quizId?.toString() === c._id.toString());
             if (quizScore) stepScores.push(quizScore.score);
-          }
-        });
+          });
       });
-      analytics.moduleStepProgress[step] = stepCompletions.size;
-      
-      // Calculate effectiveness for this step
+
       if (stepScores.length > 0) {
         analytics.moduleStepEffectiveness[step] = {
           averageScore: Math.round(stepScores.reduce((a, b) => a + b, 0) / stepScores.length),
-          completionRate: Math.round((stepCompletions.size / validProgress.length) * 100),
+          completionRate: validProgress.length > 0
+            ? Math.round((analytics.moduleStepProgress[step] / validProgress.length) * 100)
+            : 0,
           sampleSize: stepScores.length
         };
       }
@@ -727,41 +737,20 @@ router.get('/analytics', authenticateToken, async (req, res) => {
     }
     
     // Enhanced learning improvement analysis
-    progressWithMetrics.forEach(({ progress: p }) => {
-      const preTestContent = contents.find(c => c.topic.toString() === p.topic.toString() && c.moduleStep === 'pre-test');
-      const postTestContent = contents.find(c => c.topic.toString() === p.topic.toString() && c.moduleStep === 'post-test');
-      
-      if (preTestContent && postTestContent) {
-        const preTestScore = p.quizScores.find(q => q.quizId.toString() === preTestContent._id.toString());
-        const postTestScore = p.quizScores.find(q => q.quizId.toString() === postTestContent._id.toString());
-        
-        if (preTestScore && postTestScore) {
-          analytics.learningImprovement.preTestScores.push(preTestScore.score);
-          analytics.learningImprovement.postTestScores.push(postTestScore.score);
-          
-          const improvement = postTestScore.score - preTestScore.score;
-          if (improvement >= 20) analytics.learningImprovement.significantImprovementCount++;
-          if (improvement < 0) analytics.learningImprovement.regressionCount++;
-        }
-      }
-    });
-    
-    if (analytics.learningImprovement.preTestScores.length > 0) {
-      const avgPreTest = analytics.learningImprovement.preTestScores.reduce((a, b) => a + b, 0) / analytics.learningImprovement.preTestScores.length;
-      const avgPostTest = analytics.learningImprovement.postTestScores.reduce((a, b) => a + b, 0) / analytics.learningImprovement.postTestScores.length;
-      analytics.learningImprovement.averageImprovement = Math.round(avgPostTest - avgPreTest);
-    }
+    analytics.learningImprovement = buildLearningImprovement(validProgress, contents);
     
     // Learning path analysis
     progressWithMetrics.forEach(({ progress: p }) => {
       const completedSteps = [];
+      const topicId = getProgressTopicId(p);
       moduleSteps.forEach(step => {
-        const stepContent = contents.find(c => c.topic.toString() === p.topic.toString() && c.moduleStep === step);
-        if (stepContent) {
-          const isCompleted = p.activities.some(a => a.activityId.toString() === stepContent._id.toString() && a.completed) ||
-                            p.quizScores.some(q => q.quizId.toString() === stepContent._id.toString());
-          if (isCompleted) completedSteps.push(step);
-        }
+        const stepContent = contents.filter(
+          (c) => c.topic?.toString() === topicId && c.moduleStep === step
+        );
+        const isCompleted = stepContent.some((item) =>
+          isContentCompletedInProgress(p, item._id)
+        );
+        if (isCompleted) completedSteps.push(step);
       });
       if (completedSteps.length > 0) {
         analytics.learningPathAnalysis.mostCommonPath.push(completedSteps);
@@ -781,21 +770,10 @@ router.get('/analytics', authenticateToken, async (req, res) => {
       analytics.engagementMetrics.totalActivitiesCompleted += p.quizScores.length;
     });
     
-    // Content type engagement
-    contents.forEach(content => {
-      const contentType = content.type;
-      if (!analytics.engagementMetrics.mostEngagingContentTypes[contentType]) {
-        analytics.engagementMetrics.mostEngagingContentTypes[contentType] = 0;
-      }
-      
-      progressWithMetrics.forEach(({ progress: p }) => {
-        if (content.topic.toString() === p.topic.toString()) {
-          const isEngaged = p.activities.some(a => a.activityId.toString() === content._id.toString()) ||
-                          p.quizScores.some(q => q.quizId.toString() === content._id.toString());
-          if (isEngaged) analytics.engagementMetrics.mostEngagingContentTypes[contentType]++;
-        }
-      });
-    });
+    analytics.engagementMetrics.mostEngagingContentTypes = buildEngagementByContentType(
+      validProgress,
+      contents
+    );
     
     // Topic mastery analysis
     const masteryScores = progressWithMetrics.map((entry) => entry.metrics.topicMastery);
