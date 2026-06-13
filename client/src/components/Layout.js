@@ -35,7 +35,7 @@ const Layout = () => {
     { path: '/', label: 'Dashboard', icon: <HomeIcon /> },
     { path: '/topics', label: 'Topics', icon: <TopicsIcon /> },
     { path: '/constitution', label: 'Constitution', icon: <ConstitutionIcon /> },
-    { path: '/constitution/games', label: 'Learning Games', icon: <GameIcon /> },
+    { path: '/constitution/games', label: 'Practice Center', icon: <GameIcon /> },
     { path: '/constitution/map', label: 'Constitution Map', icon: <MapIcon /> },
     {path: '/user-stories', label: 'User Stories', icon: <UserIcon /> },
     { path: '/profile', label: 'Profile', icon: <UserIcon /> },

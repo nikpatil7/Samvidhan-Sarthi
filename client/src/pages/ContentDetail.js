@@ -11,6 +11,7 @@ import MatchingGame from '../components/ConstitutionalGames/MatchingGame';
 import ScenarioGame from '../components/ConstitutionalGames/ScenarioGame';
 import TimelineGame from '../components/ConstitutionalGames/TimelineGame';
 import SpiralGame from '../components/ConstitutionalGames/SpiralGame';
+import CardSortGame from '../components/ConstitutionalGames/CardSortGame';
 
 const ContentDetail = () => {
   const { contentId } = useParams();
@@ -104,7 +105,8 @@ const ContentDetail = () => {
         topicId: topic._id,
         contentId: content._id,
         type: 'quiz',
-        score: score
+        score: score,
+        stepType: content.moduleStep || undefined
       });
     } catch (err) {
       console.error('Error tracking quiz completion:', err);
@@ -112,7 +114,10 @@ const ContentDetail = () => {
   };
 
   // Handle game completion
-  const handleGameComplete = async (score) => {
+  const handleGameComplete = async (result) => {
+    const score = typeof result === 'number' ? result : result?.score;
+    const scenarioAttempts = typeof result === 'object' ? result?.scenarioAttempts : undefined;
+
     setGameScore(score);
     setGameCompleted(true);
     
@@ -123,7 +128,10 @@ const ContentDetail = () => {
         contentId: content._id,
         type: 'game',
         score: score,
-        completed: true
+        completed: true,
+        activityType: content.gameConfig?.type,
+        stepType: content.moduleStep || undefined,
+        ...(Array.isArray(scenarioAttempts) ? { scenarioAttempts } : {})
       });
     } catch (err) {
       console.error('Error tracking game completion:', err);
@@ -246,6 +254,16 @@ const ContentDetail = () => {
           <SpiralGame 
             gameData={gameConfig} 
             onComplete={handleGameComplete} 
+            isCompleted={gameCompleted}
+            score={gameScore}
+            onPlayAgain={resetGame}
+          />
+        );
+      case 'card-sort':
+        return (
+          <CardSortGame
+            gameData={gameConfig}
+            onComplete={handleGameComplete}
             isCompleted={gameCompleted}
             score={gameScore}
             onPlayAgain={resetGame}

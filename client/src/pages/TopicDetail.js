@@ -273,7 +273,15 @@ const TopicDetail = () => {
         <div className="card">
           <div className="flex items-center justify-between mb-2">
             <h3 className="text-lg font-medium text-white">Your Progress</h3>
-            <span className="text-lg font-semibold text-primary-500">{progress.completionPercentage}%</span>
+            <div className="flex items-center gap-4">
+              {progress.topicMastery != null && (
+                <span className="text-sm text-gray-400">
+                  Mastery:{' '}
+                  <span className="font-semibold text-primary-400">{progress.topicMastery}%</span>
+                </span>
+              )}
+              <span className="text-lg font-semibold text-primary-500">{progress.completionPercentage}%</span>
+            </div>
           </div>
           <div className="w-full bg-dark-200 rounded-full h-4">
             <motion.div 
@@ -283,6 +291,16 @@ const TopicDetail = () => {
               transition={{ duration: 1, ease: "easeOut" }}
             />
           </div>
+          {progress.topicMastery != null && (
+            <div className="w-full bg-dark-200 rounded-full h-2 mt-2">
+              <motion.div
+                className="h-2 rounded-full bg-emerald-500"
+                initial={{ width: 0 }}
+                animate={{ width: `${progress.topicMastery}%` }}
+                transition={{ duration: 1, ease: 'easeOut', delay: 0.2 }}
+              />
+            </div>
+          )}
         </div>
       )}
       
@@ -345,7 +363,13 @@ const TopicDetail = () => {
               <div className="border border-dark-200 rounded-lg overflow-hidden">
                 <div className="bg-dark-200 px-4 py-3">
                   <h3 className="text-lg font-semibold text-white">Additional Practice</h3>
-                  <p className="text-sm text-gray-400">Extra games and activities for this topic</p>
+                  <p className="text-sm text-gray-400">
+                    Extra activities for this topic. More games are available in the{' '}
+                    <Link to="/constitution/games" className="text-primary-400 hover:text-primary-300">
+                      Practice Center
+                    </Link>
+                    .
+                  </p>
                 </div>
                 <div className="p-4 space-y-2">
                   {supplementaryContent.map((item) => renderContentLink(item, true))}

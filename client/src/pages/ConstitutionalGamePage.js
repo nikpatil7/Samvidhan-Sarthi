@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import MatchingGame from '../components/ConstitutionalGames/MatchingGame';
 import QuizGame from '../components/ConstitutionalGames/QuizGame';
@@ -607,7 +608,10 @@ const ConstitutionalGamePage = () => {
     setGameCompleted(false);
   };
 
-  const handleGameComplete = async (score) => {
+  const handleGameComplete = async (result) => {
+    const score = typeof result === 'number' ? result : result?.score;
+    const scenarioAttempts = typeof result === 'object' ? result?.scenarioAttempts : undefined;
+
     setGameScore(score);
     setGameCompleted(true);
 
@@ -619,7 +623,9 @@ const ConstitutionalGamePage = () => {
           contentId: String(selectedGameData.id),
           type: selectedGame === 'quiz' ? 'quiz' : 'game',
           score: score,
-          completed: true
+          completed: true,
+          activityType: selectedGame,
+          ...(Array.isArray(scenarioAttempts) ? { scenarioAttempts } : {})
         });
       }
     } catch (error) {
@@ -1000,10 +1006,16 @@ const ConstitutionalGamePage = () => {
         </motion.div>
       )}
 
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-white">Constitutional Learning Games</h1>
-          <p className="text-gray-400 mt-1">Interactive games to test and improve your constitutional knowledge</p>
+          <h1 className="text-3xl font-bold text-white">Practice Center</h1>
+          <p className="text-gray-400 mt-1">
+            Bonus games to reinforce what you learn. Start with topic journeys on the{' '}
+            <Link to="/constitution/map" className="text-primary-400 hover:text-primary-300">
+              Constitution Map
+            </Link>
+            .
+          </p>
         </div>
       </div>
 
