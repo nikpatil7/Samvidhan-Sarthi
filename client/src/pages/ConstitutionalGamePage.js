@@ -6,6 +6,7 @@ import ScenarioGame from '../components/ConstitutionalGames/ScenarioGame';
 import ConstitutionSpiralGame from '../components/ConstitutionalGames/SpiralGame';
 import TimelineGame from '../components/ConstitutionalGames/TimelineGame';
 import { AuthContext } from '../contexts/AuthContext';
+import CardSortGame from '../components/ConstitutionalGames/CardSortGame';
 
 const ConstitutionalGamePage = () => {
   const [selectedGame, setSelectedGame] = useState('spiral');
@@ -16,32 +17,33 @@ const ConstitutionalGamePage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [newAchievements, setNewAchievements] = useState(false);
-  
+
   // Add state for game data
   const [quizGames, setQuizGames] = useState([]);
   const [scenarioGames, setScenarioGames] = useState([]);
   const [matchingGames, setMatchingGames] = useState([]);
   const [spiralGames, setSpiralGames] = useState([]);
   const [timelineGames, setTimelineGames] = useState([]);
-  
+  const [cardSortGames, setCardSortGames] = useState([]);
+
   // Add state for achievements
   const [achievements, setAchievements] = useState([]);
   const [achievementsLoading, setAchievementsLoading] = useState(true);
   const [badgeNotification, setBadgeNotification] = useState(null);
-  
+
   // Get the authentication context for API calls
   const { authAxios } = useContext(AuthContext);
-  
+
   // Fetch game data from the server
   useEffect(() => {
     const fetchGameData = async () => {
       setLoading(true);
       setError(null);
-      
+
       try {
         // Fetch all games of all types at once 
         const allGamesResponse = await authAxios.get('/content/games/all');
-        
+
         if (allGamesResponse.data) {
           // Process quiz games
           if (allGamesResponse.data.quiz && allGamesResponse.data.quiz.data) {
@@ -49,7 +51,7 @@ const ConstitutionalGamePage = () => {
             if (quizResponse.data && quizResponse.data.length > 0) {
               setQuizGames(quizResponse.data);
             } else {
-              setQuizGames([{ 
+              setQuizGames([{
                 id: 'sample-quiz',
                 title: 'Constitutional Quiz',
                 description: 'Test your knowledge of the constitution',
@@ -57,14 +59,14 @@ const ConstitutionalGamePage = () => {
               }]);
             }
           } else {
-            setQuizGames([{ 
+            setQuizGames([{
               id: 'sample-quiz',
               title: 'Constitutional Quiz',
               description: 'Test your knowledge of the constitution',
               questions: sampleQuizGameData
             }]);
           }
-          
+
           // Process scenario games
           if (allGamesResponse.data.scenario && allGamesResponse.data.scenario.data) {
             // Query for additional scenarios
@@ -87,7 +89,7 @@ const ConstitutionalGamePage = () => {
               scenarios: sampleScenarioGameData
             }]);
           }
-          
+
           // Process matching games
           if (allGamesResponse.data.matching && allGamesResponse.data.matching.data) {
             // Query for additional matching games
@@ -116,7 +118,7 @@ const ConstitutionalGamePage = () => {
               pairs: sampleMatchingGameData
             }]);
           }
-          
+
           // Process spiral games
           if (allGamesResponse.data.spiral && allGamesResponse.data.spiral.data) {
             // Query for additional spiral games
@@ -145,7 +147,7 @@ const ConstitutionalGamePage = () => {
               config: sampleSpiralGameData
             }]);
           }
-          
+
           // Process timeline games
           if (allGamesResponse.data.timeline && allGamesResponse.data.timeline.data) {
             // Query for additional timeline games
@@ -174,98 +176,161 @@ const ConstitutionalGamePage = () => {
               events: sampleTimelineGameData
             }]);
           }
+
+          // Process card sort games
+          // Process card sort games
+          if (
+            allGamesResponse.data['card-sort'] &&
+            allGamesResponse.data['card-sort'].data
+          ) {
+            const cardSortResponse =
+              await authAxios.get('/content/games/card-sort');
+
+            if (
+              cardSortResponse.data &&
+              cardSortResponse.data.length > 0
+            ) {
+              setCardSortGames(
+                cardSortResponse.data.map(game => ({
+                  id: game.id,
+                  topicId: game.topicId,
+                  title: game.title,
+                  description: game.description,
+                  config: game.config
+                }))
+              );
+            } else {
+              setCardSortGames([
+                {
+                  id: 'sample-card-sort',
+                  title:
+                    'Fundamental Rights Classification Challenge',
+                  description:
+                    'Classify constitutional articles into the correct rights category',
+                  config: sampleCardSortGameData
+                }
+              ]);
+            }
+          } else {
+            setCardSortGames([
+              {
+                id: 'sample-card-sort',
+                title:
+                  'Fundamental Rights Classification Challenge',
+                description:
+                  'Classify constitutional articles into the correct rights category',
+                config: sampleCardSortGameData
+              }
+            ]);
+          }
+
+
+
         } else {
           // Fallback to sample data
-          setQuizGames([{ 
+          setQuizGames([{
             id: 'sample-quiz',
             title: 'Constitutional Quiz',
             description: 'Test your knowledge of the constitution',
             questions: sampleQuizGameData
           }]);
-          
+
           setScenarioGames([{
             id: 'sample-scenario',
             title: 'Constitutional Scenarios',
             description: 'Apply constitutional principles to real-world situations',
             scenarios: sampleScenarioGameData
           }]);
-          
+
           setMatchingGames([{
             id: 'sample-matching',
             title: 'Article Matching Game',
             description: 'Match constitutional articles with their definitions',
             pairs: sampleMatchingGameData
           }]);
-          
+
           setSpiralGames([{
             id: 'sample-spiral',
             title: 'Constitution Structure Spiral',
             description: 'Explore the structure of the constitution',
             config: sampleSpiralGameData
           }]);
-          
+
           setTimelineGames([{
             id: 'sample-timeline',
             title: 'Constitutional Timeline',
             description: 'Learn the timeline of constitutional events',
             events: sampleTimelineGameData
           }]);
+
+          
         }
-        
+
         setLoading(false);
       } catch (err) {
         console.error('Error fetching game data:', err.message);
         setError('Failed to load game data. Please try again later.');
         setLoading(false);
-        
+
         // Use sample data as fallback if server fails
-        setQuizGames([{ 
+        setQuizGames([{
           id: 'sample-quiz',
           title: 'Constitutional Quiz',
           description: 'Test your knowledge of the constitution',
           questions: sampleQuizGameData
         }]);
-        
+
         setScenarioGames([{
           id: 'sample-scenario',
           title: 'Constitutional Scenarios',
           description: 'Apply constitutional principles to real-world situations',
           scenarios: sampleScenarioGameData
         }]);
-        
+
         setMatchingGames([{
           id: 'sample-matching',
           title: 'Article Matching Game',
           description: 'Match constitutional articles with their definitions',
           pairs: sampleMatchingGameData
         }]);
-        
+
         setSpiralGames([{
           id: 'sample-spiral',
           title: 'Constitution Structure Spiral',
           description: 'Explore the structure of the constitution',
           config: sampleSpiralGameData
         }]);
-        
+
         setTimelineGames([{
           id: 'sample-timeline',
           title: 'Constitutional Timeline',
           description: 'Learn the timeline of constitutional events',
           events: sampleTimelineGameData
         }]);
+        
+        setCardSortGames([
+          {
+            id: 'sample-card-sort',
+            title:
+              'Fundamental Rights Classification Challenge',
+            description:
+              'Classify constitutional articles into the correct rights category',
+            config: sampleCardSortGameData
+          }
+        ]);
       }
     };
-    
+
     fetchGameData();
     // Fallback sample data is static; game data should be fetched only when the API client changes.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authAxios]);
-  
+
   // Fetch user achievements
   useEffect(() => {
     const fetchAchievements = async () => {
       setAchievementsLoading(true);
-      
+
       try {
         const response = await authAxios.get('/users/achievements');
         if (response.data && response.data.badges) {
@@ -277,38 +342,38 @@ const ConstitutionalGamePage = () => {
         setAchievementsLoading(false);
       }
     };
-    
+
     fetchAchievements();
   }, [authAxios, newAchievements]);
-  
+
   // Sample data as fallback
   const sampleMatchingGameData = [
-    { 
-      term: 'Article 14', 
+    {
+      term: 'Article 14',
       definition: 'Right to Equality - Equality before law and equal protection of laws'
     },
-    { 
-      term: 'Article 19', 
+    {
+      term: 'Article 19',
       definition: 'Right to Freedom - Speech, expression, assembly, association, movement, residence, and profession'
     },
-    { 
-      term: 'Article 21', 
+    {
+      term: 'Article 21',
       definition: 'Right to Life and Personal Liberty - No person shall be deprived of his life or personal liberty except according to procedure established by law'
     },
-    { 
-      term: 'Article 32', 
+    {
+      term: 'Article 32',
       definition: 'Right to Constitutional Remedies - Empowers citizens to approach the Supreme Court directly for enforcement of fundamental rights'
     },
-    { 
-      term: 'Article 51A', 
+    {
+      term: 'Article 51A',
       definition: 'Fundamental Duties - List of duties that citizens are expected to abide by'
     },
-    { 
-      term: 'Article 368', 
+    {
+      term: 'Article 368',
       definition: 'Power of Parliament to amend the Constitution and procedure thereof'
     }
   ];
-  
+
   // Sample data as fallback
   const sampleQuizGameData = [
     {
@@ -357,7 +422,7 @@ const ConstitutionalGamePage = () => {
       ]
     }
   ];
-  
+
   // Sample data as fallback
   const sampleScenarioGameData = [
     {
@@ -405,7 +470,7 @@ const ConstitutionalGamePage = () => {
       ]
     }
   ];
-  
+
   // Sample data as fallback (Spiral game)
   const sampleSpiralGameData = {
     centerTitle: "Indian Constitution",
@@ -437,7 +502,7 @@ const ConstitutionalGamePage = () => {
       }
     ]
   };
-  
+
   // Sample data as fallback (Timeline game)
   const sampleTimelineGameData = [
     {
@@ -466,24 +531,86 @@ const ConstitutionalGamePage = () => {
       details: "Added the words 'secular' and 'socialist' to the Preamble"
     }
   ];
-  
+
+  const sampleCardSortGameData = {
+    categories: [
+      'Right to Equality',
+      'Right to Freedom',
+      'Right Against Exploitation',
+      'Freedom of Religion',
+      'Cultural & Educational Rights',
+      'Constitutional Remedies'
+    ],
+
+    cards: [
+      {
+        text: 'Article 14',
+        category: 'Right to Equality'
+      },
+      {
+        text: 'Article 15',
+        category: 'Right to Equality'
+      },
+      {
+        text: 'Article 19',
+        category: 'Right to Freedom'
+      },
+      {
+        text: 'Article 21',
+        category: 'Right to Freedom'
+      },
+      {
+        text: 'Article 23',
+        category: 'Right Against Exploitation'
+      },
+      {
+        text: 'Article 24',
+        category: 'Right Against Exploitation'
+      },
+      {
+        text: 'Article 25',
+        category: 'Freedom of Religion'
+      },
+      {
+        text: 'Article 26',
+        category: 'Freedom of Religion'
+      },
+      {
+        text: 'Article 29',
+        category: 'Cultural & Educational Rights'
+      },
+      {
+        text: 'Article 30',
+        category: 'Cultural & Educational Rights'
+      },
+      {
+        text: 'Article 32',
+        category: 'Constitutional Remedies'
+      },
+      {
+        text: 'Right to move Supreme Court',
+        category: 'Constitutional Remedies'
+      }
+    ]
+  };
+
   const handleGameSelect = (gameType) => {
     setSelectedGame(gameType);
     setShowGameSelector(true);
     setSelectedGameData(null);
     setGameCompleted(false);
   };
-  
+
   const handleSpecificGameSelect = (game) => {
     setSelectedGameData(game);
     setShowGameSelector(false);
     setGameCompleted(false);
   };
-  
+
   const handleGameComplete = async (score) => {
     setGameScore(score);
     setGameCompleted(true);
-    
+
     // Track game completion in progress via /content/track
     try {
       if (selectedGameData && selectedGameData.id && !String(selectedGameData.id).startsWith('sample-')) {
@@ -498,18 +625,18 @@ const ConstitutionalGamePage = () => {
     } catch (error) {
       console.error('Error tracking game progress:', error);
     }
-    
+
     // After game completion, check for new achievements
     try {
       const achieveRes = await authAxios.post('/users/process-achievements');
       setNewAchievements(prev => !prev); // Toggle to trigger re-fetch
-      
+
       // Show notification if new badges were earned
       if (achieveRes.data && achieveRes.data.newBadges > 0) {
         setBadgeNotification({
           count: achieveRes.data.newBadges,
-          message: achieveRes.data.newBadges === 1 
-            ? 'You earned a new badge!' 
+          message: achieveRes.data.newBadges === 1
+            ? 'You earned a new badge!'
             : `You earned ${achieveRes.data.newBadges} new badges!`
         });
         // Auto-dismiss after 6 seconds
@@ -519,18 +646,18 @@ const ConstitutionalGamePage = () => {
       console.error('Error processing achievements:', error);
     }
   };
-  
+
   const handlePlayAgain = () => {
     setGameCompleted(false);
     setGameScore(0);
   };
-  
+
   const handleBackToGameList = () => {
     setShowGameSelector(true);
     setSelectedGameData(null);
     setGameCompleted(false);
   };
-  
+
   // Get current games list based on selected game type
   const getCurrentGames = () => {
     switch (selectedGame) {
@@ -544,15 +671,17 @@ const ConstitutionalGamePage = () => {
         return spiralGames;
       case 'timeline':
         return timelineGames;
+      case 'card-sort':
+        return cardSortGames;
       default:
         return [];
     }
   };
-  
+
   // Get game data for the selected game
   const getGameData = () => {
     if (!selectedGameData) return null;
-    
+
     switch (selectedGame) {
       case 'quiz':
         return selectedGameData.questions;
@@ -564,53 +693,55 @@ const ConstitutionalGamePage = () => {
         return selectedGameData.config;
       case 'timeline':
         return selectedGameData.events;
+      case 'card-sort':
+        return selectedGameData.config;
       default:
         return null;
     }
   };
-  
+
   // Render the game component based on selected game type
   const renderGameComponent = () => {
     const gameData = getGameData();
     if (!gameData) return null;
-    
+
     switch (selectedGame) {
       case 'matching':
         return (
-          <MatchingGame 
-            gameData={gameData} 
+          <MatchingGame
+            gameData={gameData}
             onComplete={handleGameComplete}
             isCompleted={gameCompleted}
             score={gameScore}
             onPlayAgain={handlePlayAgain}
           />
         );
-      
+
       case 'quiz':
         return (
-          <QuizGame 
-            quizData={gameData} 
+          <QuizGame
+            quizData={gameData}
             onComplete={handleGameComplete}
             isCompleted={gameCompleted}
             score={gameScore}
             onPlayAgain={handlePlayAgain}
           />
         );
-      
+
       case 'scenario':
         return (
-          <ScenarioGame 
-            scenarioData={gameData} 
+          <ScenarioGame
+            scenarioData={gameData}
             onComplete={handleGameComplete}
             isCompleted={gameCompleted}
             score={gameScore}
             onPlayAgain={handlePlayAgain}
           />
         );
-      
+
       case 'spiral':
         return (
-          <ConstitutionSpiralGame 
+          <ConstitutionSpiralGame
             gameData={gameData}
             onComplete={handleGameComplete}
             isCompleted={gameCompleted}
@@ -618,10 +749,10 @@ const ConstitutionalGamePage = () => {
             onPlayAgain={handlePlayAgain}
           />
         );
-      
+
       case 'timeline':
         return (
-          <TimelineGame 
+          <TimelineGame
             gameData={gameData}
             onComplete={handleGameComplete}
             isCompleted={gameCompleted}
@@ -629,12 +760,22 @@ const ConstitutionalGamePage = () => {
             onPlayAgain={handlePlayAgain}
           />
         );
-      
+      case 'card-sort':
+        return (
+          <CardSortGame
+            gameData={gameData}
+            onComplete={handleGameComplete}
+            isCompleted={gameCompleted}
+            score={gameScore}
+            onPlayAgain={handlePlayAgain}
+          />
+        );
+
       default:
         return null;
     }
   };
-  
+
   // Get the game type title
   const getGameTypeTitle = () => {
     switch (selectedGame) {
@@ -648,11 +789,13 @@ const ConstitutionalGamePage = () => {
         return 'Spiral Visualizations';
       case 'timeline':
         return 'Timeline Games';
+      case 'card-sort':
+        return 'Classification Games';
       default:
         return 'Games';
     }
   };
-  
+
   // Helper function to get badge icon
   const getBadgeIcon = (badgeName) => {
     switch (badgeName) {
@@ -712,11 +855,11 @@ const ConstitutionalGamePage = () => {
         );
     }
   };
-  
+
   // Helper function to get badge color based on rarity
   const getBadgeColor = (rarity, earned) => {
     if (!earned) return 'bg-dark-200 text-gray-400';
-    
+
     switch (rarity) {
       case 'common':
         return 'bg-green-900/30 border-2 border-green-500 text-green-400';
@@ -732,7 +875,7 @@ const ConstitutionalGamePage = () => {
         return 'bg-dark-200 text-gray-400';
     }
   };
-  
+
   // Game type definitions
   const gameTypes = [
     {
@@ -784,9 +927,31 @@ const ConstitutionalGamePage = () => {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
       )
+    },
+    {
+      id: 'card-sort',
+      title: 'Fundamental Rights Classification',
+      description:
+        'Classify constitutional articles into their correct rights category',
+      icon: (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-6 w-6"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M9 17v-2h6v2m-6-6h6m-6-4h6"
+          />
+        </svg>
+      )
     }
   ];
-  
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -794,7 +959,7 @@ const ConstitutionalGamePage = () => {
       </div>
     );
   }
-  
+
   if (error) {
     return (
       <div className="text-center p-6 bg-red-900/20 border border-red-800 rounded-lg">
@@ -803,12 +968,12 @@ const ConstitutionalGamePage = () => {
       </div>
     );
   }
-  
+
   return (
     <div className="space-y-6">
       {/* Badge notification toast */}
       {badgeNotification && (
-        <motion.div 
+        <motion.div
           className="fixed top-6 right-6 z-50 bg-gradient-to-r from-yellow-600 to-amber-600 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3"
           initial={{ opacity: 0, x: 100, scale: 0.8 }}
           animate={{ opacity: 1, x: 0, scale: 1 }}
@@ -824,7 +989,7 @@ const ConstitutionalGamePage = () => {
             <p className="font-bold text-lg">{badgeNotification.message}</p>
             <p className="text-yellow-100 text-sm">Check your achievements below!</p>
           </div>
-          <button 
+          <button
             onClick={() => setBadgeNotification(null)}
             className="ml-2 text-yellow-200 hover:text-white"
           >
@@ -834,29 +999,27 @@ const ConstitutionalGamePage = () => {
           </button>
         </motion.div>
       )}
-      
+
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
         <div>
           <h1 className="text-3xl font-bold text-white">Constitutional Learning Games</h1>
           <p className="text-gray-400 mt-1">Interactive games to test and improve your constitutional knowledge</p>
         </div>
       </div>
-      
+
       {/* Game selection section */}
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
         {gameTypes.map(game => (
           <button
             key={game.id}
             onClick={() => handleGameSelect(game.id)}
-            className={`p-4 rounded-lg flex flex-col items-center transition ${
-              selectedGame === game.id
-                ? 'bg-primary-600 text-white' 
+            className={`p-4 rounded-lg flex flex-col items-center transition ${selectedGame === game.id
+                ? 'bg-primary-600 text-white'
                 : 'bg-dark-200 text-gray-300 hover:bg-dark-100'
-            }`}
+              }`}
           >
-            <div className={`p-3 rounded-full mb-2 ${
-              selectedGame === game.id ? 'bg-primary-700' : 'bg-dark-300'
-            }`}>
+            <div className={`p-3 rounded-full mb-2 ${selectedGame === game.id ? 'bg-primary-700' : 'bg-dark-300'
+              }`}>
               {game.icon}
             </div>
             <h3 className="font-medium text-center">{game.title}</h3>
@@ -864,7 +1027,7 @@ const ConstitutionalGamePage = () => {
           </button>
         ))}
       </div>
-      
+
       {/* Game display area */}
       <motion.div
         className="card p-5"
@@ -879,7 +1042,7 @@ const ConstitutionalGamePage = () => {
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-bold text-white">{getGameTypeTitle()}</h2>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {getCurrentGames().map((game) => (
                 <motion.div
@@ -903,7 +1066,7 @@ const ConstitutionalGamePage = () => {
           <div>
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-bold text-white">{selectedGameData?.title}</h2>
-              <button 
+              <button
                 onClick={handleBackToGameList}
                 className="text-sm text-primary-500 hover:text-primary-400"
               >
@@ -914,10 +1077,10 @@ const ConstitutionalGamePage = () => {
           </div>
         )}
       </motion.div>
-      
+
       {/* Game completion card */}
       {gameCompleted && (
-        <motion.div 
+        <motion.div
           className="card p-5 bg-gradient-to-r from-primary-600 to-primary-800"
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -930,13 +1093,13 @@ const ConstitutionalGamePage = () => {
             <h3 className="text-2xl font-bold text-white mb-2">Game Completed!</h3>
             <p className="text-white/80 mb-6">Your score: {gameScore.toFixed(2)}%</p>
             <div className="flex justify-center space-x-4">
-              <button 
+              <button
                 onClick={handlePlayAgain}
                 className="px-5 py-2.5 bg-white text-primary-600 font-medium rounded-lg hover:bg-white/90 transition"
               >
                 Play Again
               </button>
-              <button 
+              <button
                 onClick={handleBackToGameList}
                 className="px-5 py-2.5 bg-primary-700 text-white font-medium rounded-lg hover:bg-primary-800 transition"
               >
@@ -946,11 +1109,11 @@ const ConstitutionalGamePage = () => {
           </div>
         </motion.div>
       )}
-      
+
       {/* Game badges and achievements */}
       <div className="card p-5">
         <h2 className="text-xl font-bold text-white mb-4">Your Achievements</h2>
-        
+
         {achievementsLoading ? (
           <div className="flex justify-center py-8">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>

@@ -67,7 +67,7 @@ router.get('/content/:contentId', async (req, res) => {
 router.get('/games/all', async (req, res) => {
   try {
     // Valid game types
-    const gameTypes = ['quiz', 'scenario', 'matching', 'spiral', 'timeline'];
+    const gameTypes = ['quiz', 'scenario', 'matching', 'spiral', 'timeline','card-sort'];
     const result = {};
     
     // Process each game type
@@ -122,7 +122,20 @@ router.get('/games/all', async (req, res) => {
             title: games[0].title,
             data: pairs
           };
-        } else if (gameType === 'spiral') {
+        } else if (gameType === 'card-sort') {
+          const config =
+            games[0].gameConfig &&
+            games[0].gameConfig.config
+              ? games[0].gameConfig.config
+              : {};
+        
+          result[gameType] = {
+            id: games[0]._id,
+            topicId: games[0].topic,
+            title: games[0].title,
+            data: config
+          };
+        }else if (gameType === 'spiral') {
           const config = games[0].gameConfig && games[0].gameConfig.config ? 
                         games[0].gameConfig.config : {};
           result[gameType] = {
@@ -198,7 +211,7 @@ router.get('/games/:gameType', async (req, res) => {
     const { gameType } = req.params;
     
     // Validate game type
-    const validGameTypes = ['quiz', 'scenario', 'matching', 'spiral', 'timeline'];
+    const validGameTypes = ['quiz', 'scenario', 'matching', 'spiral', 'timeline','card-sort'];
     if (!validGameTypes.includes(gameType)) {
       return res.status(400).json({ 
         message: 'Invalid game type',
@@ -527,7 +540,7 @@ router.post('/track', authenticateToken, async (req, res) => {
       isGame = type === 'quiz' || 
               (content.type === 'game' || 
                (content.gameConfig && 
-                ['quiz', 'scenario', 'matching', 'spiral', 'timeline'].includes(content.gameConfig.type)));
+                ['quiz', 'scenario', 'matching', 'spiral', 'timeline','card-sort'].includes(content.gameConfig.type)));
     }
     
     if (type === 'quiz') {
