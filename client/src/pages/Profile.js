@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { AuthContext } from '../contexts/AuthContext';
@@ -24,6 +24,24 @@ const Profile = () => {
   const [updateSuccess, setUpdateSuccess] = useState(false);
   const [passwordSuccess, setPasswordSuccess] = useState(false);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [achievements, setAchievements] = useState([]);
+  const [achievementsLoading, setAchievementsLoading] = useState(true);
+
+  const fetchAchievements = useCallback(async () => {
+    try {
+      setAchievementsLoading(true);
+      const response = await authAxios.get('/users/achievements');
+      setAchievements(response.data?.badges || []);
+    } catch (err) {
+      console.error('Error fetching achievements:', err);
+    } finally {
+      setAchievementsLoading(false);
+    }
+  }, [authAxios]);
+
+  useEffect(() => {
+    fetchAchievements();
+  }, [fetchAchievements]);
 
   // Static assets (avatars) are served from the server root, not under /api
   const SERVER_URL = (process.env.REACT_APP_SERVER_URL ||
@@ -510,6 +528,52 @@ const Profile = () => {
             ) : (
               <p className="text-gray-400">
                 We recommend using a strong password that you don't use elsewhere.
+              </p>
+            )}
+          </div>
+
+          {/* Achievements */}
+          <div className="card">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-bold text-white">Achievements</h2>
+              <span className="text-sm text-gray-400">
+                {achievements.filter((b) => b.earned).length}/{achievements.length} earned
+              </span>
+            </div>
+
+            {achievementsLoading ? (
+              <div className="flex justify-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary-500" />
+              </div>
+            ) : achievements.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {achievements.map((badge) => (
+                  <div
+                    key={badge.id}
+                    className={`p-4 rounded-lg border ${
+                      badge.earned
+                        ? 'bg-primary-900/20 border-primary-700'
+                        : 'bg-dark-200 border-dark-100 opacity-60'
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <h3 className="font-medium text-white">{badge.name}</h3>
+                        <p className="text-sm text-gray-400 mt-1">{badge.description}</p>
+                      </div>
+                      {badge.earned && (
+                        <span className="text-xs uppercase tracking-wide text-primary-400 flex-shrink-0">
+                          Earned
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs text-gray-500 mt-2 capitalize">{badge.rarity} · {badge.category}</p>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-gray-400 text-center py-6">
+                Complete learning activities to earn achievements.
               </p>
             )}
           </div>

@@ -38,6 +38,11 @@ const SEED_SCRIPTS = [
   'seeds/migrate-phase4-new-badges.js',
 ];
 
+const VALIDATION_SCRIPTS = [
+  'seeds/test-module-based-learning.js',
+  'seeds/test-badge-awarding.js',
+];
+
 function runScript(relativePath) {
   const scriptPath = path.join(serverDir, relativePath);
 
@@ -70,6 +75,14 @@ SEED_SCRIPTS.forEach((script, index) => {
 console.log('');
 
 for (const script of SEED_SCRIPTS) {
+  runScript(script);
+}
+
+console.log('\n' + '='.repeat(60));
+console.log('🔍 Running post-seed validation...');
+console.log('='.repeat(60));
+
+for (const script of VALIDATION_SCRIPTS) {
   runScript(script);
 }
 

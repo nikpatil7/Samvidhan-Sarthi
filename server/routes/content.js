@@ -600,14 +600,6 @@ router.post('/track', authenticateToken, async (req, res) => {
     const resolvedStepType = stepType || content?.moduleStep || null;
     const contentIdStr = contentId?.toString();
 
-    let isGame = false;
-    if (content) {
-      isGame = type === 'quiz' ||
-              (content.type === 'game' ||
-               (content.gameConfig &&
-                ['quiz', 'scenario', 'matching', 'spiral', 'timeline', 'card-sort'].includes(content.gameConfig.type)));
-    }
-    
     if (type === 'quiz') {
       const existingQuizIndex = progress.quizScores.findIndex(
         (quiz) => quiz.quizId.toString() === contentId
@@ -726,19 +718,13 @@ router.post('/track', authenticateToken, async (req, res) => {
     progress.lastUpdated = Date.now();
     await progress.save();
     
-    let achievementsChecked = false;
-    let newBadges = 0;
-    
-    if (isGame && (completed || (type === 'quiz' && score >= 80))) {
-      const { checkAndAwardAchievements } = require('./users');
-      newBadges = await checkAndAwardAchievements(req.user.id);
-      achievementsChecked = true;
-    }
+    const { checkAndAwardAchievements } = require('./users');
+    const newBadges = await checkAndAwardAchievements(req.user.id);
     
     res.json({
       progress,
-      achievementsChecked,
-      newBadges
+      achievementsChecked: true,
+      newBadges: newBadges || 0
     });
   } catch (error) {
     console.error('Error tracking progress:', error);

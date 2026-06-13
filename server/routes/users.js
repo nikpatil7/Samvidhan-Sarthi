@@ -8,6 +8,12 @@ const Progress = require('../models/Progress');
 const Content = require('../models/Content');
 const Topic = require('../models/Topic');
 const { computeProgressMetrics, averageMetric } = require('../utils/progressMetrics');
+const {
+  buildBadgeStats,
+  countTopicsWithFullJourney,
+  getCompletedCoreSteps
+} = require('../utils/badgeEligibility');
+const { MODULE_STEP_ORDER } = require('../utils/constants');
 const router = express.Router();
 
 // Ensure uploads directory exists
@@ -342,102 +348,26 @@ router.get('/achievements', authenticateToken, async (req, res) => {
 // Check and award achievements (internal function)
 async function checkAndAwardAchievements(userId) {
   try {
-    // Get user
     const user = await User.findById(userId);
     if (!user) return null;
-    
-    // Get user progress across all topics
+
     const userProgress = await Progress.find({ user: userId });
-    
-    // Get all available badges
+    const topicIds = userProgress.map((p) => p.topic);
+    const allContent = await Content.find({
+      topic: { $in: topicIds },
+      isActive: true
+    });
+
+    const stats = buildBadgeStats(userProgress, allContent);
     const allBadges = await Badge.find({ isActive: true });
-    
-    // Get all user content activity
-    const contentIds = userProgress.flatMap(p => [
-      ...p.quizScores.map(q => q.quizId),
-      ...p.activities.map(a => a.activityId)
-    ]);
-    
-    const contents = await Content.find({ _id: { $in: contentIds } });
-    
-    // Calculate stats
-    const stats = {
-      totalQuizzes: userProgress.reduce((total, p) => total + p.quizScores.length, 0),
-      highScoreQuizzes: userProgress.reduce((total, p) => total + p.quizScores.filter(q => q.score >= 80).length, 0),
-      perfectScoreQuizzes: userProgress.reduce((total, p) => total + p.quizScores.filter(q => q.score >= 95).length, 0),
-      totalScenarios: userProgress.reduce((total, p) => total + p.activities.filter(a => 
-        contents.some(c => c._id.toString() === a.activityId.toString() && 
-                    c.type === 'game' && 
-                    c.gameConfig && 
-                    c.gameConfig.type === 'scenario')
-      ).length, 0),
-      completedTopics: userProgress.filter(p => p.completionPercentage >= 90).length,
-      constitutionalQuizzes: userProgress.reduce((total, p) => {
-        const constitutionalQuizzes = p.quizScores.filter(q => 
-          contents.some(c => c._id.toString() === q.quizId.toString() && 
-                      c.topic && 
-                      (c.topic.toString().includes('constitution') || 
-                       contents.some(tc => tc._id.toString() === c.topic.toString() && 
-                                    tc.title.toLowerCase().includes('constitution'))))
-        );
-        return total + constitutionalQuizzes.length;
-      }, 0),
-      totalActivities: userProgress.reduce((total, p) => total + p.activities.length, 0),
-      // New experiential learning stats
-      scenarioPerformanceScores: userProgress.map(p => p.scenarioPerformanceScore).filter(s => s !== null),
-      moduleStepCompletions: {},
-      applicationQuestionScores: [],
-      preTestScores: [],
-      postTestScores: []
-    };
-    
-    // Calculate module step completions
-    userProgress.forEach(p => {
-      contents.filter(c => c._id.toString() && c.moduleStep).forEach(c => {
-        const step = c.moduleStep;
-        const isCompleted = p.activities.some(a => a.activityId.toString() === c._id.toString() && a.completed) ||
-                          p.quizScores.some(q => q.quizId.toString() === c._id.toString());
-        if (!stats.moduleStepCompletions[step]) {
-          stats.moduleStepCompletions[step] = new Set();
-        }
-        if (isCompleted) {
-          stats.moduleStepCompletions[step].add(p.topic.toString());
-        }
-      });
-    });
-    
-    // Convert Sets to counts
-    Object.keys(stats.moduleStepCompletions).forEach(step => {
-      stats.moduleStepCompletions[step] = stats.moduleStepCompletions[step].size;
-    });
-    
-    // Calculate application question scores
-    userProgress.forEach(p => {
-      p.quizScores.forEach(qs => {
-        const content = contents.find(c => c._id.toString() === qs.quizId.toString());
-        if (content && content.quiz && content.quiz.questions) {
-          const applicationQuestions = content.quiz.questions.filter(q => q.questionType === 'application');
-          if (applicationQuestions.length > 0) {
-            stats.applicationQuestionScores.push({
-              score: qs.score,
-              applicationCount: applicationQuestions.length
-            });
-          }
-        }
-      });
-    });
-    
-    // Check each badge requirement and award if eligible
     const newBadges = [];
-    const userBadgeIds = user.badges.map(b => b.toString());
-    
+    const userBadgeIds = user.badges.map((b) => b.toString());
+
     for (const badge of allBadges) {
-      // Skip if user already has this badge
       if (userBadgeIds.includes(badge._id.toString())) continue;
-      
+
       let eligible = false;
-      
-      // Check requirements based on badge category
+
       switch (badge.name) {
         case 'Quiz Master':
           eligible = stats.highScoreQuizzes >= 5;
@@ -446,143 +376,177 @@ async function checkAndAwardAchievements(userId) {
           eligible = stats.totalScenarios >= 3;
           break;
         case 'Preamble Scholar':
-          eligible = userProgress.some(p => 
-            p.quizScores.some(q => 
-              contents.some(c => c._id.toString() === q.quizId.toString() && 
-                          c.title.toLowerCase().includes('preamble') && 
-                          q.score >= 80)
+          eligible = userProgress.some((p) =>
+            p.quizScores.some((q) =>
+              allContent.some(
+                (c) =>
+                  c._id.toString() === q.quizId?.toString() &&
+                  c.title.toLowerCase().includes('preamble') &&
+                  q.score >= 80
+              )
             )
           );
           break;
         case 'Rights Expert':
-          eligible = userProgress.some(p => 
-            p.quizScores.some(q => 
-              contents.some(c => c._id.toString() === q.quizId.toString() && 
-                          c.title.toLowerCase().includes('right') && 
-                          q.score >= 80)
+          eligible = userProgress.some((p) =>
+            p.quizScores.some((q) =>
+              allContent.some(
+                (c) =>
+                  c._id.toString() === q.quizId?.toString() &&
+                  c.title.toLowerCase().includes('right') &&
+                  q.score >= 80
+              )
             )
           );
           break;
         case 'Amendment Tracker':
-          eligible = userProgress.some(p => 
-            p.quizScores.some(q => 
-              contents.some(c => c._id.toString() === q.quizId.toString() && 
-                          c.title.toLowerCase().includes('amendment') && 
-                          q.score >= 80)
+          eligible = userProgress.some((p) =>
+            p.quizScores.some((q) =>
+              allContent.some(
+                (c) =>
+                  c._id.toString() === q.quizId?.toString() &&
+                  c.title.toLowerCase().includes('amendment') &&
+                  q.score >= 80
+              )
             )
           );
           break;
-        // New experiential learning badges
-        case 'Scenario Master':
-          const highScenarioPerformance = stats.scenarioPerformanceScores.filter(s => s >= 80).length;
-          eligible = highScenarioPerformance >= (badge.requirements.minTopics || 5);
+        case 'Scenario Master': {
+          const highScenarioTopics = stats.scenarioPerformanceScores.filter((s) => s >= 80).length;
+          eligible = highScenarioTopics >= (badge.requirements.minTopics || 5);
           break;
+        }
         case 'First Steps':
-          eligible = (stats.moduleStepCompletions['why-it-matters'] || 0) >= (badge.requirements.minTopics || 3);
+          eligible =
+            (stats.moduleStepCompletions['why-it-matters'] || 0) >=
+            (badge.requirements.minTopics || 3);
           break;
-        case 'Constitutional Reasoner':
-          const highApplicationScores = stats.applicationQuestionScores.filter(s => s.score >= 80).length;
+        case 'Constitutional Reasoner': {
+          const highApplicationScores = stats.applicationQuestionScores.filter(
+            (s) => s.score >= 80
+          ).length;
           eligible = highApplicationScores >= (badge.requirements.minQuizzes || 5);
           break;
+        }
         case 'Module Journey Complete':
-          // Check if any topic has all 7 module steps completed
-          eligible = userProgress.some(p => {
-            const completedSteps = new Set();
-            contents.filter(c => c.topic.toString() === p.topic.toString() && c.moduleStep).forEach(c => {
-              const isCompleted = p.activities.some(a => a.activityId.toString() === c._id.toString() && a.completed) ||
-                                p.quizScores.some(q => q.quizId.toString() === c._id.toString());
-              if (isCompleted) completedSteps.add(c.moduleStep);
-            });
-            return completedSteps.size >= 7;
+          eligible = userProgress.some((p) => {
+            const topicId = p.topic?._id?.toString() || p.topic?.toString();
+            const topicContent = stats.contentByTopic.get(topicId) || [];
+            return getCompletedCoreSteps(p, topicContent).size >= MODULE_STEP_ORDER.length;
           });
           break;
         case 'Learning Journey Expert':
-          const topicsWithAllSteps = userProgress.filter(p => {
-            const completedSteps = new Set();
-            contents.filter(c => c.topic.toString() === p.topic.toString() && c.moduleStep).forEach(c => {
-              const isCompleted = p.activities.some(a => a.activityId.toString() === c._id.toString() && a.completed) ||
-                                p.quizScores.some(q => q.quizId.toString() === c._id.toString());
-              if (isCompleted) completedSteps.add(c.moduleStep);
-            });
-            return completedSteps.size >= 7;
-          }).length;
-          eligible = topicsWithAllSteps >= (badge.requirements.minTopics || 5);
+          eligible =
+            countTopicsWithFullJourney(userProgress, stats.contentByTopic) >=
+            (badge.requirements.minTopics || 5);
           break;
         case 'Case Study Analyst':
-          eligible = (stats.moduleStepCompletions['case-example'] || 0) >= (badge.requirements.minTopics || 3);
+          eligible =
+            (stats.moduleStepCompletions['case-example'] || 0) >=
+            (badge.requirements.minTopics || 3);
           break;
         case 'Reinforcement Champion':
-          eligible = (stats.moduleStepCompletions['reinforcement-activity'] || 0) >= (badge.requirements.minTopics || 5);
+          eligible =
+            (stats.moduleStepCompletions['reinforcement-activity'] || 0) >=
+            (badge.requirements.minTopics || 5);
           break;
-        case 'Pre-Test Achiever':
-          const preTestHighScores = userProgress.filter(p => {
-            const preTestContent = contents.find(c => c.topic.toString() === p.topic.toString() && c.moduleStep === 'pre-test');
+        case 'Pre-Test Achiever': {
+          const preTestHighScores = userProgress.filter((p) => {
+            const preTestContent = allContent.find(
+              (c) => c.topic.toString() === p.topic.toString() && c.moduleStep === 'pre-test'
+            );
             if (!preTestContent) return false;
-            const preTestScore = p.quizScores.find(q => q.quizId.toString() === preTestContent._id.toString());
+            const preTestScore = p.quizScores.find(
+              (q) => q.quizId.toString() === preTestContent._id.toString()
+            );
             return preTestScore && preTestScore.score >= 70;
           }).length;
           eligible = preTestHighScores >= (badge.requirements.minTopics || 3);
           break;
+        }
         case 'Learning Growth':
-          // Check for improvement between pre-test and post-test
-          eligible = userProgress.some(p => {
-            const preTestContent = contents.find(c => c.topic.toString() === p.topic.toString() && c.moduleStep === 'pre-test');
-            const postTestContent = contents.find(c => c.topic.toString() === p.topic.toString() && c.moduleStep === 'post-test');
+          eligible = userProgress.some((p) => {
+            const preTestContent = allContent.find(
+              (c) => c.topic.toString() === p.topic.toString() && c.moduleStep === 'pre-test'
+            );
+            const postTestContent = allContent.find(
+              (c) => c.topic.toString() === p.topic.toString() && c.moduleStep === 'post-test'
+            );
             if (!preTestContent || !postTestContent) return false;
-            
-            const preTestScore = p.quizScores.find(q => q.quizId.toString() === preTestContent._id.toString());
-            const postTestScore = p.quizScores.find(q => q.quizId.toString() === postTestContent._id.toString());
-            
+
+            const preTestScore = p.quizScores.find(
+              (q) => q.quizId.toString() === preTestContent._id.toString()
+            );
+            const postTestScore = p.quizScores.find(
+              (q) => q.quizId.toString() === postTestContent._id.toString()
+            );
             if (!preTestScore || !postTestScore) return false;
-            
-            const improvement = postTestScore.score - preTestScore.score;
-            return improvement >= (badge.requirements.improvementPercentage || 20);
+
+            return (
+              postTestScore.score - preTestScore.score >=
+              (badge.requirements.improvementPercentage || 20)
+            );
           });
           break;
         case 'Key Takeaways Master':
-          eligible = (stats.moduleStepCompletions['key-takeaways'] || 0) >= (badge.requirements.minTopics || 5);
+          eligible =
+            (stats.moduleStepCompletions['key-takeaways'] || 0) >=
+            (badge.requirements.minTopics || 5);
           break;
-        case 'Application Expert':
+        case 'Application Expert': {
           const totalCorrectApplication = stats.applicationQuestionScores.reduce((sum, s) => {
-            const correctCount = Math.round((s.score / 100) * s.applicationCount);
-            return sum + correctCount;
+            return sum + Math.round((s.score / 100) * s.applicationCount);
           }, 0);
           eligible = totalCorrectApplication >= (badge.requirements.correctAnswers || 50);
           break;
-        case 'Experiential Learner':
-          const hasScenario = stats.moduleStepCompletions['real-life-scenario'] > 0 || 
-                            stats.moduleStepCompletions['case-example'] > 0;
-          const hasReinforcement = stats.moduleStepCompletions['reinforcement-activity'] > 0;
+        }
+        case 'Experiential Learner': {
+          const hasScenario =
+            (stats.moduleStepCompletions['real-life-scenario'] || 0) > 0 ||
+            (stats.moduleStepCompletions['case-example'] || 0) > 0;
+          const hasReinforcement =
+            (stats.moduleStepCompletions['reinforcement-activity'] || 0) > 0;
           eligible = hasScenario && hasReinforcement;
           break;
-        // Add more badge checks here
+        }
         default:
-          // For unknown badges, check the requirements field if it's structured
           if (badge.requirements) {
-            if (badge.requirements.minQuizzes && stats.totalQuizzes >= badge.requirements.minQuizzes) {
+            if (
+              badge.requirements.minQuizzes &&
+              stats.totalQuizzes >= badge.requirements.minQuizzes
+            ) {
               eligible = true;
-            } else if (badge.requirements.minScenarios && stats.totalScenarios >= badge.requirements.minScenarios) {
+            } else if (
+              badge.requirements.minScenarios &&
+              stats.totalScenarios >= badge.requirements.minScenarios
+            ) {
               eligible = true;
-            } else if (badge.requirements.minCompletedTopics && stats.completedTopics >= badge.requirements.minCompletedTopics) {
+            } else if (
+              badge.requirements.minCompletedTopics &&
+              stats.completedTopics >= badge.requirements.minCompletedTopics
+            ) {
+              eligible = true;
+            } else if (
+              badge.requirements.topicsCompleted &&
+              stats.completedTopics >= badge.requirements.topicsCompleted
+            ) {
               eligible = true;
             }
           }
           break;
       }
-      
-      // Award badge if eligible
+
       if (eligible) {
         newBadges.push(badge._id);
       }
     }
-    
-    // Update user with new badges
+
     if (newBadges.length > 0) {
       user.badges = [...user.badges, ...newBadges];
       await user.save();
       return newBadges.length;
     }
-    
+
     return 0;
   } catch (error) {
     console.error('Error checking achievements:', error);

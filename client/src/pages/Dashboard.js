@@ -114,6 +114,7 @@ const Dashboard = () => {
     try {
       setLoading(true);
       setError(null);
+      await authAxios.post('/users/process-achievements').catch(() => {});
       const response = await authAxios.get(`/users/dashboard?country=${encodeURIComponent(country)}`);
       setDashboardData(response.data);
     } catch (err) {
