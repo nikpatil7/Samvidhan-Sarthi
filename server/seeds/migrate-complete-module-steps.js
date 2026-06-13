@@ -161,9 +161,9 @@ async function completeModuleSteps() {
     });
     console.log('✅ Connected to MongoDB');
     
-    // Get topics with partial migration status
-    const partialTopics = await Topic.find({ migrationStatus: 'partial' });
-    console.log(`📚 Found ${partialTopics.length} topics with partial migration status`);
+    // Process every topic that does not yet have a complete module journey
+    const partialTopics = await Topic.find({ migrationStatus: { $ne: 'complete' } });
+    console.log(`📚 Found ${partialTopics.length} topics needing module step completion`);
     
     let scenariosAdded = 0;
     let caseExamplesAdded = 0;

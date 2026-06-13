@@ -45,9 +45,9 @@ async function restructureContentWithTemplate() {
     });
     console.log('✅ Connected to MongoDB');
     
-    // Get priority topics
-    const priorityTopics = await Topic.find({ migrationStatus: { $ne: 'legacy' } });
-    console.log(`📚 Found ${priorityTopics.length} priority topics for content restructuring`);
+    // Apply templates to all topics still building their module journey
+    const priorityTopics = await Topic.find({ migrationStatus: { $ne: 'complete' } });
+    console.log(`📚 Found ${priorityTopics.length} topics for content restructuring`);
     
     let whyItMattersAdded = 0;
     let keyTakeawaysAdded = 0;
@@ -84,10 +84,12 @@ async function restructureContentWithTemplate() {
         topicUpdated = true;
       }
       
-      // Check if topic has all 7 module steps
+      // Check if topic has all 7 module steps (refresh after inserts)
       const requiredSteps = ['why-it-matters', 'real-life-scenario', 'constitutional-concept', 'case-example', 'interactive-assessment', 'reinforcement-activity', 'key-takeaways'];
-      const hasAllSteps = requiredSteps.every(step => existingSteps.has(step));
-      
+      const updatedContent = await Content.find({ topic: topic._id });
+      const updatedSteps = new Set(updatedContent.map(c => c.moduleStep).filter(Boolean));
+      const hasAllSteps = requiredSteps.every(step => updatedSteps.has(step));
+
       if (hasAllSteps) {
         topic.migrationStatus = 'complete';
         await topic.save();

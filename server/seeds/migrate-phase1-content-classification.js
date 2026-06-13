@@ -131,20 +131,16 @@ async function migrateContentClassification() {
     const topics = await Topic.find({});
     console.log(`📚 Found ${topics.length} topics`);
     
-    // Set migration status for priority topics
-    let priorityTopicCount = 0;
+    // Mark all topics for module-step migration (not just title-matched priority list)
+    let topicsMarkedPartial = 0;
     for (const topic of topics) {
-      const isPriority = PRIORITY_TOPICS.some(priority => 
-        topic.title.toLowerCase().includes(priority.toLowerCase())
-      );
-      
-      if (isPriority) {
-        topic.migrationStatus = 'partial'; // Mark as partial migration
+      if (topic.migrationStatus !== 'complete') {
+        topic.migrationStatus = 'partial';
         await topic.save();
-        priorityTopicCount++;
+        topicsMarkedPartial++;
       }
     }
-    console.log(`✅ Marked ${priorityTopicCount} priority topics with migrationStatus: 'partial'`);
+    console.log(`✅ Marked ${topicsMarkedPartial} topics with migrationStatus: 'partial'`);
     
     // Get all content
     const allContent = await Content.find({});

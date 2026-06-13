@@ -118,29 +118,39 @@ const TopicDetail = () => {
     return labels[type] || type;
   };
 
-  // Module step configuration for experiential learning
+  // Core 7-step learning journey (Constitution-first flow)
   const moduleSteps = [
     { key: 'why-it-matters', label: 'Why It Matters', icon: '💡', description: 'Understand the importance of this topic' },
-    { key: 'real-life-scenario', label: 'Real-Life Scenario', icon: '🌍', description: 'Explore a real-world situation' },
     { key: 'constitutional-concept', label: 'Constitutional Concept', icon: '📚', description: 'Learn the core constitutional principles' },
+    { key: 'real-life-scenario', label: 'Real-Life Scenario', icon: '🌍', description: 'Explore a real-world situation' },
     { key: 'case-example', label: 'Case Example', icon: '⚖️', description: 'Study a relevant case or example' },
-    { key: 'interactive-assessment', label: 'Interactive Assessment', icon: '📝', description: 'Test your understanding' },
+    { key: 'interactive-assessment', label: 'Quiz', icon: '📝', description: 'Test your understanding' },
     { key: 'reinforcement-activity', label: 'Reinforcement Activity', icon: '🎮', description: 'Practice with interactive activities' },
     { key: 'key-takeaways', label: 'Key Takeaways', icon: '✨', description: 'Review important points' }
   ];
 
-  // Check if topic uses module-based learning (has migrationStatus and content with moduleStep)
-  const usesModuleBasedLearning = topic?.migrationStatus && topic.migrationStatus !== 'legacy' && 
-    content.some(item => item.moduleStep);
+  const assessmentSteps = [
+    { key: 'pre-test', label: 'Pre-Test', icon: '📋', description: 'Check your starting knowledge' },
+    { key: 'post-test', label: 'Post-Test', icon: '📊', description: 'Measure your learning growth' }
+  ];
 
-  // Group content by module step
-  const contentByModuleStep = () => {
-    const grouped = {};
-    moduleSteps.forEach(step => {
-      grouped[step.key] = content.filter(item => item.moduleStep === step.key);
-    });
-    return grouped;
-  };
+  const journeyStepKeys = new Set([
+    ...moduleSteps.map((step) => step.key),
+    ...assessmentSteps.map((step) => step.key)
+  ]);
+
+  // Show module journey whenever content carries moduleStep (no migrationStatus gate)
+  const usesModuleBasedLearning = content.some((item) => item.moduleStep);
+
+  const displaySteps = [
+    ...assessmentSteps.filter((step) => step.key === 'pre-test'),
+    ...moduleSteps,
+    ...assessmentSteps.filter((step) => step.key === 'post-test')
+  ];
+
+  const supplementaryContent = content.filter(
+    (item) => !item.moduleStep || !journeyStepKeys.has(item.moduleStep)
+  );
 
   // Calculate module step completion
   const getModuleStepCompletion = (stepKey) => {
@@ -152,11 +162,46 @@ const TopicDetail = () => {
     return Math.round((completedCount / stepContent.length) * 100);
   };
 
-  // Get module step icon
-  const getModuleStepIcon = (stepKey) => {
-    const step = moduleSteps.find(s => s.key === stepKey);
-    return step ? step.icon : '📄';
-  };
+  const renderContentLink = (item, compact = false) => (
+    <Link
+      key={item._id}
+      to={`/content/${item._id}`}
+      className={`flex items-center rounded-lg bg-dark-100 hover:bg-dark-50 transition-colors ${
+        compact ? 'p-3' : 'p-4'
+      }`}
+    >
+      <div className={`flex-shrink-0 rounded-lg bg-primary-600/20 flex items-center justify-center mr-3 ${
+        compact ? 'h-8 w-8' : 'h-10 w-10'
+      }`}>
+        <span className={`text-primary-500 ${compact ? 'text-sm' : ''}`}>
+          {getContentTypeIcon(item.type)}
+        </span>
+      </div>
+
+      <div className="flex-1 min-w-0">
+        <h4 className={`font-medium text-white truncate ${compact ? 'text-sm' : 'text-lg'}`}>
+          {item.title}
+        </h4>
+        <p className={`text-gray-400 ${compact ? 'text-xs' : 'text-sm'}`}>
+          {getContentTypeLabel(item.type)} • {item.estimatedTime} min
+        </p>
+      </div>
+
+      <div className="ml-3 flex-shrink-0">
+        {isContentCompleted(item._id) ? (
+          <span className="text-green-400">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+          </span>
+        ) : (
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
+        )}
+      </div>
+    </Link>
+  );
 
   if (loading) {
     return (
@@ -254,7 +299,7 @@ const TopicDetail = () => {
         ) : usesModuleBasedLearning ? (
           // Module-based learning view
           <div className="space-y-6">
-            {moduleSteps.map((step, stepIndex) => {
+            {displaySteps.map((step, stepIndex) => {
               const stepContent = content.filter(item => item.moduleStep === step.key);
               if (stepContent.length === 0) return null;
               
@@ -290,44 +335,23 @@ const TopicDetail = () => {
                   
                   {/* Module step content */}
                   <div className="p-4 space-y-2">
-                    {stepContent.map((item) => (
-                      <Link
-                        key={item._id}
-                        to={`/content/${item._id}`}
-                        className="flex items-center p-3 rounded-lg bg-dark-100 hover:bg-dark-50 transition-colors"
-                      >
-                        <div className="flex-shrink-0 h-8 w-8 rounded-lg bg-primary-600/20 flex items-center justify-center mr-3">
-                          <span className="text-primary-500 text-sm">
-                            {getContentTypeIcon(item.type)}
-                          </span>
-                        </div>
-                        
-                        <div className="flex-1 min-w-0">
-                          <h4 className="text-sm font-medium text-white truncate">{item.title}</h4>
-                          <p className="text-xs text-gray-400">
-                            {getContentTypeLabel(item.type)} • {item.estimatedTime} min
-                          </p>
-                        </div>
-                        
-                        <div className="ml-3 flex-shrink-0">
-                          {isContentCompleted(item._id) ? (
-                            <span className="text-green-400">
-                              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                              </svg>
-                            </span>
-                          ) : (
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                            </svg>
-                          )}
-                        </div>
-                      </Link>
-                    ))}
+                    {stepContent.map((item) => renderContentLink(item, true))}
                   </div>
                 </motion.div>
               );
             })}
+
+            {supplementaryContent.length > 0 && (
+              <div className="border border-dark-200 rounded-lg overflow-hidden">
+                <div className="bg-dark-200 px-4 py-3">
+                  <h3 className="text-lg font-semibold text-white">Additional Practice</h3>
+                  <p className="text-sm text-gray-400">Extra games and activities for this topic</p>
+                </div>
+                <div className="p-4 space-y-2">
+                  {supplementaryContent.map((item) => renderContentLink(item, true))}
+                </div>
+              </div>
+            )}
           </div>
         ) : (
           // Linear content view (backward compatible)

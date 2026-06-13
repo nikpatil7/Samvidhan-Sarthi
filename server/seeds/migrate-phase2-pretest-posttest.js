@@ -92,9 +92,9 @@ async function integratePreTestPostTest() {
     });
     console.log('✅ Connected to MongoDB');
     
-    // Get priority topics (those with migrationStatus)
-    const priorityTopics = await Topic.find({ migrationStatus: { $ne: 'legacy' } });
-    console.log(`📚 Found ${priorityTopics.length} priority topics for pre-test/post-test integration`);
+    // Add pre/post tests for all active topics in the learning journey
+    const priorityTopics = await Topic.find({ isActive: true });
+    console.log(`📚 Found ${priorityTopics.length} topics for pre-test/post-test integration`);
     
     let preTestsCreated = 0;
     let postTestsCreated = 0;
